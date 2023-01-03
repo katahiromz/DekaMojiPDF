@@ -7,7 +7,7 @@
 cmake_minimum_required(VERSION 3.0)
 
 # project name and languages
-project(GNPDF CXX RC)
+project(DMPDF CXX RC)
 
 # set output directory (build/)
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
@@ -44,19 +44,13 @@ endif()
 # Unicode
 add_definitions(-DUNICODE -D_UNICODE)
 
-# zlib
-find_package(ZLIB)
-
-# libpng
-find_package(PNG)
-
 # libharu (hpdf)
 set(LIBHPDF_STATIC ON)
 add_subdirectory(libharu)
 include_directories(libharu/include)
 
-# GNPDF.exe
-add_executable(GNPDF WIN32 GNPDF.cpp GNPDF_res.rc gpimage.cpp Shareware.cpp SHA-256.cpp)
-target_link_libraries(GNPDF comctl32 shlwapi gdiplus hpdf ${PNG_LIBRARY} ${ZLIB_LIBRARY})
+# DMPDF.exe
+add_executable(DMPDF WIN32 DMPDF.cpp DMPDF_res.rc Shareware.cpp SHA-256.cpp)
+target_link_libraries(DMPDF comctl32 shlwapi gdiplus hpdf ${PNG_LIBRARY} ${ZLIB_LIBRARY})
 
 ##############################################################################

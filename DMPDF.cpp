@@ -51,6 +51,13 @@ struct FONT_ENTRY
     int m_index = -1;
 };
 
+// わかりやすい項目名を使用する。
+enum
+{
+    IDC_GENERATE = IDOK,
+    IDC_EXIT = IDCANCEL,
+};
+
 // デカ文字PDFのメインクラス。
 class DekaMoji
 {
@@ -59,7 +66,6 @@ public:
     INT m_argc;
     LPTSTR *m_argv;
     std::map<string_t, string_t> m_settings;
-    std::vector<string_t> m_list;
     std::vector<FONT_ENTRY> m_font_map;
 
     // コンストラクタ。
@@ -68,7 +74,6 @@ public:
     // デストラクタ。
     ~DekaMoji()
     {
-        ::DeleteObject(m_hbmPreview);
     }
 
     // フォントマップを読み込む。
@@ -78,9 +83,9 @@ public:
     // ダイアログを初期化する。
     void InitDialog(HWND hwnd);
     // ダイアログからデータへ。
-    BOOL DataFromDialog(HWND hwnd, BOOL bList);
+    BOOL DataFromDialog(HWND hwnd);
     // データからダイアログへ。
-    BOOL DialogFromData(HWND hwnd, BOOL bList);
+    BOOL DialogFromData(HWND hwnd);
     // レジストリからデータへ。
     BOOL DataFromReg(HWND hwnd);
     // データからレジストリへ。
@@ -337,21 +342,12 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     : m_hInstance(hInstance)
     , m_argc(argc)
     , m_argv(argv)
-    , m_hbmPreview(NULL)
 {
     // データをリセットする。
     Reset();
 
     // フォントマップを読み込む。
     LoadFontMap();
-
-    // コマンドライン引数をリストに追加。
-    for (INT i = 1; i < m_argc; ++i)
-    {
-        // 有効な画像ファイルかを確認して追加。
-        if (isValidImageFile(m_argv[i]))
-            m_list.push_back(m_argv[i]);
-    }
 }
 
 // データをリセットする。
@@ -386,6 +382,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
 // データからレジストリへ。
 BOOL DekaMoji::RegFromData(HWND hwnd)
 {
+    return TRUE;
 }
 
 // 文字列中に見つかった部分文字列をすべて置き換える。
@@ -532,7 +529,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         else if (SETTING(IDC_PAGE_DIRECTION) == doLoadString(IDS_LANDSCAPE))
             direction = HPDF_PAGE_LANDSCAPE;
         else
-            direction = HPDF_PAGE_LANDSCAPE;
+            direction = HPDF_PAGE_PORTRAIT;
 
         // ページサイズ。
         HPDF_PageSizes page_size;
@@ -550,279 +547,117 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             page_size = HPDF_PAGE_SIZE_A4;
 
         // ページ余白。
-        double margin = pixels_from_mm(_wtof(SETTING(IDC_MARGIN).c_str()));
-
-        // 1ページの行数。
-        int rows = _ttoi(SETTING(IDC_ROWS).c_str());
-        // 1ページの列数。
-        int columns = _ttoi(SETTING(IDC_COLUMNS).c_str());
-
-        // 枠線を描画するか？
-        bool draw_border = SETTING(IDC_DRAW_BORDER) == doLoadString(IDS_YES);
-        // ページ番号を付けるか？
-        bool page_numbers = SETTING(IDC_PAGE_NUMBERS) == doLoadString(IDS_YES);
-        // 小さい画像は拡大しないか？
-        bool dont_resize_small = SETTING(IDC_DONT_RESIZE_SMALL) == doLoadString(IDS_YES);
+        double margin = pixels_from_mm(10);
 
         // フォント名。
         string_t font_name;
-        if (m_font_map.size())
+        for (auto& entry : m_font_map)
         {
-            for (auto& entry : m_font_map)
-            {
-                if (entry.m_font_name != SETTING(IDC_FONT_NAME))
-                    continue;
+            if (entry.m_font_name != SETTING(IDC_FONT_NAME))
+                continue;
 
-                auto ansi = ansi_from_wide(CP_ACP, entry.m_pathname.c_str());
-                if (entry.m_index != -1)
-                {
-                    std::string font_name_a = HPDF_LoadTTFontFromFile2(pdf, ansi, entry.m_index, HPDF_TRUE);
-                    font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
-                }
-                else
-                {
-                    std::string font_name_a = HPDF_LoadTTFontFromFile(pdf, ansi, HPDF_TRUE);
-                    font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
-                }
+            auto ansi = ansi_from_wide(CP_ACP, entry.m_pathname.c_str());
+            if (entry.m_index != -1)
+            {
+                std::string font_name_a = HPDF_LoadTTFontFromFile2(pdf, ansi, entry.m_index, HPDF_TRUE);
+                font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
             }
-        }
-        else
-        {
-            if (SETTING(IDC_FONT_NAME) == doLoadString(IDS_FONT_01))
-                font_name = TEXT("MS-PGothic");
-            else if (SETTING(IDC_FONT_NAME) == doLoadString(IDS_FONT_02))
-                font_name = TEXT("MS-PMincho");
-            else if (SETTING(IDC_FONT_NAME) == doLoadString(IDS_FONT_03))
-                font_name = TEXT("MS-Gothic");
-            else if (SETTING(IDC_FONT_NAME) == doLoadString(IDS_FONT_04))
-                font_name = TEXT("MS-Mincho");
             else
-                font_name = TEXT("MS-PGothic");
+            {
+                std::string font_name_a = HPDF_LoadTTFontFromFile(pdf, ansi, HPDF_TRUE);
+                font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
+            }
         }
 
         // フォントサイズ（pt）。
-        double font_size = _wtof(SETTING(IDC_FONT_SIZE).c_str());
-
-        // 画像データサイズ。
-        int max_data_size = 0;
-        if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_64KB))
-            max_data_size = 1024 * 64;
-        else if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_128KB))
-            max_data_size = 1024 * 128;
-        else if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_256KB))
-            max_data_size = 1024 * 256;
-        else if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_512KB))
-            max_data_size = 1024 * 512;
-        else if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_1MB))
-            max_data_size = 1024 * 1024;
-        else if (SETTING(IDC_IMAGE_DATA_SIZE) == doLoadString(IDS_2MB))
-            max_data_size = 1024 * 1024 * 2;
-        else
-            max_data_size = 0;
-
-        // 画像ラベル。
-        string_t image_title = SETTING(IDC_IMAGE_TITLE);
-        if (image_title == doLoadString(IDS_NOSPEC))
-            image_title.clear();
-
-        // ヘッダー。
-        string_t header = SETTING(IDC_HEADER);
-        if (header == doLoadString(IDS_NOSPEC))
-            header.clear();
-        // フッター。
-        string_t footer = SETTING(IDC_FOOTER);
-        if (footer == doLoadString(IDS_NOSPEC))
-            footer.clear();
+        double font_size = HPDF_MAX_FONTSIZE;
 
         // 出力ファイル名。
-        string_t output_name = SETTING(IDC_OUTPUT_NAME);
-
-        // 線の幅。
-        double border_width = 2;
-        // フッターの高さ。
-        double footer_height = pixels_from_mm(6);
+        string_t output_name = TEXT("DekaMojiPDF");
 
         HPDF_Page page; // ページオブジェクト。
         HPDF_Font font; // フォントオブジェクト。
-        INT iColumn = 0, iRow = 0, iPage = 0; // セル位置とページ番号。
-        INT cItems = INT(m_list.size()); // 項目数。
-        INT cPages = (cItems + (columns * rows) - 1) / (columns * rows); // ページ総数。
         double page_width, page_height; // ページサイズ。
         double content_x, content_y, content_width, content_height; // ページ内容の位置とサイズ。
-        for (INT iItem = 0; iItem < cItems; ++iItem)
+        for (INT iPage = 0; iPage < 1; ++iPage)
         {
-            if (iColumn == 0 && iRow == 0) // 項目がページの最初ならば
-            {
-                // ページを追加する。
-                page = HPDF_AddPage(pdf);
+            // ページを追加する。
+            page = HPDF_AddPage(pdf);
 
-                // ページサイズと用紙の向きを指定。
-                HPDF_Page_SetSize(page, page_size, direction);
+            // ページサイズと用紙の向きを指定。
+            HPDF_Page_SetSize(page, page_size, direction);
 
-                // ページサイズ（ピクセル単位）。
-                page_width = HPDF_Page_GetWidth(page);
-                page_height = HPDF_Page_GetHeight(page);
+            // ページサイズ（ピクセル単位）。
+            page_width = HPDF_Page_GetWidth(page);
+            page_height = HPDF_Page_GetHeight(page);
 
-                // ページ内容の位置とサイズ。
-                content_x = margin;
-                content_y = margin;
-                content_width = page_width - margin * 2;
-                content_height = page_height - margin * 2;
+            // ページ内容の位置とサイズ。
+            content_x = margin;
+            content_y = margin;
+            content_width = page_width - margin * 2;
+            content_height = page_height - margin * 2;
 
-                // 線の幅を指定。
-                HPDF_Page_SetLineWidth(page, border_width);
+            // 線の幅を指定。
+            HPDF_Page_SetLineWidth(page, 2);
 
-                // 線の色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。
-                HPDF_Page_SetRGBStroke(page, 0, 0, 0);
+            // 線の色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。
+            HPDF_Page_SetRGBStroke(page, 0, 0, 0);
 
-                /* 塗りつぶしの色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。*/
-                HPDF_Page_SetRGBFill(page, 0, 0, 0);
+            /* 塗りつぶしの色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。*/
+            HPDF_Page_SetRGBFill(page, 0, 0, 0);
 
-                // フォントを指定する。
-                auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
+            // フォントを指定する。
+            auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
 #ifdef UTF8_SUPPORT
-                font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
+            font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 #else
-                font = HPDF_GetFont(pdf, font_name_a, "90ms-RKSJ-H");
+            font = HPDF_GetFont(pdf, font_name_a, "90ms-RKSJ-H");
 #endif
 
 #ifndef NO_SHAREWARE
-                // シェアウェア未登録ならば、ロゴ文字列を描画する。
-                if (!g_shareware.IsRegistered())
-                {
-#ifdef UTF8_SUPPORT
-                    auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
-#else
-                    auto logo_a = ansi_from_wide(CP932, doLoadString(IDS_LOGO));
-#endif
-                    double logo_x = content_x, logo_y = content_y;
-
-                    // フォントとフォントサイズを指定。
-                    HPDF_Page_SetFontAndSize(page, font, footer_height);
-
-                    // テキストを描画する。
-                    HPDF_Page_BeginText(page);
-                    {
-                        HPDF_Page_TextOut(page, logo_x, logo_y, logo_a);
-                    }
-                    HPDF_Page_EndText(page);
-                }
-#endif
-                // ヘッダー（ページ見出し）を描画する。
-                if (header.size())
-                {
-                    string_t text = header;
-                    substitute_tags(text, m_list[iItem], iItem, cItems, iPage, cPages);
-#ifdef UTF8_SUPPORT
-                    auto header_text_a = ansi_from_wide(CP_UTF8, text.c_str());
-#else
-                    auto header_text_a = ansi_from_wide(CP932, text.c_str());
-#endif
-                    hpdf_draw_text(page, font, footer_height, header_text_a,
-                                   content_x, content_y + content_height - footer_height,
-                                   content_width, footer_height);
-                    // ヘッダーの分だけページ内容のサイズを縮小する。
-                    content_height -= footer_height;
-                }
-
-                // フッター（ページ番号）を描画する。
-                if (page_numbers || footer.size())
-                {
-                    string_t text = footer;
-                    substitute_tags(text, m_list[iItem], iItem, cItems, iPage, cPages);
-#ifdef UTF8_SUPPORT
-                    auto footer_text_a = ansi_from_wide(CP_UTF8, text.c_str());
-#else
-                    auto footer_text_a = ansi_from_wide(CP932, text.c_str());
-#endif
-                    hpdf_draw_text(page, font, footer_height, footer_text_a,
-                                   content_x, content_y,
-                                   content_width, footer_height);
-                    // フッターの分だけページ内容のサイズを縮小する。
-                    content_y += footer_height;
-                    content_height -= footer_height;
-                }
-
-                // 枠線を描く。
-                if (draw_border)
-                {
-                    hpdf_draw_box(page, content_x, content_y, content_width, content_height);
-                }
-            }
-
-            // セルの位置とサイズ。
-            double cell_width = content_width / columns;
-            double cell_height = content_height / rows;
-            double cell_x = content_x + cell_width * iColumn;
-            double cell_y = content_y + cell_height * (rows - iRow - 1);
-
-            // セルの枠線を描く。
-            if (draw_border)
+            // シェアウェア未登録ならば、ロゴ文字列を描画する。
+            if (!g_shareware.IsRegistered())
             {
-                hpdf_draw_box(page, cell_x, cell_y, cell_width, cell_height);
-
-                // 枠線の分だけセルを縮小。
-                cell_x += border_width;
-                cell_y += border_width;
-                cell_width -= border_width * 2;
-                cell_height -= border_width * 2;
-            }
-
-            // テキストを描画する。
-            if (image_title.size())
-            {
-                // タグを規則に従って置き換える。
-                string_t text = image_title;
-                substitute_tags(text, m_list[iItem], iItem, cItems, iPage, cPages);
-
-                // ANSI文字列に変換してテキストを描画する。
 #ifdef UTF8_SUPPORT
-                auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
+                auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
 #else
-                auto text_a = ansi_from_wide(CP932, text.c_str());
+                auto logo_a = ansi_from_wide(CP932, doLoadString(IDS_LOGO));
 #endif
-                hpdf_draw_text(page, font, font_size, text_a, cell_x, cell_y, cell_width, font_size);
+                double logo_x = content_x, logo_y = content_y;
 
-                // セルのサイズを縮小する。
-                cell_y += font_size;
-                cell_height -= font_size;
-            }
+                // フォントとフォントサイズを指定。
+                HPDF_Page_SetFontAndSize(page, font, font_size);
 
-            // 画像を描く。
-            hpdf_draw_image(pdf, page, cell_x, cell_y, cell_width, cell_height, m_list[iItem],
-                            max_data_size, dont_resize_small);
-
-            // 次のセルに進む。必要ならばページ番号を進める。
-            ++iColumn;
-            if (iColumn == columns)
-            {
-                iColumn = 0;
-                ++iRow;
-                if (iRow == rows)
+                // テキストを描画する。
+                HPDF_Page_BeginText(page);
                 {
-                    iRow = 0;
-                    ++iPage;
+                    HPDF_Page_TextOut(page, logo_x, logo_y, logo_a);
                 }
+                HPDF_Page_EndText(page);
             }
+#endif
+
+            // ANSI文字列に変換してテキストを描画する。
+            string_t text = TEXT("This is a test.");
+#ifdef UTF8_SUPPORT
+            auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
+#else
+            auto text_a = ansi_from_wide(CP932, text.c_str());
+#endif
+            hpdf_draw_text(page, font, font_size, text_a, content_x, content_y, content_width, font_size);
         }
 
+        // PDF出力。
         {
-            // 出力ファイル名のタグを置き換える。
-            string_t text = output_name;
-            substitute_tags(text, m_list[0], 0, cItems, 0, cPages, true);
-
-            // ファイル名に使えない文字を置き換える。
-            validate_filename(text);
-
             // PDFを一時ファイルに保存する。
-            TempFile temp_file(TEXT("GN2"), TEXT(".pdf"));
+            TempFile temp_file(TEXT("DM2"), TEXT(".pdf"));
             std::string temp_file_a = ansi_from_wide(CP_ACP, temp_file.make());
             HPDF_SaveToFile(pdf, temp_file_a.c_str());
 
             // デスクトップにファイルをコピー。
             TCHAR szPath[MAX_PATH];
             SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
-            PathAppend(szPath, text.c_str());
+            PathAppend(szPath, output_name.c_str());
             StringCchCat(szPath, _countof(szPath), TEXT(".pdf"));
             if (!CopyFile(temp_file.get(), szPath, FALSE))
             {
@@ -831,7 +666,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             }
 
             // 成功メッセージを表示。
-            StringCchCopy(szPath, _countof(szPath), text.c_str());
+            StringCchCopy(szPath, _countof(szPath), output_name.c_str());
             StringCchCat(szPath, _countof(szPath), TEXT(".pdf"));
             TCHAR szText[MAX_PATH];
             StringCchPrintf(szText, _countof(szText), doLoadString(IDS_SUCCEEDED), szPath);
@@ -879,7 +714,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     pDM->DataFromReg(hwnd);
 
     // ダイアログにデータを設定。
-    pDM->DialogFromData(hwnd, FALSE);
+    pDM->DialogFromData(hwnd);
 
     return TRUE;
 }
@@ -895,7 +730,7 @@ BOOL OnOK(HWND hwnd)
     SetWindowText(hButton, doLoadString(IDS_PROCESSINGNOW));
 
     // ダイアログからデータを取得。
-    if (!pDM->DataFromDialog(hwnd, TRUE)) // 失敗。
+    if (!pDM->DataFromDialog(hwnd)) // 失敗。
     {
         // ボタンテキストを元に戻す。
         SetWindowText(hButton, doLoadString(IDS_GENERATE));
@@ -931,7 +766,7 @@ void OnEraseSettings(HWND hwnd)
     pDM->Reset();
 
     // データからダイアログへ。
-    pDM->DialogFromData(hwnd, FALSE);
+    pDM->DialogFromData(hwnd);
 
     // データからレジストリへ。
     pDM->RegFromData(hwnd);
