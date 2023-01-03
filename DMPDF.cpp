@@ -1,24 +1,24 @@
-// ƒfƒJ•¶šPDF by katahiromz
-// Copyright (C) 2022-2023 •ĞR”•¶MZ. All Rights Reserved.
+// ãƒ‡ã‚«æ–‡å­—PDF by katahiromz
+// Copyright (C) 2022-2023 ç‰‡å±±åšæ–‡MZ. All Rights Reserved.
 // See README.txt and LICENSE.txt.
-#include <windows.h>        // Windows‚Ì•W€ƒwƒbƒ_B
-#include <windowsx.h>       // Windows‚Ìƒ}ƒNƒƒwƒbƒ_B
-#include <commctrl.h>       // ‹¤’ÊƒRƒ“ƒgƒ[ƒ‹‚Ìƒwƒbƒ_B
-#include <commdlg.h>        // ‹¤’Êƒ_ƒCƒAƒƒO‚Ìƒwƒbƒ_B
-#include <shlobj.h>         // ƒVƒFƒ‹API‚Ìƒwƒbƒ_B
-#include <shlwapi.h>        // ƒVƒFƒ‹Œy—ÊAPI‚Ìƒwƒbƒ_B
-#include <tchar.h>          // ƒWƒFƒlƒŠƒbƒNƒeƒLƒXƒgƒ}ƒbƒsƒ“ƒO—p‚Ìƒwƒbƒ_B
-#include <strsafe.h>        // ˆÀ‘S‚È•¶š—ñ‘€ì—p‚Ìƒwƒbƒ_ (StringC*)
-#include <string>           // std::string ‚¨‚æ‚Ñ std::wstring ƒNƒ‰ƒXB
-#include <vector>           // std::vector ƒNƒ‰ƒXB
-#include <map>              // std::map ƒNƒ‰ƒXB
-#include <stdexcept>        // std::runtime_error ƒNƒ‰ƒXB
-#include <cassert>          // assertƒ}ƒNƒB
-#include <hpdf.h>           // PDFo—Í—p‚Ìƒ‰ƒCƒuƒ‰ƒŠlibharu‚Ìƒwƒbƒ_B
-#include "TempFile.hpp"     // ˆêƒtƒ@ƒCƒ‹‘€ì—p‚Ìƒwƒbƒ_B
-#include "resource.h"       // ƒŠƒ\[ƒXID‚Ì’è‹`ƒwƒbƒ_B
+#include <windows.h>        // Windowsã®æ¨™æº–ãƒ˜ãƒƒãƒ€ã€‚
+#include <windowsx.h>       // Windowsã®ãƒã‚¯ãƒ­ãƒ˜ãƒƒãƒ€ã€‚
+#include <commctrl.h>       // å…±é€šã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ã®ãƒ˜ãƒƒãƒ€ã€‚
+#include <commdlg.h>        // å…±é€šãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®ãƒ˜ãƒƒãƒ€ã€‚
+#include <shlobj.h>         // ã‚·ã‚§ãƒ«APIã®ãƒ˜ãƒƒãƒ€ã€‚
+#include <shlwapi.h>        // ã‚·ã‚§ãƒ«è»½é‡APIã®ãƒ˜ãƒƒãƒ€ã€‚
+#include <tchar.h>          // ã‚¸ã‚§ãƒãƒªãƒƒã‚¯ãƒ†ã‚­ã‚¹ãƒˆãƒãƒƒãƒ”ãƒ³ã‚°ç”¨ã®ãƒ˜ãƒƒãƒ€ã€‚
+#include <strsafe.h>        // å®‰å…¨ãªæ–‡å­—åˆ—æ“ä½œç”¨ã®ãƒ˜ãƒƒãƒ€ (StringC*)
+#include <string>           // std::string ãŠã‚ˆã³ std::wstring ã‚¯ãƒ©ã‚¹ã€‚
+#include <vector>           // std::vector ã‚¯ãƒ©ã‚¹ã€‚
+#include <map>              // std::map ã‚¯ãƒ©ã‚¹ã€‚
+#include <stdexcept>        // std::runtime_error ã‚¯ãƒ©ã‚¹ã€‚
+#include <cassert>          // assertãƒã‚¯ãƒ­ã€‚
+#include <hpdf.h>           // PDFå‡ºåŠ›ç”¨ã®ãƒ©ã‚¤ãƒ–ãƒ©ãƒªlibharuã®ãƒ˜ãƒƒãƒ€ã€‚
+#include "TempFile.hpp"     // ä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«æ“ä½œç”¨ã®ãƒ˜ãƒƒãƒ€ã€‚
+#include "resource.h"       // ãƒªã‚½ãƒ¼ã‚¹IDã®å®šç¾©ãƒ˜ãƒƒãƒ€ã€‚
 
-// ƒVƒFƒAƒEƒFƒAî•ñB
+// ã‚·ã‚§ã‚¢ã‚¦ã‚§ã‚¢æƒ…å ±ã€‚
 #ifndef NO_SHAREWARE
     #include "Shareware.hpp"
 
@@ -32,16 +32,16 @@
         /* version string */            "0.0.0");
 #endif
 
-#define UTF8_SUPPORT // UTF-8ƒTƒ|[ƒgB
+#define UTF8_SUPPORT // UTF-8ã‚µãƒãƒ¼ãƒˆã€‚
 
-// •¶š—ñƒNƒ‰ƒXB
+// æ–‡å­—åˆ—ã‚¯ãƒ©ã‚¹ã€‚
 #ifdef UNICODE
     typedef std::wstring string_t;
 #else
     typedef std::string string_t;
 #endif
 
-// ƒVƒtƒgJIS ƒR[ƒhƒy[ƒWiShift_JISjB
+// ã‚·ãƒ•ãƒˆJIS ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸ï¼ˆShift_JISï¼‰ã€‚
 #define CP932  932
 
 struct FONT_ENTRY
@@ -51,7 +51,7 @@ struct FONT_ENTRY
     int m_index = -1;
 };
 
-// ‚í‚©‚è‚â‚·‚¢€–Ú–¼‚ğg—p‚·‚éB
+// ã‚ã‹ã‚Šã‚„ã™ã„é …ç›®åã‚’ä½¿ç”¨ã™ã‚‹ã€‚
 enum
 {
     IDC_GENERATE = IDOK,
@@ -62,7 +62,7 @@ enum
     IDC_TEXT = edt1,
 };
 
-// ƒfƒJ•¶šPDF‚ÌƒƒCƒ“ƒNƒ‰ƒXB
+// ãƒ‡ã‚«æ–‡å­—PDFã®ãƒ¡ã‚¤ãƒ³ã‚¯ãƒ©ã‚¹ã€‚
 class DekaMoji
 {
 public:
@@ -72,40 +72,40 @@ public:
     std::map<string_t, string_t> m_settings;
     std::vector<FONT_ENTRY> m_font_map;
 
-    // ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+    // ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
     DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv);
 
-    // ƒfƒXƒgƒ‰ƒNƒ^B
+    // ãƒ‡ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
     ~DekaMoji()
     {
     }
 
-    // ƒtƒHƒ“ƒgƒ}ƒbƒv‚ğ“Ç‚İ‚ŞB
+    // ãƒ•ã‚©ãƒ³ãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
     BOOL LoadFontMap();
-    // ƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚éB
+    // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     void Reset();
-    // ƒ_ƒCƒAƒƒO‚ğ‰Šú‰»‚·‚éB
+    // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
     void InitDialog(HWND hwnd);
-    // ƒ_ƒCƒAƒƒO‚©‚çƒf[ƒ^‚ÖB
+    // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
     BOOL DataFromDialog(HWND hwnd);
-    // ƒf[ƒ^‚©‚çƒ_ƒCƒAƒƒO‚ÖB
+    // ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¸ã€‚
     BOOL DialogFromData(HWND hwnd);
-    // ƒŒƒWƒXƒgƒŠ‚©‚çƒf[ƒ^‚ÖB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
     BOOL DataFromReg(HWND hwnd);
-    // ƒf[ƒ^‚©‚çƒŒƒWƒXƒgƒŠ‚ÖB
+    // ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã¸ã€‚
     BOOL RegFromData(HWND hwnd);
 
-    // ƒƒCƒ“ƒfƒBƒbƒVƒ…ˆ—B
+    // ãƒ¡ã‚¤ãƒ³ãƒ‡ã‚£ãƒƒã‚·ãƒ¥å‡¦ç†ã€‚
     string_t JustDoIt(HWND hwnd);
 };
 
-// ƒOƒ[ƒoƒ‹•Ï”B
-HINSTANCE g_hInstance = NULL; // ƒCƒ“ƒXƒ^ƒ“ƒXB
-TCHAR g_szAppName[256] = TEXT(""); // ƒAƒvƒŠ–¼B
-HICON g_hIcon = NULL; // ƒAƒCƒRƒ“i‘åjB
-HICON g_hIconSm = NULL; // ƒAƒCƒRƒ“i¬jB
+// ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°ã€‚
+HINSTANCE g_hInstance = NULL; // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã€‚
+TCHAR g_szAppName[256] = TEXT(""); // ã‚¢ãƒ—ãƒªåã€‚
+HICON g_hIcon = NULL; // ã‚¢ã‚¤ã‚³ãƒ³ï¼ˆå¤§ï¼‰ã€‚
+HICON g_hIconSm = NULL; // ã‚¢ã‚¤ã‚³ãƒ³ï¼ˆå°ï¼‰ã€‚
 
-// ƒŠƒ\[ƒX•¶š—ñ‚ğ“Ç‚İ‚ŞB
+// ãƒªã‚½ãƒ¼ã‚¹æ–‡å­—åˆ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
 LPTSTR doLoadString(INT nID)
 {
     static TCHAR s_szText[1024];
@@ -114,44 +114,44 @@ LPTSTR doLoadString(INT nID)
     return s_szText;
 }
 
-// •¶š—ñ‚Ì‘OŒã‚Ì‹ó”’‚ğíœ‚·‚éB
+// æ–‡å­—åˆ—ã®å‰å¾Œã®ç©ºç™½ã‚’å‰Šé™¤ã™ã‚‹ã€‚
 void str_trim(LPWSTR text)
 {
     StrTrimW(text, L" \t\r\n\x3000");
 }
 
-// ƒ[ƒJƒ‹‚Ìƒtƒ@ƒCƒ‹‚ÌƒpƒX–¼‚ğæ“¾‚·‚éB
+// ãƒ­ãƒ¼ã‚«ãƒ«ã®ãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹åã‚’å–å¾—ã™ã‚‹ã€‚
 LPCTSTR findLocalFile(LPCTSTR filename)
 {
-    // Œ»İ‚ÌƒvƒƒOƒ‰ƒ€‚ÌƒpƒXƒtƒ@ƒCƒ‹–¼‚ğæ“¾‚·‚éB
+    // ç¾åœ¨ã®ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã®ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«åã‚’å–å¾—ã™ã‚‹ã€‚
     static TCHAR szPath[MAX_PATH];
     GetModuleFileName(NULL, szPath, _countof(szPath));
 
-    // ƒtƒ@ƒCƒ‹ƒ^ƒCƒgƒ‹‚ğfilename‚Å’u‚«Š·‚¦‚éB
+    // ãƒ•ã‚¡ã‚¤ãƒ«ã‚¿ã‚¤ãƒˆãƒ«ã‚’filenameã§ç½®ãæ›ãˆã‚‹ã€‚
     PathRemoveFileSpec(szPath);
     PathAppend(szPath, filename);
     if (PathFileExists(szPath))
         return szPath;
 
-    // ˆê‚Âã‚ÌƒtƒHƒ‹ƒ_‚ÖB
-    PathRemoveFileSpec(szPath);
-    PathRemoveFileSpec(szPath);
-    PathAppend(szPath, filename);
-    if (PathFileExists(szPath))
-        return szPath;
-
-    // ‚³‚ç‚Éˆê‚Âã‚ÌƒtƒHƒ‹ƒ_‚ÖB
-    PathRemoveFileSpec(szPath);
+    // ä¸€ã¤ä¸Šã®ãƒ•ã‚©ãƒ«ãƒ€ã¸ã€‚
     PathRemoveFileSpec(szPath);
     PathRemoveFileSpec(szPath);
     PathAppend(szPath, filename);
     if (PathFileExists(szPath))
         return szPath;
 
-    return NULL; // Œ©‚Â‚©‚ç‚È‚©‚Á‚½B
+    // ã•ã‚‰ã«ä¸€ã¤ä¸Šã®ãƒ•ã‚©ãƒ«ãƒ€ã¸ã€‚
+    PathRemoveFileSpec(szPath);
+    PathRemoveFileSpec(szPath);
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, filename);
+    if (PathFileExists(szPath))
+        return szPath;
+
+    return NULL; // è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã€‚
 }
 
-// •s³‚È•¶š—ñ‚ª“ü—Í‚³‚ê‚½B
+// ä¸æ­£ãªæ–‡å­—åˆ—ãŒå…¥åŠ›ã•ã‚ŒãŸã€‚
 void OnInvalidString(HWND hwnd, INT nItemID, INT nFieldId, INT nReasonId)
 {
     SetFocus(GetDlgItem(hwnd, nItemID));
@@ -162,21 +162,21 @@ void OnInvalidString(HWND hwnd, INT nItemID, INT nFieldId, INT nReasonId)
     MessageBox(hwnd, szText, g_szAppName, MB_ICONERROR);
 }
 
-// ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚ÌƒeƒLƒXƒg‚ğæ“¾‚·‚éB
+// ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
 BOOL getComboText(HWND hwnd, INT id, LPTSTR text, INT cchMax)
 {
     text[0] = 0;
 
     HWND hCombo = GetDlgItem(hwnd, id);
     INT iSel = ComboBox_GetCurSel(hCombo);
-    if (iSel == CB_ERR) // ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚É‘I‘ğ€–Ú‚ª‚È‚¯‚ê‚Î
+    if (iSel == CB_ERR) // ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã«é¸æŠé …ç›®ãŒãªã‘ã‚Œã°
     {
-        // ‚»‚Ì‚Ü‚ÜƒeƒLƒXƒg‚ğæ“¾‚·‚éB
+        // ãã®ã¾ã¾ãƒ†ã‚­ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚
         ComboBox_GetText(hCombo, text, cchMax);
     }
     else
     {
-        // ƒŠƒXƒg‚©‚çƒeƒLƒXƒg‚ğæ“¾‚·‚éB’·‚³‚Ìƒ`ƒFƒbƒN‚ ‚èB
+        // ãƒªã‚¹ãƒˆã‹ã‚‰ãƒ†ã‚­ã‚¹ãƒˆã‚’å–å¾—ã™ã‚‹ã€‚é•·ã•ã®ãƒã‚§ãƒƒã‚¯ã‚ã‚Šã€‚
         if (ComboBox_GetLBTextLen(hCombo, iSel) >= cchMax)
         {
             StringCchCopy(text, cchMax, doLoadString(IDS_TEXTTOOLONG));
@@ -191,25 +191,25 @@ BOOL getComboText(HWND hwnd, INT id, LPTSTR text, INT cchMax)
     return TRUE;
 }
 
-// ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚ÌƒeƒLƒXƒg‚ğİ’è‚·‚éB
+// ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã®ãƒ†ã‚­ã‚¹ãƒˆã‚’è¨­å®šã™ã‚‹ã€‚
 BOOL setComboText(HWND hwnd, INT id, LPCTSTR text)
 {
-    // ƒeƒLƒXƒg‚Éˆê’v‚·‚é€–Ú‚ğæ“¾‚·‚éB
+    // ãƒ†ã‚­ã‚¹ãƒˆã«ä¸€è‡´ã™ã‚‹é …ç›®ã‚’å–å¾—ã™ã‚‹ã€‚
     HWND hCombo = GetDlgItem(hwnd, id);
     INT iItem = ComboBox_FindStringExact(hCombo, -1, text);
-    if (iItem == CB_ERR) // ˆê’v‚·‚é€–Ú‚ª‚È‚¯‚ê‚Î
-        ComboBox_SetText(hCombo, text); // ‚»‚Ì‚Ü‚ÜƒeƒLƒXƒg‚ğİ’èB
+    if (iItem == CB_ERR) // ä¸€è‡´ã™ã‚‹é …ç›®ãŒãªã‘ã‚Œã°
+        ComboBox_SetText(hCombo, text); // ãã®ã¾ã¾ãƒ†ã‚­ã‚¹ãƒˆã‚’è¨­å®šã€‚
     else
-        ComboBox_SetCurSel(hCombo, iItem); // ˆê’v‚·‚é€–Ú‚ğ‘I‘ğB
+        ComboBox_SetCurSel(hCombo, iItem); // ä¸€è‡´ã™ã‚‹é …ç›®ã‚’é¸æŠã€‚
     return TRUE;
 }
 
-// ƒƒCƒh•¶š—ñ‚ğANSI•¶š—ñ‚É•ÏŠ·‚·‚éB
+// ãƒ¯ã‚¤ãƒ‰æ–‡å­—åˆ—ã‚’ANSIæ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ã€‚
 LPSTR ansi_from_wide(UINT codepage, LPCWSTR wide)
 {
     static CHAR s_ansi[1024];
 
-    // ƒR[ƒhƒy[ƒW‚Å•\¦‚Å‚«‚È‚¢•¶š‚ÍƒQƒ^•¶ši¬j‚É‚·‚éB
+    // ã‚³ãƒ¼ãƒ‰ãƒšãƒ¼ã‚¸ã§è¡¨ç¤ºã§ããªã„æ–‡å­—ã¯ã‚²ã‚¿æ–‡å­—ï¼ˆã€“ï¼‰ã«ã™ã‚‹ã€‚
     static const char utf8_geta[] = "\xE3\x80\x93";
     static const char cp932_geta[] = "\x81\xAC";
     const char *geta = NULL;
@@ -226,7 +226,7 @@ LPSTR ansi_from_wide(UINT codepage, LPCWSTR wide)
     return s_ansi;
 }
 
-// ANSI•¶š—ñ‚ğƒƒCƒh•¶š—ñ‚É•ÏŠ·‚·‚éB
+// ANSIæ–‡å­—åˆ—ã‚’ãƒ¯ã‚¤ãƒ‰æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ã€‚
 LPWSTR wide_from_ansi(UINT codepage, LPCSTR ansi)
 {
     static WCHAR s_wide[1024];
@@ -234,19 +234,19 @@ LPWSTR wide_from_ansi(UINT codepage, LPCSTR ansi)
     return s_wide;
 }
 
-// mm’PˆÊ‚©‚çƒsƒNƒZƒ‹’PˆÊ‚Ö‚Ì•ÏŠ·B
+// mmå˜ä½ã‹ã‚‰ãƒ”ã‚¯ã‚»ãƒ«å˜ä½ã¸ã®å¤‰æ›ã€‚
 double pixels_from_mm(double mm, double dpi = 72)
 {
     return dpi * mm / 25.4;
 }
 
-// ƒsƒNƒZƒ‹’PˆÊ‚©‚çmm’PˆÊ‚Ö‚Ì•ÏŠ·B
+// ãƒ”ã‚¯ã‚»ãƒ«å˜ä½ã‹ã‚‰mmå˜ä½ã¸ã®å¤‰æ›ã€‚
 double mm_from_pixels(double pixels, double dpi = 72)
 {
     return 25.4 * pixels / dpi;
 }
 
-// ƒtƒ@ƒCƒ‹–¼‚Ég‚¦‚È‚¢•¶š‚ğ‰ºü•¶š‚É’u‚«Š·‚¦‚éB
+// ãƒ•ã‚¡ã‚¤ãƒ«åã«ä½¿ãˆãªã„æ–‡å­—ã‚’ä¸‹ç·šæ–‡å­—ã«ç½®ãæ›ãˆã‚‹ã€‚
 void validate_filename(string_t& filename)
 {
     for (auto& ch : filename)
@@ -256,53 +256,53 @@ void validate_filename(string_t& filename)
     }
 }
 
-// ƒtƒHƒ“ƒgƒ}ƒbƒv‚ğ“Ç‚İ‚ŞB
+// ãƒ•ã‚©ãƒ³ãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
 BOOL DekaMoji::LoadFontMap()
 {
-    // ‰Šú‰»‚·‚éB
+    // åˆæœŸåŒ–ã™ã‚‹ã€‚
     m_font_map.clear();
 
-    // ƒ[ƒJƒ‹ƒtƒ@ƒCƒ‹‚Ìufontmap.datv‚ğ’T‚·B
+    // ãƒ­ãƒ¼ã‚«ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã®ã€Œfontmap.datã€ã‚’æ¢ã™ã€‚
     auto filename = findLocalFile(TEXT("fontmap.dat"));
     if (filename == NULL)
-        return FALSE; // Œ©‚Â‚©‚ç‚È‚©‚Á‚½B
+        return FALSE; // è¦‹ã¤ã‹ã‚‰ãªã‹ã£ãŸã€‚
 
-    // ƒtƒ@ƒCƒ‹ufontmap.datv‚ğŠJ‚­B
+    // ãƒ•ã‚¡ã‚¤ãƒ«ã€Œfontmap.datã€ã‚’é–‹ãã€‚
     if (FILE *fp = _tfopen(filename, TEXT("rb")))
     {
-        // ˆês‚¸‚Â“Ç‚İ‚ŞB
+        // ä¸€è¡Œãšã¤èª­ã¿è¾¼ã‚€ã€‚
         char buf[512];
         while (fgets(buf, _countof(buf), fp))
         {
-            // UTF-8•¶š—ñ‚ğƒƒCƒh•¶š—ñ‚É•ÏŠ·‚·‚éB
+            // UTF-8æ–‡å­—åˆ—ã‚’ãƒ¯ã‚¤ãƒ‰æ–‡å­—åˆ—ã«å¤‰æ›ã™ã‚‹ã€‚
             WCHAR szText[512];
             MultiByteToWideChar(CP_UTF8, 0, buf, -1, szText, _countof(szText));
 
-            // ‘OŒã‚Ì‹ó”’‚ğæ‚èœ‚­B
+            // å‰å¾Œã®ç©ºç™½ã‚’å–ã‚Šé™¤ãã€‚
             str_trim(szText);
 
-            // sƒRƒƒ“ƒg‚ğíœ‚·‚éB
+            // è¡Œã‚³ãƒ¡ãƒ³ãƒˆã‚’å‰Šé™¤ã™ã‚‹ã€‚
             if (auto pch = wcschr(szText, L';'))
             {
                 *pch = 0;
             }
 
-            // ‚à‚¤ˆê“x‘OŒã‚Ì‹ó”’‚ğæ‚èœ‚­B
+            // ã‚‚ã†ä¸€åº¦å‰å¾Œã®ç©ºç™½ã‚’å–ã‚Šé™¤ãã€‚
             str_trim(szText);
 
-            // u=v‚ğ’T‚·B
+            // ã€Œ=ã€ã‚’æ¢ã™ã€‚
             if (auto pch = wcschr(szText, L'='))
             {
-                // •¶š—ñ‚ğØ‚è•ª‚¯‚éB
+                // æ–‡å­—åˆ—ã‚’åˆ‡ã‚Šåˆ†ã‘ã‚‹ã€‚
                 *pch++ = 0;
                 auto font_name = szText;
                 auto font_file = pch;
 
-                // ‘OŒã‚Ì‹ó”’‚ğæ‚èœ‚­B
+                // å‰å¾Œã®ç©ºç™½ã‚’å–ã‚Šé™¤ãã€‚
                 str_trim(font_name);
                 str_trim(font_file);
 
-                // u,v‚ª‚ ‚ê‚ÎƒCƒ“ƒfƒbƒNƒX‚ğ“Ç‚İ‚İAØ‚è•ª‚¯‚éB
+                // ã€Œ,ã€ãŒã‚ã‚Œã°ã‚¤ãƒ³ãƒ‡ãƒƒã‚¯ã‚¹ã‚’èª­ã¿è¾¼ã¿ã€åˆ‡ã‚Šåˆ†ã‘ã‚‹ã€‚
                 pch = wcschr(pch, L',');
                 int index = -1;
                 if (pch)
@@ -311,20 +311,20 @@ BOOL DekaMoji::LoadFontMap()
                     index = _wtoi(pch);
                 }
 
-                // ‚³‚ç‚É‘OŒã‚Ì‹ó”’‚ğæ‚èœ‚­B
+                // ã•ã‚‰ã«å‰å¾Œã®ç©ºç™½ã‚’å–ã‚Šé™¤ãã€‚
                 str_trim(font_name);
                 str_trim(font_file);
 
-                // ƒtƒHƒ“ƒgƒtƒ@ƒCƒ‹‚ÌƒpƒXƒtƒ@ƒCƒ‹–¼‚ğ\’z‚·‚éB
+                // ãƒ•ã‚©ãƒ³ãƒˆãƒ•ã‚¡ã‚¤ãƒ«ã®ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«åã‚’æ§‹ç¯‰ã™ã‚‹ã€‚
                 TCHAR font_pathname[MAX_PATH];
                 GetWindowsDirectory(font_pathname, _countof(font_pathname));
                 PathAppend(font_pathname, TEXT("Fonts"));
                 PathAppend(font_pathname, font_file);
 
-                // ƒpƒXƒtƒ@ƒCƒ‹–¼‚ª‘¶İ‚·‚é‚©H
+                // ãƒ‘ã‚¹ãƒ•ã‚¡ã‚¤ãƒ«åãŒå­˜åœ¨ã™ã‚‹ã‹ï¼Ÿ
                 if (PathFileExists(font_pathname))
                 {
-                    // ‘¶İ‚·‚ê‚ÎAƒtƒHƒ“ƒg‚ÌƒGƒ“ƒgƒŠ[‚ğ’Ç‰ÁB
+                    // å­˜åœ¨ã™ã‚Œã°ã€ãƒ•ã‚©ãƒ³ãƒˆã®ã‚¨ãƒ³ãƒˆãƒªãƒ¼ã‚’è¿½åŠ ã€‚
                     FONT_ENTRY entry;
                     entry.m_font_name = font_name;
                     entry.m_pathname = font_pathname;
@@ -334,33 +334,33 @@ BOOL DekaMoji::LoadFontMap()
             }
         }
 
-        // ƒtƒ@ƒCƒ‹‚ğ•Â‚¶‚éB
+        // ãƒ•ã‚¡ã‚¤ãƒ«ã‚’é–‰ã˜ã‚‹ã€‚
         fclose(fp);
     }
 
     return m_font_map.size() > 0;
 }
 
-// ƒRƒ“ƒXƒgƒ‰ƒNƒ^B
+// ã‚³ãƒ³ã‚¹ãƒˆãƒ©ã‚¯ã‚¿ã€‚
 DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     : m_hInstance(hInstance)
     , m_argc(argc)
     , m_argv(argv)
 {
-    // ƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚éB
+    // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     Reset();
 
-    // ƒtƒHƒ“ƒgƒ}ƒbƒv‚ğ“Ç‚İ‚ŞB
+    // ãƒ•ã‚©ãƒ³ãƒˆãƒãƒƒãƒ—ã‚’èª­ã¿è¾¼ã‚€ã€‚
     LoadFontMap();
 }
 
-// Šù’è’lB
+// æ—¢å®šå€¤ã€‚
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_PORTRAIT)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 
-// ƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚éB
+// ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
 void DekaMoji::Reset()
 {
 #define SETTING(id) m_settings[TEXT(#id)]
@@ -370,21 +370,21 @@ void DekaMoji::Reset()
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
 }
 
-// ƒ_ƒCƒAƒƒO‚ğ‰Šú‰»‚·‚éB
+// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
 void DekaMoji::InitDialog(HWND hwnd)
 {
-    // IDC_PAGE_SIZE: —p†ƒTƒCƒYB
+    // IDC_PAGE_SIZE: ç”¨ç´™ã‚µã‚¤ã‚ºã€‚
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A3));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A4));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A5));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B4));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B5));
 
-    // IDC_PAGE_DIRECTION: ƒy[ƒW‚ÌŒü‚«B
+    // IDC_PAGE_DIRECTION: ãƒšãƒ¼ã‚¸ã®å‘ãã€‚
     SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_PORTRAIT));
     SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_LANDSCAPE));
 
-    // IDC_FONT_NAME: ƒtƒHƒ“ƒg–¼B
+    // IDC_FONT_NAME: ãƒ•ã‚©ãƒ³ãƒˆåã€‚
     if (m_font_map.size())
     {
         for (auto& entry : m_font_map)
@@ -394,11 +394,11 @@ void DekaMoji::InitDialog(HWND hwnd)
     }
 }
 
-// ƒ_ƒCƒAƒƒO‚©‚çƒf[ƒ^‚ÖB
+// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 BOOL DekaMoji::DataFromDialog(HWND hwnd)
 {
     TCHAR szText[MAX_PATH];
-    // ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚©‚çƒf[ƒ^‚ğæ“¾‚·‚éB
+    // ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
 #define GET_COMBO_DATA(id) do { \
     getComboText(hwnd, (id), szText, _countof(szText)); \
     str_trim(szText); \
@@ -422,10 +422,10 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     return TRUE;
 }
 
-// ƒf[ƒ^‚©‚çƒ_ƒCƒAƒƒO‚ÖB
+// ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¸ã€‚
 BOOL DekaMoji::DialogFromData(HWND hwnd)
 {
-    // ƒRƒ“ƒ{ƒ{ƒbƒNƒX‚Öƒf[ƒ^‚ğİ’è‚·‚éB
+    // ã‚³ãƒ³ãƒœãƒœãƒƒã‚¯ã‚¹ã¸ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 #define SET_COMBO_DATA(id) \
     setComboText(hwnd, (id), m_settings[TEXT(#id)].c_str());
     SET_COMBO_DATA(IDC_PAGE_SIZE);
@@ -437,16 +437,16 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     return TRUE;
 }
 
-// ƒŒƒWƒXƒgƒŠ‚©‚çƒf[ƒ^‚ÖB
+// ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã¸ã€‚
 BOOL DekaMoji::DataFromReg(HWND hwnd)
 {
-    // ƒ\ƒtƒgŒÅ—L‚ÌƒŒƒWƒXƒgƒŠƒL[‚ğŠJ‚­B
+    // ã‚½ãƒ•ãƒˆå›ºæœ‰ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’é–‹ãã€‚
     HKEY hKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), 0, KEY_READ, &hKey);
     if (!hKey)
-        return FALSE; // ŠJ‚¯‚È‚©‚Á‚½B
+        return FALSE; // é–‹ã‘ãªã‹ã£ãŸã€‚
 
-    // ƒŒƒWƒXƒgƒŠ‚©‚çƒf[ƒ^‚ğæ“¾‚·‚éB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã™ã‚‹ã€‚
     TCHAR szText[MAX_PATH];
 #define GET_REG_DATA(id) do { \
     szText[0] = 0; \
@@ -462,30 +462,30 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_TEXT);
 #undef GET_REG_DATA
 
-    // ƒŒƒWƒXƒgƒŠƒL[‚ğ•Â‚¶‚éB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’é–‰ã˜ã‚‹ã€‚
     RegCloseKey(hKey);
     return TRUE;
 }
 
-// ƒf[ƒ^‚©‚çƒŒƒWƒXƒgƒŠ‚ÖB
+// ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã¸ã€‚
 BOOL DekaMoji::RegFromData(HWND hwnd)
 {
     HKEY hCompanyKey = NULL, hAppKey = NULL;
 
-    // ‰ïĞŒÅ—L‚ÌƒŒƒWƒXƒgƒŠƒL[‚ğì¬‚Ü‚½‚ÍŠJ‚­B
+    // ä¼šç¤¾å›ºæœ‰ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ä½œæˆã¾ãŸã¯é–‹ãã€‚
     RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ"), &hCompanyKey);
     if (hCompanyKey == NULL)
-        return FALSE; // ¸”sB
+        return FALSE; // å¤±æ•—ã€‚
 
-    // ƒ\ƒtƒgŒÅ—L‚ÌƒŒƒWƒXƒgƒŠƒL[‚ğì¬‚Ü‚½‚ÍŠJ‚­B
+    // ã‚½ãƒ•ãƒˆå›ºæœ‰ã®ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’ä½œæˆã¾ãŸã¯é–‹ãã€‚
     RegCreateKey(hCompanyKey, TEXT("DekaMojiPDF"), &hAppKey);
     if (hAppKey == NULL)
     {
         RegCloseKey(hCompanyKey);
-        return FALSE; // ¸”sB
+        return FALSE; // å¤±æ•—ã€‚
     }
 
-    // ƒŒƒWƒXƒgƒŠ‚Éƒf[ƒ^‚ğİ’è‚·‚éB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã«ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã™ã‚‹ã€‚
 #define SET_REG_DATA(id) do { \
     auto& str = m_settings[TEXT(#id)]; \
     DWORD cbText = (str.size() + 1) * sizeof(WCHAR); \
@@ -497,14 +497,14 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_TEXT);
 #undef SET_REG_DATA
 
-    // ƒŒƒWƒXƒgƒŠƒL[‚ğ•Â‚¶‚éB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‚­ãƒ¼ã‚’é–‰ã˜ã‚‹ã€‚
     RegCloseKey(hAppKey);
     RegCloseKey(hCompanyKey);
 
-    return TRUE; // ¬Œ÷B
+    return TRUE; // æˆåŠŸã€‚
 }
 
-// •¶š—ñ’†‚ÉŒ©‚Â‚©‚Á‚½•”•ª•¶š—ñ‚ğ‚·‚×‚Ä’u‚«Š·‚¦‚éB
+// æ–‡å­—åˆ—ä¸­ã«è¦‹ã¤ã‹ã£ãŸéƒ¨åˆ†æ–‡å­—åˆ—ã‚’ã™ã¹ã¦ç½®ãæ›ãˆã‚‹ã€‚
 template <typename T_STR>
 inline bool
 str_replace(T_STR& str, const T_STR& from, const T_STR& to)
@@ -530,20 +530,20 @@ str_replace(T_STR& str,
     return str_replace(str, T_STR(from), T_STR(to));
 }
 
-// ƒtƒ@ƒCƒ‹ƒTƒCƒY‚ğæ“¾‚·‚éB
+// ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã‚’å–å¾—ã™ã‚‹ã€‚
 DWORD get_file_size(const string_t& filename)
 {
     WIN32_FIND_DATA find;
     HANDLE hFind = FindFirstFile(filename.c_str(), &find);
     if (hFind == INVALID_HANDLE_VALUE)
-        return 0; // ƒGƒ‰[B
+        return 0; // ã‚¨ãƒ©ãƒ¼ã€‚
     FindClose(hFind);
     if (find.nFileSizeHigh)
-        return 0; // ‘å‚«‚·‚¬‚é‚Ì‚ÅƒGƒ‰[B
-    return find.nFileSizeLow; // ƒtƒ@ƒCƒ‹ƒTƒCƒYB
+        return 0; // å¤§ãã™ãã‚‹ã®ã§ã‚¨ãƒ©ãƒ¼ã€‚
+    return find.nFileSizeLow; // ãƒ•ã‚¡ã‚¤ãƒ«ã‚µã‚¤ã‚ºã€‚
 }
 
-// libHaru‚ÌƒGƒ‰[ƒnƒ“ƒhƒ‰‚ÌÀ‘•B
+// libHaruã®ã‚¨ãƒ©ãƒ¼ãƒãƒ³ãƒ‰ãƒ©ã®å®Ÿè£…ã€‚
 void hpdf_error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_data) {
     char message[1024];
     StringCchPrintfA(message, _countof(message), "error: error_no = %04X, detail_no = %d",
@@ -551,7 +551,7 @@ void hpdf_error_handler(HPDF_STATUS error_no, HPDF_STATUS detail_no, void* user_
     throw std::runtime_error(message);
 }
 
-// ’·•ûŒ`‚ğ•`‰æ‚·‚éB
+// é•·æ–¹å½¢ã‚’æç”»ã™ã‚‹ã€‚
 void hpdf_draw_box(HPDF_Page page, double x, double y, double width, double height)
 {
     HPDF_Page_MoveTo(page, x, y);
@@ -562,31 +562,31 @@ void hpdf_draw_box(HPDF_Page page, double x, double y, double width, double heig
     HPDF_Page_Stroke(page);
 }
 
-// ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éBc‰¡”ä‚ğl—¶B
+// ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚ç¸¦æ¨ªæ¯”ã‚’è€ƒæ…®ã€‚
 void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text,
                       double x, double y, double width, double height,
                       int draw_box = 0)
 {
-    // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ§ŒÀB
+    // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’åˆ¶é™ã€‚
     if (font_size > HPDF_MAX_FONTSIZE)
         font_size = HPDF_MAX_FONTSIZE;
 
-    // ’·•ûŒ`‚ğ•`‰æ‚·‚éB
+    // é•·æ–¹å½¢ã‚’æç”»ã™ã‚‹ã€‚
     if (draw_box == 1)
     {
         hpdf_draw_box(page, x, y, width, height);
     }
 
-    // ’·•ûŒ`‚Éû‚Ü‚éƒtƒHƒ“ƒgƒTƒCƒY‚ğŒvZ‚·‚éB
+    // é•·æ–¹å½¢ã«åã¾ã‚‹ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã™ã‚‹ã€‚
     double text_width, text_height;
     double ratio2 = 1.0;
     for (;;)
     {
-        // ƒtƒHƒ“ƒg‚ÆƒtƒHƒ“ƒgƒTƒCƒY‚ğw’èB
+        // ãƒ•ã‚©ãƒ³ãƒˆã¨ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã€‚
         HPDF_Page_SetFontAndSize(page, font, font_size);
 
-        // ƒeƒLƒXƒg‚Ì•‚Æ‚‚³‚ğæ“¾‚·‚éB
+        // ãƒ†ã‚­ã‚¹ãƒˆã®å¹…ã¨é«˜ã•ã‚’å–å¾—ã™ã‚‹ã€‚
         text_width = HPDF_Page_TextWidth(page, text);
         text_height = HPDF_Page_GetCurrentFontSize(page);
 
@@ -595,75 +595,75 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
 
         if (text_width > width)
         {
-            // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ­‚µ¬‚³‚­‚µ‚ÄÄŒvZB
+            // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å°‘ã—å°ã•ãã—ã¦å†è¨ˆç®—ã€‚
             ratio2 *= 0.95;
             continue;
         }
 
         if (text_width * 1.1 < width)
         {
-            // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ­‚µ‘å‚«‚­‚µ‚ÄÄŒvZB
+            // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å°‘ã—å¤§ããã—ã¦å†è¨ˆç®—ã€‚
             ratio2 *= 1.1;
             continue;
         }
 
-        // x,y‚ğ’†‰›‚»‚ë‚¦B
+        // x,yã‚’ä¸­å¤®ãã‚ãˆã€‚
         x += (width - text_width) / 2;
         y += (height - text_height) / 2;
         break;
     }
 
-    // ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+    // ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
     HPDF_Page_BeginText(page);
     {
-        // ƒx[ƒXƒ‰ƒCƒ“‚©‚çdescent‚¾‚¯‚¸‚ç‚·B
+        // ãƒ™ãƒ¼ã‚¹ãƒ©ã‚¤ãƒ³ã‹ã‚‰descentã ã‘ãšã‚‰ã™ã€‚
         double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
         descent *= ratio2;
 
-        // •¶š‚ğƒy[ƒW‚¢‚Á‚Ï‚¢‚É‚·‚éB
+        // æ–‡å­—ã‚’ãƒšãƒ¼ã‚¸ã„ã£ã±ã„ã«ã™ã‚‹ã€‚
         HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent);
 
-        // ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+        // ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
         HPDF_Page_ShowText(page, text);
     }
     HPDF_Page_EndText(page);
 
-    // ’·•ûŒ`‚ğ•`‰æ‚·‚éB
+    // é•·æ–¹å½¢ã‚’æç”»ã™ã‚‹ã€‚
     if (draw_box == 2)
     {
         hpdf_draw_box(page, x, y, text_width, text_height);
     }
 }
 
-// ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éBc‰¡”ä‚ğ–³‹B
+// ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚ç¸¦æ¨ªæ¯”ã‚’ç„¡è¦–ã€‚
 void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text,
                       double x, double y, double width, double height,
                       int draw_box = 0)
 {
-    // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ§ŒÀB
+    // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’åˆ¶é™ã€‚
     if (font_size > HPDF_MAX_FONTSIZE)
         font_size = HPDF_MAX_FONTSIZE;
 
-    // ’·•ûŒ`‚ğ•`‰æ‚·‚éB
+    // é•·æ–¹å½¢ã‚’æç”»ã™ã‚‹ã€‚
     if (draw_box == 1)
     {
         hpdf_draw_box(page, x, y, width, height);
     }
 
-    // ’·•ûŒ`‚Éû‚Ü‚éƒtƒHƒ“ƒgƒTƒCƒY‚ğŒvZ‚·‚éB
+    // é•·æ–¹å½¢ã«åã¾ã‚‹ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’è¨ˆç®—ã™ã‚‹ã€‚
     double text_width, text_height;
     double aspect1, aspect2, ratio1, ratio2 = 1.0;
     for (;;)
     {
-        // ƒtƒHƒ“ƒg‚ÆƒtƒHƒ“ƒgƒTƒCƒY‚ğw’èB
+        // ãƒ•ã‚©ãƒ³ãƒˆã¨ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã€‚
         HPDF_Page_SetFontAndSize(page, font, font_size);
 
-        // ƒeƒLƒXƒg‚Ì•‚Æ‚‚³‚ğæ“¾‚·‚éB
+        // ãƒ†ã‚­ã‚¹ãƒˆã®å¹…ã¨é«˜ã•ã‚’å–å¾—ã™ã‚‹ã€‚
         text_width = HPDF_Page_TextWidth(page, text);
         text_height = HPDF_Page_GetCurrentFontSize(page);
 
-        // ƒAƒXƒyƒNƒg”ä‚ğ’²®‚·‚éB
+        // ã‚¢ã‚¹ãƒšã‚¯ãƒˆæ¯”ã‚’èª¿æ•´ã™ã‚‹ã€‚
         aspect1 = text_height / text_width;
         aspect2 = height / width;
         ratio1 = aspect2 / aspect1;
@@ -674,67 +674,124 @@ void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
 
         if (text_width > width && text_height > height)
         {
-            // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ­‚µ¬‚³‚­‚µ‚ÄÄŒvZB
+            // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å°‘ã—å°ã•ãã—ã¦å†è¨ˆç®—ã€‚
             ratio2 *= 0.95;
             continue;
         }
 
         if (text_width * 1.1 < width && text_height * 1.1 < height)
         {
-            // ƒtƒHƒ“ƒgƒTƒCƒY‚ğ­‚µ‘å‚«‚­‚µ‚ÄÄŒvZB
+            // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’å°‘ã—å¤§ããã—ã¦å†è¨ˆç®—ã€‚
             ratio2 *= 1.1;
             continue;
         }
 
+        // x,yã‚’ä¸­å¤®ãã‚ãˆã€‚
+        x += (width - text_width) / 2;
+        y += (height - text_height) / 2;
         break;
     }
 
-    // ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+    // ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
     HPDF_Page_BeginText(page);
     {
-        // ƒx[ƒXƒ‰ƒCƒ“‚©‚çdescent‚¾‚¯‚¸‚ç‚·B
+        // ãƒ™ãƒ¼ã‚¹ãƒ©ã‚¤ãƒ³ã‹ã‚‰descentã ã‘ãšã‚‰ã™ã€‚
         double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
         descent *= ratio2 * ratio1;
 
-        // •¶š‚ğƒy[ƒW‚¢‚Á‚Ï‚¢‚É‚·‚éB
+        // æ–‡å­—ã‚’ãƒšãƒ¼ã‚¸ã„ã£ã±ã„ã«ã™ã‚‹ã€‚
         HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent);
 
-        // ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+        // ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
         HPDF_Page_ShowText(page, text);
     }
     HPDF_Page_EndText(page);
 
-    // ’·•ûŒ`‚ğ•`‰æ‚·‚éB
+    // é•·æ–¹å½¢ã‚’æç”»ã™ã‚‹ã€‚
     if (draw_box == 2)
     {
         hpdf_draw_box(page, x, y, text_width, text_height);
     }
 }
 
-// ƒƒCƒ“ƒfƒBƒbƒVƒ…ˆ—B
+template <typename T_STR_CONTAINER>
+inline void
+str_split(T_STR_CONTAINER& container,
+          const typename T_STR_CONTAINER::value_type& str,
+          const typename T_STR_CONTAINER::value_type& chars)
+{
+    container.clear();
+    size_t i = 0, k = str.find_first_of(chars);
+    while (k != T_STR_CONTAINER::value_type::npos)
+    {
+        container.push_back(str.substr(i, k - i));
+        i = k + 1;
+        k = str.find_first_of(chars, i);
+    }
+    container.push_back(str.substr(i));
+}
+
+// ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
+void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
+                              const char *text,
+                              double x, double y, double width, double height)
+{
+    char buf[1024];
+    StringCchCopyA(buf, _countof(buf), text);
+    StrTrimA(buf, " \t\r\n");
+
+    std::string str = buf;
+    str_replace(str, "\r\n", "\n"); // æ”¹è¡Œã‚³ãƒ¼ãƒ‰ã€‚
+    str_replace(str, "\xE3\x80\x80", "  "); // å…¨è§’ç©ºç™½ã€Œã€€ã€
+
+    // æ”¹è¡Œã§åˆ†å‰²ã€‚
+    std::vector<std::string> lines;
+    str_split(lines, str, std::string("\n"));
+
+    auto rows = lines.size();
+    if (rows == 0)
+        return;
+
+    for (size_t i = 0; i < rows; ++i)
+    {
+        auto line = lines[i];
+        StringCchCopyA(buf, _countof(buf), line.c_str());
+        StrTrimA(buf, " \t\r\n");
+
+        double line_x = x;
+        double line_y = y + (height / rows) * (rows - i - 1);
+        double line_width = width;
+        double line_height = height / rows;
+
+        hpdf_draw_text_2(page, font, font_size, buf, 
+                         line_x, line_y, line_width, line_height, 1);
+    }
+}
+
+// ãƒ¡ã‚¤ãƒ³ãƒ‡ã‚£ãƒƒã‚·ãƒ¥å‡¦ç†ã€‚
 string_t DekaMoji::JustDoIt(HWND hwnd)
 {
     string_t ret;
-    // PDFƒIƒuƒWƒFƒNƒg‚ğì¬‚·‚éB
+    // PDFã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’ä½œæˆã™ã‚‹ã€‚
     HPDF_Doc pdf = HPDF_New(hpdf_error_handler, NULL);
     if (!pdf)
         return L"";
 
     try
     {
-        // ƒGƒ“ƒR[ƒfƒBƒ“ƒO 90ms-RKSJ-H, 90ms-RKSJ-V, 90msp-RKSJ-H, EUC-H, EUC-V ‚ª—˜—p‰Â”\‚Æ‚È‚é
+        // ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚° 90ms-RKSJ-H, 90ms-RKSJ-V, 90msp-RKSJ-H, EUC-H, EUC-V ãŒåˆ©ç”¨å¯èƒ½ã¨ãªã‚‹
         HPDF_UseJPEncodings(pdf);
 
 #ifdef UTF8_SUPPORT
-        // ƒGƒ“ƒR[ƒfƒBƒ“ƒO "UTF-8" ‚ª—˜—p‰Â”\‚ÉHHH
+        // ã‚¨ãƒ³ã‚³ãƒ¼ãƒ‡ã‚£ãƒ³ã‚° "UTF-8" ãŒåˆ©ç”¨å¯èƒ½ã«ï¼Ÿï¼Ÿï¼Ÿ
         HPDF_UseUTFEncodings(pdf);
         HPDF_SetCurrentEncoder(pdf, "UTF-8");
 #endif
 
-        // “ú–{ŒêƒtƒHƒ“ƒg‚Ì MS-(P)Mincyo, MS-(P)Gothic ‚ª—˜—p‰Â”\‚Æ‚È‚é
+        // æ—¥æœ¬èªãƒ•ã‚©ãƒ³ãƒˆã® MS-(P)Mincyo, MS-(P)Gothic ãŒåˆ©ç”¨å¯èƒ½ã¨ãªã‚‹
         //HPDF_UseJPFonts(pdf);
 
-        // —p†‚ÌŒü‚«B
+        // ç”¨ç´™ã®å‘ãã€‚
         HPDF_PageDirection direction;
         if (SETTING(IDC_PAGE_DIRECTION) == doLoadString(IDS_PORTRAIT))
             direction = HPDF_PAGE_PORTRAIT;
@@ -743,7 +800,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         else
             direction = HPDF_PAGE_PORTRAIT;
 
-        // ƒy[ƒWƒTƒCƒYB
+        // ãƒšãƒ¼ã‚¸ã‚µã‚¤ã‚ºã€‚
         HPDF_PageSizes page_size;
         if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_A3))
             page_size = HPDF_PAGE_SIZE_A3;
@@ -758,10 +815,10 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         else
             page_size = HPDF_PAGE_SIZE_A4;
 
-        // ƒy[ƒW—]”’B
+        // ãƒšãƒ¼ã‚¸ä½™ç™½ã€‚
         double margin = pixels_from_mm(10);
 
-        // ƒtƒHƒ“ƒg–¼B
+        // ãƒ•ã‚©ãƒ³ãƒˆåã€‚
         string_t font_name;
         for (auto& entry : m_font_map)
         {
@@ -781,44 +838,44 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             }
         }
 
-        // ƒtƒHƒ“ƒgƒTƒCƒYiptjB
+        // ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºï¼ˆptï¼‰ã€‚
         double font_size = HPDF_MAX_FONTSIZE;
 
-        // o—Íƒtƒ@ƒCƒ‹–¼B
+        // å‡ºåŠ›ãƒ•ã‚¡ã‚¤ãƒ«åã€‚
         string_t output_name = TEXT("DekaMojiPDF");
 
-        HPDF_Page page; // ƒy[ƒWƒIƒuƒWƒFƒNƒgB
-        HPDF_Font font; // ƒtƒHƒ“ƒgƒIƒuƒWƒFƒNƒgB
-        double page_width, page_height; // ƒy[ƒWƒTƒCƒYB
-        double content_x, content_y, content_width, content_height; // ƒy[ƒW“à—e‚ÌˆÊ’u‚ÆƒTƒCƒYB
+        HPDF_Page page; // ãƒšãƒ¼ã‚¸ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€‚
+        HPDF_Font font; // ãƒ•ã‚©ãƒ³ãƒˆã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã€‚
+        double page_width, page_height; // ãƒšãƒ¼ã‚¸ã‚µã‚¤ã‚ºã€‚
+        double content_x, content_y, content_width, content_height; // ãƒšãƒ¼ã‚¸å†…å®¹ã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã€‚
         for (INT iPage = 0; iPage < 1; ++iPage)
         {
-            // ƒy[ƒW‚ğ’Ç‰Á‚·‚éB
+            // ãƒšãƒ¼ã‚¸ã‚’è¿½åŠ ã™ã‚‹ã€‚
             page = HPDF_AddPage(pdf);
 
-            // ƒy[ƒWƒTƒCƒY‚Æ—p†‚ÌŒü‚«‚ğw’èB
+            // ãƒšãƒ¼ã‚¸ã‚µã‚¤ã‚ºã¨ç”¨ç´™ã®å‘ãã‚’æŒ‡å®šã€‚
             HPDF_Page_SetSize(page, page_size, direction);
 
-            // ƒy[ƒWƒTƒCƒYiƒsƒNƒZƒ‹’PˆÊjB
+            // ãƒšãƒ¼ã‚¸ã‚µã‚¤ã‚ºï¼ˆãƒ”ã‚¯ã‚»ãƒ«å˜ä½ï¼‰ã€‚
             page_width = HPDF_Page_GetWidth(page);
             page_height = HPDF_Page_GetHeight(page);
 
-            // ƒy[ƒW“à—e‚ÌˆÊ’u‚ÆƒTƒCƒYB
+            // ãƒšãƒ¼ã‚¸å†…å®¹ã®ä½ç½®ã¨ã‚µã‚¤ã‚ºã€‚
             content_x = margin;
             content_y = margin;
             content_width = page_width - margin * 2;
             content_height = page_height - margin * 2;
 
-            // ü‚Ì•‚ğw’èB
+            // ç·šã®å¹…ã‚’æŒ‡å®šã€‚
             HPDF_Page_SetLineWidth(page, 2);
 
-            // ü‚ÌF‚ğ RGB ‚Åİ’è‚·‚éBPDF ‚Å‚Í RGB Še’l‚ğ [0,1] ‚Åw’è‚·‚é‚±‚Æ‚É‚È‚Á‚Ä‚¢‚éB
+            // ç·šã®è‰²ã‚’ RGB ã§è¨­å®šã™ã‚‹ã€‚PDF ã§ã¯ RGB å„å€¤ã‚’ [0,1] ã§æŒ‡å®šã™ã‚‹ã“ã¨ã«ãªã£ã¦ã„ã‚‹ã€‚
             HPDF_Page_SetRGBStroke(page, 0, 0, 0);
 
-            /* “h‚è‚Â‚Ô‚µ‚ÌF‚ğ RGB ‚Åİ’è‚·‚éBPDF ‚Å‚Í RGB Še’l‚ğ [0,1] ‚Åw’è‚·‚é‚±‚Æ‚É‚È‚Á‚Ä‚¢‚éB*/
+            /* å¡—ã‚Šã¤ã¶ã—ã®è‰²ã‚’ RGB ã§è¨­å®šã™ã‚‹ã€‚PDF ã§ã¯ RGB å„å€¤ã‚’ [0,1] ã§æŒ‡å®šã™ã‚‹ã“ã¨ã«ãªã£ã¦ã„ã‚‹ã€‚*/
             HPDF_Page_SetRGBFill(page, 0, 0, 0);
 
-            // ƒtƒHƒ“ƒg‚ğw’è‚·‚éB
+            // ãƒ•ã‚©ãƒ³ãƒˆã‚’æŒ‡å®šã™ã‚‹ã€‚
             auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
 #ifdef UTF8_SUPPORT
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
@@ -827,7 +884,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #endif
 
 #ifndef NO_SHAREWARE
-            // ƒVƒFƒAƒEƒFƒA–¢“o˜^‚È‚ç‚ÎAƒƒS•¶š—ñ‚ğ•`‰æ‚·‚éB
+            // ã‚·ã‚§ã‚¢ã‚¦ã‚§ã‚¢æœªç™»éŒ²ãªã‚‰ã°ã€ãƒ­ã‚´æ–‡å­—åˆ—ã‚’æç”»ã™ã‚‹ã€‚
             if (!g_shareware.IsRegistered())
             {
 #ifdef UTF8_SUPPORT
@@ -835,10 +892,10 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #else
                 auto logo_a = ansi_from_wide(CP932, doLoadString(IDS_LOGO));
 #endif
-                // ƒtƒHƒ“ƒg‚ÆƒtƒHƒ“ƒgƒTƒCƒY‚ğw’èB
+                // ãƒ•ã‚©ãƒ³ãƒˆã¨ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚ºã‚’æŒ‡å®šã€‚
                 HPDF_Page_SetFontAndSize(page, font, 12);
 
-                // ƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+                // ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
                 HPDF_Page_BeginText(page);
                 {
                     HPDF_Page_TextOut(page, content_x, content_y, logo_a);
@@ -847,24 +904,24 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             }
 #endif
 
-            // ANSI•¶š—ñ‚É•ÏŠ·‚µ‚ÄƒeƒLƒXƒg‚ğ•`‰æ‚·‚éB
+            // ANSIæ–‡å­—åˆ—ã«å¤‰æ›ã—ã¦ãƒ†ã‚­ã‚¹ãƒˆã‚’æç”»ã™ã‚‹ã€‚
             string_t text = SETTING(IDC_TEXT);
 #ifdef UTF8_SUPPORT
             auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
 #else
             auto text_a = ansi_from_wide(CP932, text.c_str());
 #endif
-            hpdf_draw_text_1(page, font, font_size, text_a, content_x, content_y, content_width, content_height, 1);
+            hpdf_draw_multiline_text(page, font, font_size, text_a, content_x, content_y, content_width, content_height);
         }
 
-        // PDFo—ÍB
+        // PDFå‡ºåŠ›ã€‚
         {
-            // PDF‚ğˆêƒtƒ@ƒCƒ‹‚É•Û‘¶‚·‚éB
+            // PDFã‚’ä¸€æ™‚ãƒ•ã‚¡ã‚¤ãƒ«ã«ä¿å­˜ã™ã‚‹ã€‚
             TempFile temp_file(TEXT("DM2"), TEXT(".pdf"));
             std::string temp_file_a = ansi_from_wide(CP_ACP, temp_file.make());
             HPDF_SaveToFile(pdf, temp_file_a.c_str());
 
-            // ƒfƒXƒNƒgƒbƒv‚Éƒtƒ@ƒCƒ‹‚ğƒRƒs[B
+            // ãƒ‡ã‚¹ã‚¯ãƒˆãƒƒãƒ—ã«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã‚³ãƒ”ãƒ¼ã€‚
             TCHAR szPath[MAX_PATH];
             SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
             PathAppend(szPath, output_name.c_str());
@@ -875,7 +932,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
                 throw std::runtime_error(err_msg);
             }
 
-            // ¬Œ÷ƒƒbƒZ[ƒW‚ğ•\¦B
+            // æˆåŠŸãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ã‚’è¡¨ç¤ºã€‚
             StringCchCopy(szPath, _countof(szPath), output_name.c_str());
             StringCchCat(szPath, _countof(szPath), TEXT(".pdf"));
             TCHAR szText[MAX_PATH];
@@ -885,129 +942,129 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
     }
     catch (std::runtime_error& err)
     {
-        // ¸”sB
+        // å¤±æ•—ã€‚
         auto wide = wide_from_ansi(CP_ACP, err.what());
         MessageBoxW(hwnd, wide, NULL, MB_ICONERROR);
         return TEXT("");
     }
 
-    // PDFƒIƒuƒWƒFƒNƒg‚ğ‰ğ•ú‚·‚éB
+    // PDFã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’è§£æ”¾ã™ã‚‹ã€‚
     HPDF_Free(pdf);
 
     return ret;
 }
 
 // WM_INITDIALOG
-// ƒ_ƒCƒAƒƒO‚Ì‰Šú‰»B
+// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã®åˆæœŸåŒ–ã€‚
 BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
-    // ƒ†[ƒUƒf[ƒ^B
+    // ãƒ¦ãƒ¼ã‚¶ãƒ‡ãƒ¼ã‚¿ã€‚
     DekaMoji* pDM = (DekaMoji*)lParam;
 
-    // ƒ†[ƒU[ƒf[ƒ^‚ğƒEƒBƒ“ƒhƒEƒnƒ“ƒhƒ‹‚ÉŠÖ˜A•t‚¯‚éB
+    // ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãƒãƒ³ãƒ‰ãƒ«ã«é–¢é€£ä»˜ã‘ã‚‹ã€‚
     SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
 
-    // ƒAƒvƒŠ‚Ì–¼‘OB
+    // ã‚¢ãƒ—ãƒªã®åå‰ã€‚
     LoadString(NULL, IDS_APPNAME, g_szAppName, _countof(g_szAppName));
 
-    // ƒAƒCƒRƒ“‚Ìİ’èB
+    // ã‚¢ã‚¤ã‚³ãƒ³ã®è¨­å®šã€‚
     g_hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(1));
     g_hIconSm = (HICON)LoadImage(g_hInstance, MAKEINTRESOURCE(1), IMAGE_ICON,
         GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), 0);
     SendMessage(hwnd, WM_SETICON, ICON_BIG, (WPARAM)g_hIcon);
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (WPARAM)g_hIconSm);
 
-    // ‰Šú‰»B
+    // åˆæœŸåŒ–ã€‚
     pDM->InitDialog(hwnd);
 
-    // ƒŒƒWƒXƒgƒŠ‚©‚çƒf[ƒ^‚ğ“Ç‚İ‚ŞB
+    // ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’èª­ã¿è¾¼ã‚€ã€‚
     pDM->DataFromReg(hwnd);
 
-    // ƒ_ƒCƒAƒƒO‚Éƒf[ƒ^‚ğİ’èB
+    // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã«ãƒ‡ãƒ¼ã‚¿ã‚’è¨­å®šã€‚
     pDM->DialogFromData(hwnd);
 
     return TRUE;
 }
 
-// uOKvƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½B
+// ã€ŒOKã€ãƒœã‚¿ãƒ³ãŒæŠ¼ã•ã‚ŒãŸã€‚
 BOOL OnOK(HWND hwnd)
 {
-    // ƒ†[ƒUƒf[ƒ^B
+    // ãƒ¦ãƒ¼ã‚¶ãƒ‡ãƒ¼ã‚¿ã€‚
     DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
-    // uˆ—’†...v‚Æƒ{ƒ^ƒ“‚É•\¦‚·‚éB
+    // ã€Œå‡¦ç†ä¸­...ã€ã¨ãƒœã‚¿ãƒ³ã«è¡¨ç¤ºã™ã‚‹ã€‚
     HWND hButton = GetDlgItem(hwnd, IDC_GENERATE);
     SetWindowText(hButton, doLoadString(IDS_PROCESSINGNOW));
 
-    // ƒ_ƒCƒAƒƒO‚©‚çƒf[ƒ^‚ğæ“¾B
-    if (!pDM->DataFromDialog(hwnd)) // ¸”sB
+    // ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‹ã‚‰ãƒ‡ãƒ¼ã‚¿ã‚’å–å¾—ã€‚
+    if (!pDM->DataFromDialog(hwnd)) // å¤±æ•—ã€‚
     {
-        // ƒ{ƒ^ƒ“ƒeƒLƒXƒg‚ğŒ³‚É–ß‚·B
+        // ãƒœã‚¿ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’å…ƒã«æˆ»ã™ã€‚
         SetWindowText(hButton, doLoadString(IDS_GENERATE));
 
-        return FALSE; // ¸”sB
+        return FALSE; // å¤±æ•—ã€‚
     }
 
-    // İ’è‚ğƒŒƒWƒXƒgƒŠ‚É•Û‘¶B
+    // è¨­å®šã‚’ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã«ä¿å­˜ã€‚
     pDM->RegFromData(hwnd);
 
-    // ƒƒCƒ“ƒfƒBƒbƒVƒ…ˆ—B
+    // ãƒ¡ã‚¤ãƒ³ãƒ‡ã‚£ãƒƒã‚·ãƒ¥å‡¦ç†ã€‚
     string_t success = pDM->JustDoIt(hwnd);
 
-    // ƒ{ƒ^ƒ“ƒeƒLƒXƒg‚ğŒ³‚É–ß‚·B
+    // ãƒœã‚¿ãƒ³ãƒ†ã‚­ã‚¹ãƒˆã‚’å…ƒã«æˆ»ã™ã€‚
     SetWindowText(hButton, doLoadString(IDS_GENERATE));
 
-    // •K—v‚È‚çŒ‹‰Ê‚ğƒƒbƒZ[ƒWƒ{ƒbƒNƒX‚Æ‚µ‚Ä•\¦‚·‚éB
+    // å¿…è¦ãªã‚‰çµæœã‚’ãƒ¡ãƒƒã‚»ãƒ¼ã‚¸ãƒœãƒƒã‚¯ã‚¹ã¨ã—ã¦è¡¨ç¤ºã™ã‚‹ã€‚
     if (success.size())
     {
         MessageBox(hwnd, success.c_str(), g_szAppName, MB_ICONINFORMATION);
     }
 
-    return TRUE; // ¬Œ÷B
+    return TRUE; // æˆåŠŸã€‚
 }
 
-// uİ’è‚Ì‰Šú‰»vƒ{ƒ^ƒ“B
+// ã€Œè¨­å®šã®åˆæœŸåŒ–ã€ãƒœã‚¿ãƒ³ã€‚
 void OnEraseSettings(HWND hwnd)
 {
-    // ƒ†[ƒU[ƒf[ƒ^B
+    // ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ‡ãƒ¼ã‚¿ã€‚
     DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
 
-    // ƒf[ƒ^‚ğƒŠƒZƒbƒg‚·‚éB
+    // ãƒ‡ãƒ¼ã‚¿ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ã€‚
     pDM->Reset();
 
-    // ƒf[ƒ^‚©‚çƒ_ƒCƒAƒƒO‚ÖB
+    // ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã¸ã€‚
     pDM->DialogFromData(hwnd);
 
-    // ƒf[ƒ^‚©‚çƒŒƒWƒXƒgƒŠ‚ÖB
+    // ãƒ‡ãƒ¼ã‚¿ã‹ã‚‰ãƒ¬ã‚¸ã‚¹ãƒˆãƒªã¸ã€‚
     pDM->RegFromData(hwnd);
 }
 
 // WM_COMMAND
-// ƒRƒ}ƒ“ƒhB
+// ã‚³ãƒãƒ³ãƒ‰ã€‚
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
 {
     switch (id)
     {
-    case IDC_GENERATE: // uPDF¶¬vƒ{ƒ^ƒ“B
+    case IDC_GENERATE: // ã€ŒPDFç”Ÿæˆã€ãƒœã‚¿ãƒ³ã€‚
         OnOK(hwnd);
         break;
-    case IDC_EXIT: // uI—¹vƒ{ƒ^ƒ“B
+    case IDC_EXIT: // ã€Œçµ‚äº†ã€ãƒœã‚¿ãƒ³ã€‚
         EndDialog(hwnd, id);
         break;
     }
 }
 
 // WM_DESTROY
-// ƒEƒBƒ“ƒhƒE‚ª”jŠü‚³‚ê‚½B
+// ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ãŒç ´æ£„ã•ã‚ŒãŸã€‚
 void OnDestroy(HWND hwnd)
 {
-    // ƒAƒCƒRƒ“‚ğ”jŠüB
+    // ã‚¢ã‚¤ã‚³ãƒ³ã‚’ç ´æ£„ã€‚
     DestroyIcon(g_hIcon);
     DestroyIcon(g_hIconSm);
     g_hIcon = g_hIconSm = NULL;
 }
 
-// ƒ_ƒCƒAƒƒOƒvƒƒV[ƒWƒƒB
+// ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ãƒ—ãƒ­ã‚·ãƒ¼ã‚¸ãƒ£ã€‚
 INT_PTR CALLBACK
 DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1020,35 +1077,35 @@ DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// ƒfƒJ•¶šPDF‚ÌƒƒCƒ“ŠÖ”B
+// ãƒ‡ã‚«æ–‡å­—PDFã®ãƒ¡ã‚¤ãƒ³é–¢æ•°ã€‚
 INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 {
-    // ƒAƒvƒŠ‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ğ•Û‚·‚éB
+    // ã‚¢ãƒ—ãƒªã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä¿æŒã™ã‚‹ã€‚
     g_hInstance = hInstance;
 
-    // ‹¤’ÊƒRƒ“ƒgƒ[ƒ‹ŒQ‚ğ‰Šú‰»‚·‚éB
+    // å…±é€šã‚³ãƒ³ãƒˆãƒ­ãƒ¼ãƒ«ç¾¤ã‚’åˆæœŸåŒ–ã™ã‚‹ã€‚
     InitCommonControls();
 
 #ifndef NO_SHAREWARE
-    // ƒfƒoƒbƒK\‚ª—LŒøA‚Ü‚½‚ÍƒVƒFƒAƒEƒFƒA‚ğŠJn‚Å‚«‚È‚¢‚Æ‚«‚Í
+    // ãƒ‡ãƒãƒƒã‚¬â€•ãŒæœ‰åŠ¹ã€ã¾ãŸã¯ã‚·ã‚§ã‚¢ã‚¦ã‚§ã‚¢ã‚’é–‹å§‹ã§ããªã„ã¨ãã¯
     if (IsDebuggerPresent() || !g_shareware.Start(NULL))
     {
-        // ¸”sBƒAƒvƒŠƒP[ƒVƒ‡ƒ“‚ğI—¹‚·‚éB
+        // å¤±æ•—ã€‚ã‚¢ãƒ—ãƒªã‚±ãƒ¼ã‚·ãƒ§ãƒ³ã‚’çµ‚äº†ã™ã‚‹ã€‚
         return -1;
     }
 #endif
 
-    // ƒ†[ƒU[ƒf[ƒ^‚ğ•Û‚·‚éB
+    // ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ä¿æŒã™ã‚‹ã€‚
     DekaMoji dm(hInstance, argc, argv);
 
-    // ƒ†[ƒU[ƒf[ƒ^‚ğƒpƒ‰ƒ[ƒ^‚Æ‚µ‚Äƒ_ƒCƒAƒƒO‚ğŠJ‚­B
+    // ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ‡ãƒ¼ã‚¿ã‚’ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã¨ã—ã¦ãƒ€ã‚¤ã‚¢ãƒ­ã‚°ã‚’é–‹ãã€‚
     DialogBoxParam(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc, (LPARAM)&dm);
 
-    // ³íI—¹B
+    // æ­£å¸¸çµ‚äº†ã€‚
     return 0;
 }
 
-// WindowsƒAƒvƒŠ‚ÌƒƒCƒ“ŠÖ”B
+// Windowsã‚¢ãƒ—ãƒªã®ãƒ¡ã‚¤ãƒ³é–¢æ•°ã€‚
 INT WINAPI
 WinMain(HINSTANCE   hInstance,
         HINSTANCE   hPrevInstance,
@@ -1056,7 +1113,7 @@ WinMain(HINSTANCE   hInstance,
         INT         nCmdShow)
 {
 #ifdef UNICODE
-    // wWinMain‚ğƒTƒ|[ƒg‚µ‚Ä‚¢‚È‚¢ƒRƒ“ƒpƒCƒ‰‚Ì‚½‚ß‚ÉAƒRƒ}ƒ“ƒhƒ‰ƒCƒ“‚Ìˆ—‚ğs‚¤B
+    // wWinMainã‚’ã‚µãƒãƒ¼ãƒˆã—ã¦ã„ãªã„ã‚³ãƒ³ãƒ‘ã‚¤ãƒ©ã®ãŸã‚ã«ã€ã‚³ãƒãƒ³ãƒ‰ãƒ©ã‚¤ãƒ³ã®å‡¦ç†ã‚’è¡Œã†ã€‚
     INT argc;
     LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     INT ret = DekaMoji_Main(hInstance, argc, argv);
