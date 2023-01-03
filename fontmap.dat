@@ -1,0 +1,43 @@
+﻿; 【ガゾーナラベPDFで利用するフォント情報】
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; このファイルは、自由に変更しても構いません。
+
+[FONTMAP]
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Windows標準フォント。
+; 利用条件：編集可能。
+ＭＳ ゴシック=MSGOTHIC.TTC,0
+ＭＳ Ｐゴシック=MSGOTHIC.TTC,2
+ＭＳ 明朝=MSMINCHO.TTC,0
+ＭＳ Ｐ明朝=MSMINCHO.TTC,1
+MS UI Gothic=MSGOTHIC.TTC,1
+;メイリオ=MEIRYO.TTC,0 ;「メイリオ」には行間の問題があるので読み込まない。
+Meiryo UI=MEIRYO.TTC,2
+游ゴシック=YUGOTHR.TTC,0
+游明朝=YUMIN.TTF
+Yu Gothic UI=YUGOTHM.TTC,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BIZ UDPフォント。
+; 利用条件：印刷とプレビュー可能。
+BIZ UDゴシック=BIZ-UDGOTHICR.TTC,0
+BIZ UDPゴシック=BIZ-UDGOTHICR.TTC,1
+BIZ UD明朝=BIZ-UDMINCHOM.TTC,0
+BIZ UDP明朝=BIZ-UDMINCHOM.TTC,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; RICOHフォント。
+; 利用条件：編集可能。
+HGゴシックE=HGRGE90.TTC,0
+HGPゴシックE=HGRGE90.TTC,1
+HGSゴシックE=HGRGE90.TTC,2
+HG明朝E=HGRME90.TTC,0
+HGP明朝E=HGRME90.TTC,1
+HGS明朝E=HGRME90.TTC,2
+HG丸ゴシックM-PRO=HGRSM90.TTF
+HG創英角ゴシックUB=HGRSGU90.TTC,0
+HGP創英角ゴシックUB=HGRSGU90.TTC,1
+HGS創英角ゴシックUB=HGRSGU90.TTC,2
+HG創英角ポップ体=HGRPP190.TTC,0
+HGP創英角ポップ体=HGRPP190.TTC,1
+HGS創英角ポップ体=HGRPP190.TTC,2
