@@ -19,6 +19,9 @@
 #define IDS_GENERATE                        113
 #define IDS_PROCESSINGNOW                   114
 #define IDS_FONT_01                         115
+#define IDS_SAMPLETEXT                      116
+#define IDS_FIELD_TEXT                      117
+#define IDS_REASON_EMPTY_TEXT               118
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

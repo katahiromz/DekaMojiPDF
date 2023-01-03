@@ -49,7 +49,7 @@ FONT 9, "Meiryo UI"
 STRINGTABLE
 {
     IDS_APPNAME, "デカ文字PDF"
-    IDS_INVALIDSTRING, "不正な文字列です。"
+    IDS_INVALIDSTRING, "「%s」が不正な文字列です。\n\n%s"
     IDS_TEXTTOOLONG, "(テキストが長すぎます)"
     IDS_PORTRAIT, "縦向き"
     IDS_LANDSCAPE, "横向き"
@@ -59,11 +59,14 @@ STRINGTABLE
     IDS_B4, "B4 用紙"
     IDS_B5, "B5 用紙"
     IDS_LOGO, "「デカ文字PDF」買ってね"
-    IDS_COPYFILEFAILED, "ファイルのコピーに失敗しました。"
-    IDS_SUCCEEDED, "成功しました。"
+    IDS_COPYFILEFAILED, "デスクトップへのファイルのコピーに失敗しました。"
+    IDS_SUCCEEDED, "デスクトップにファイル「%s」を作成しました。"
     IDS_GENERATE, "PDF生成"
     IDS_PROCESSINGNOW, "生成中..."
     IDS_FONT_01, "ＭＳ ゴシック"
+    IDS_SAMPLETEXT, "文字列を入力して下さい"
+    IDS_FIELD_TEXT, "テキスト"
+    IDS_REASON_EMPTY_TEXT, "空ではない文字列を指定して下さい。"
 }
 
 //////////////////////////////////////////////////////////////////////////////

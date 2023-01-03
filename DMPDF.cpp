@@ -59,6 +59,7 @@ enum
     IDC_PAGE_SIZE = cmb1,
     IDC_PAGE_DIRECTION = cmb2,
     IDC_FONT_NAME = cmb3,
+    IDC_TEXT = edt1,
 };
 
 // デカ文字PDFのメインクラス。
@@ -357,6 +358,7 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_PORTRAIT)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
+#define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -365,6 +367,7 @@ void DekaMoji::Reset()
     SETTING(IDC_PAGE_SIZE) = IDC_PAGE_SIZE_DEFAULT;
     SETTING(IDC_PAGE_DIRECTION) = IDC_PAGE_DIRECTION_DEFAULT;
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
+    SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -405,6 +408,17 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     GET_COMBO_DATA(IDC_PAGE_SIZE);
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
+
+    GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
+    str_trim(szText);
+    if (szText[0] == 0)
+    {
+        m_settings[TEXT("IDC_TEXT")] = IDC_TEXT_DEFAULT;
+        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT));
+        OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_TEXT, IDS_REASON_EMPTY_TEXT);
+    }
+    m_settings[TEXT("IDC_TEXT")] = szText;
+
     return TRUE;
 }
 
@@ -417,6 +431,9 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_SIZE);
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
+
+    ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
+
     return TRUE;
 }
 
@@ -442,6 +459,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_PAGE_SIZE);
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
+    GET_REG_DATA(IDC_TEXT);
 #undef GET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -476,6 +494,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_PAGE_SIZE);
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
+    SET_REG_DATA(IDC_TEXT);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -588,7 +607,8 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
             continue;
         }
 
-        // yを中央そろえ。
+        // x,yを中央そろえ。
+        x += (width - text_width) / 2;
         y += (height - text_height) / 2;
         break;
     }
@@ -828,7 +848,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #endif
 
             // ANSI文字列に変換してテキストを描画する。
-            string_t text = doLoadString(IDS_LOGO);
+            string_t text = SETTING(IDC_TEXT);
 #ifdef UTF8_SUPPORT
             auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
 #else
