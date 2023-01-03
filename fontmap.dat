@@ -41,3 +41,11 @@ HGS創英角ゴシックUB=HGRSGU90.TTC,2
 HG創英角ポップ体=HGRPP190.TTC,0
 HGP創英角ポップ体=HGRPP190.TTC,1
 HGS創英角ポップ体=HGRPP190.TTC,2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 英字フォント。
+; 利用条件：編集可能。
+Arial Bold=ARIALBD.TTF
+Comic Sans MS Bold=COMIC.TTF
+Impact=IMPACT.TTF
+Tahoma Bold=TAHOMABD.TTF
