@@ -25,6 +25,9 @@
 #define IDS_OUTPUT_NAME                     119
 #define IDS_YES                             120
 #define IDS_NO                              121
+#define IDS_METHOD_01                       122
+#define IDS_METHOD_02                       123
+#define IDS_METHOD_03                       124
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

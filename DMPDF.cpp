@@ -32,8 +32,6 @@
         /* version string */            "0.0.0");
 #endif
 
-#define UTF8_SUPPORT // UTF-8サポート。
-
 // 文字列クラス。
 #ifdef UNICODE
     typedef std::wstring string_t;
@@ -59,9 +57,8 @@ enum
     IDC_PAGE_SIZE = cmb1,
     IDC_PAGE_DIRECTION = cmb2,
     IDC_FONT_NAME = cmb3,
+    IDC_METHOD = cmb5,
     IDC_TEXT = edt1,
-    IDC_IGNORE_ASPECT = chx1,
-    IDC_ONE_CHAR_PER_PAGE = chx2,
     IDC_ERASESETTINGS = psh5,
 };
 
@@ -361,9 +358,8 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_LANDSCAPE)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
+#define IDC_METHOD_DEFAULT doLoadString(IDS_METHOD_02)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
-#define IDC_IGNORE_ASPECT_DEFAULT doLoadString(IDS_YES)
-#define IDC_ONE_CHAR_PER_PAGE_DEFAULT doLoadString(IDS_NO)
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -372,9 +368,8 @@ void DekaMoji::Reset()
     SETTING(IDC_PAGE_SIZE) = IDC_PAGE_SIZE_DEFAULT;
     SETTING(IDC_PAGE_DIRECTION) = IDC_PAGE_DIRECTION_DEFAULT;
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
+    SETTING(IDC_METHOD) = IDC_METHOD_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
-    SETTING(IDC_IGNORE_ASPECT) = IDC_IGNORE_ASPECT_DEFAULT;
-    SETTING(IDC_ONE_CHAR_PER_PAGE) = IDC_ONE_CHAR_PER_PAGE_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -399,6 +394,11 @@ void DekaMoji::InitDialog(HWND hwnd)
             SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_ADDSTRING, 0, (LPARAM)entry.m_font_name.c_str());
         }
     }
+
+    // IDC_METHOD: テキストの配置方法。
+    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_01));
+    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_02));
+    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_03));
 }
 
 // ダイアログからデータへ。
@@ -415,6 +415,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     GET_COMBO_DATA(IDC_PAGE_SIZE);
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
+    GET_COMBO_DATA(IDC_METHOD);
 
     // チェックボックスからデータを取得する。
 #define GET_CHECK_DATA(id) do { \
@@ -423,8 +424,6 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     else \
         m_settings[TEXT(#id)] = doLoadString(IDS_NO); \
 } while (0)
-    GET_CHECK_DATA(IDC_IGNORE_ASPECT);
-    GET_CHECK_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef GET_CHECK_DATA
 
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
@@ -434,6 +433,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
         m_settings[TEXT("IDC_TEXT")] = IDC_TEXT_DEFAULT;
         ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT));
         OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_TEXT, IDS_REASON_EMPTY_TEXT);
+        return FALSE;
     }
     m_settings[TEXT("IDC_TEXT")] = szText;
 
@@ -449,6 +449,7 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_SIZE);
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
+    SET_COMBO_DATA(IDC_METHOD);
 #undef SET_COMBO_DATA
 
     // チェックボックスへデータを設定する。
@@ -458,8 +459,6 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     else \
         CheckDlgButton(hwnd, (id), BST_UNCHECKED); \
 } while (0)
-    SET_CHECK_DATA(IDC_IGNORE_ASPECT);
-    SET_CHECK_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef SET_CHECK_DATA
 
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
@@ -489,9 +488,8 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_PAGE_SIZE);
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
+    GET_REG_DATA(IDC_METHOD);
     GET_REG_DATA(IDC_TEXT);
-    GET_REG_DATA(IDC_IGNORE_ASPECT);
-    GET_REG_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef GET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -526,9 +524,8 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_PAGE_SIZE);
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
+    SET_REG_DATA(IDC_METHOD);
     SET_REG_DATA(IDC_TEXT);
-    SET_REG_DATA(IDC_IGNORE_ASPECT);
-    SET_REG_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -627,14 +624,14 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
         text_width *= ratio2;
         text_height *= ratio2;
 
-        if (text_width > width)
+        if (text_height > height || text_width > width)
         {
             // フォントサイズを少し小さくして再計算。
             ratio2 *= 0.95;
             continue;
         }
 
-        if (text_width * 1.1 < width)
+        if (text_height * 1.1 < height && text_width * 1.1 < width)
         {
             // フォントサイズを少し大きくして再計算。
             ratio2 *= 1.1;
@@ -811,6 +808,26 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
     }
 }
 
+// 1文字ずつ分割する。空白文字は無視する。
+void split_text_data(std::vector<string_t>& chars, const string_t& text)
+{
+    string_t data = text;
+    str_replace(data, L" ", L"");
+    str_replace(data, L"\t", L"");
+    str_replace(data, L"\r", L"");
+    str_replace(data, L"\n", L"");
+    str_replace(data, L"\r", L"");
+    str_replace(data, L"\x3000", L""); // 全角空白「　」
+
+    for (auto& ch : data)
+    {
+        WCHAR sz[2];
+        sz[0] = ch;
+        sz[1] = 0;
+        chars.push_back(sz);
+    }
+}
+
 // メインディッシュ処理。
 string_t DekaMoji::JustDoIt(HWND hwnd)
 {
@@ -825,11 +842,9 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         // エンコーディング 90ms-RKSJ-H, 90ms-RKSJ-V, 90msp-RKSJ-H, EUC-H, EUC-V が利用可能となる
         HPDF_UseJPEncodings(pdf);
 
-#ifdef UTF8_SUPPORT
         // エンコーディング "UTF-8" が利用可能に？？？
         HPDF_UseUTFEncodings(pdf);
         HPDF_SetCurrentEncoder(pdf, "UTF-8");
-#endif
 
         // 日本語フォントの MS-(P)Mincyo, MS-(P)Gothic が利用可能となる
         //HPDF_UseJPFonts(pdf);
@@ -885,11 +900,29 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         double font_size = HPDF_MAX_FONTSIZE;
 
         // アスペクト比を無視する。
-        bool ignore_aspect;
-        if (SETTING(IDC_IGNORE_ASPECT) == doLoadString(IDS_YES))
-            ignore_aspect = true;
-        else
+        bool ignore_aspect = true;
+        // 1ページに1文字ずつ配置する。
+        bool one_char_per_page = false;
+        if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_01))
+        {
             ignore_aspect = false;
+            one_char_per_page = false;
+        }
+        else if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_02))
+        {
+            ignore_aspect = true;
+            one_char_per_page = false;
+        }
+        else if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_03))
+        {
+            ignore_aspect = false;
+            one_char_per_page = true;
+        }
+        else
+        {
+            ignore_aspect = true;
+            one_char_per_page = false;
+        }
 
         // 出力ファイル名。
         string_t output_name;
@@ -902,11 +935,77 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             output_name = szText;
         }
 
+        // テキストデータ。
+        string_t text_data = SETTING(IDC_TEXT);
+
         HPDF_Page page; // ページオブジェクト。
         HPDF_Font font; // フォントオブジェクト。
         double page_width, page_height; // ページサイズ。
         double content_x, content_y, content_width, content_height; // ページ内容の位置とサイズ。
-        for (INT iPage = 0; iPage < 1; ++iPage)
+        if (one_char_per_page)
+        {
+            // 1文字ずつ分割する。空白文字は無視する。
+            std::vector<string_t> chars;
+            split_text_data(chars, text_data);
+
+            for (size_t iPage = 0; iPage < chars.size(); ++iPage)
+            {
+                // 文字列。
+                string_t& str = chars[iPage];
+
+                // ページを追加する。
+                page = HPDF_AddPage(pdf);
+
+                // ページサイズと用紙の向きを指定。
+                HPDF_Page_SetSize(page, page_size, direction);
+
+                // ページサイズ（ピクセル単位）。
+                page_width = HPDF_Page_GetWidth(page);
+                page_height = HPDF_Page_GetHeight(page);
+
+                // ページ内容の位置とサイズ。
+                content_x = margin;
+                content_y = margin;
+                content_width = page_width - margin * 2;
+                content_height = page_height - margin * 2;
+
+                // 線の幅を指定。
+                HPDF_Page_SetLineWidth(page, 2);
+
+                // 線の色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。
+                HPDF_Page_SetRGBStroke(page, 0, 0, 0);
+
+                /* 塗りつぶしの色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。*/
+                HPDF_Page_SetRGBFill(page, 0, 0, 0);
+
+                // フォントを指定する。
+                auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
+                font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
+
+#ifndef NO_SHAREWARE
+                // シェアウェア未登録ならば、ロゴ文字列を描画する。
+                if (!g_shareware.IsRegistered())
+                {
+                    auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
+                    // フォントとフォントサイズを指定。
+                    HPDF_Page_SetFontAndSize(page, font, 12);
+
+                    // テキストを描画する。
+                    HPDF_Page_BeginText(page);
+                    {
+                        HPDF_Page_TextOut(page, content_x, content_y, logo_a);
+                    }
+                    HPDF_Page_EndText(page);
+                }
+#endif
+
+                // ANSI文字列に変換してテキストを描画する。
+                auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
+                hpdf_draw_multiline_text(page, font, font_size, text_a,
+                    content_x, content_y, content_width, content_height, ignore_aspect);
+            }
+        }
+        else
         {
             // ページを追加する。
             page = HPDF_AddPage(pdf);
@@ -935,21 +1034,13 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 
             // フォントを指定する。
             auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
-#ifdef UTF8_SUPPORT
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
-#else
-            font = HPDF_GetFont(pdf, font_name_a, "90ms-RKSJ-H");
-#endif
 
 #ifndef NO_SHAREWARE
             // シェアウェア未登録ならば、ロゴ文字列を描画する。
             if (!g_shareware.IsRegistered())
             {
-#ifdef UTF8_SUPPORT
                 auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
-#else
-                auto logo_a = ansi_from_wide(CP932, doLoadString(IDS_LOGO));
-#endif
                 // フォントとフォントサイズを指定。
                 HPDF_Page_SetFontAndSize(page, font, 12);
 
@@ -963,12 +1054,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #endif
 
             // ANSI文字列に変換してテキストを描画する。
-            string_t text = SETTING(IDC_TEXT);
-#ifdef UTF8_SUPPORT
-            auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
-#else
-            auto text_a = ansi_from_wide(CP932, text.c_str());
-#endif
+            auto text_a = ansi_from_wide(CP_UTF8, text_data.c_str());
             hpdf_draw_multiline_text(page, font, font_size, text_a,
                 content_x, content_y, content_width, content_height, ignore_aspect);
         }
@@ -1110,6 +1196,30 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
         OnEraseSettings(hwnd);
+        break;
+    case stc1:
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, cmb1));
+        break;
+    case stc2:
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, cmb2));
+        break;
+    case stc3:
+        // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, edt1));
+        break;
+    case stc4:
+        // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, edt2));
+        break;
+    case stc5:
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, cmb5));
+        break;
+    case stc6:
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, cmb3));
         break;
     }
 }
