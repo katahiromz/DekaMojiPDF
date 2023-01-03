@@ -30,7 +30,7 @@
         "f7a72f14611fe48739102edbd86a4d3179511007a44d39e1c50a2d3b84127a56",
         /* trial days */                10,
         /* salt string */               "gsI5AZ",
-        /* version string */            "1.0.0");
+        /* version string */            "1.0.1");
 #endif
 
 // 文字列クラス。
