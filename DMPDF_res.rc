@@ -28,13 +28,15 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 
 1 DIALOG 0, 0, 270, 190
 CAPTION "デカ文字PDF Ver.0.0.0 by 片山博文MZ"
-STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
+STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 9, "Meiryo UI"
 {
     LTEXT "用紙サイズ:", stc1, 5, 5, 60, 10, SS_CENTERIMAGE | NOT WS_GROUP
     COMBOBOX cmb1, 70, 5, 70, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "ページの向き:", stc2, 5, 25, 60, 10, SS_CENTERIMAGE | NOT WS_GROUP
     COMBOBOX cmb2, 70, 25, 70, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    AUTOCHECKBOX "縦横比を無視する", chx1, 155, 5, 85, 14
+    AUTOCHECKBOX "1ページに1文字ずつ", chx2, 155, 25, 85, 14
     LTEXT "テキスト（複数行可）:", stc3, 5, 45, 80, 10, SS_CENTERIMAGE | NOT WS_GROUP
     EDITTEXT edt1, 5, 55, 260, 55, ES_MULTILINE | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
     LTEXT "テキストの色:", stc4, 5, 120, 60, 10, SS_CENTERIMAGE | NOT WS_GROUP
@@ -45,6 +47,7 @@ FONT 9, "Meiryo UI"
     CONTROL "", stc5, "STATIC", SS_BITMAP | WS_GROUP, 5, 155, 120, 30
     DEFPUSHBUTTON "PDF生成", IDOK, 140, 155, 60, 30
     PUSHBUTTON "終了", IDCANCEL, 205, 155, 60, 30
+    PUSHBUTTON "設定の初期化", psh5, 5, 170, 60, 14
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -73,9 +76,12 @@ STRINGTABLE
     IDS_GENERATE, "PDF生成"
     IDS_PROCESSINGNOW, "生成中..."
     IDS_FONT_01, "ＭＳ ゴシック"
-    IDS_SAMPLETEXT, "文字列を入力して下さい"
+    IDS_SAMPLETEXT, "ページいっぱいに\r\n文字を配置します"
     IDS_FIELD_TEXT, "テキスト"
     IDS_REASON_EMPTY_TEXT, "空ではない文字列を指定して下さい。"
+    IDS_OUTPUT_NAME, "デカ文字-%04u-%02u-%02u.pdf"
+    IDS_YES, "はい"
+    IDS_NO, "いいえ"
 }
 
 //////////////////////////////////////////////////////////////////////////////

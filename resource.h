@@ -22,6 +22,9 @@
 #define IDS_SAMPLETEXT                      116
 #define IDS_FIELD_TEXT                      117
 #define IDS_REASON_EMPTY_TEXT               118
+#define IDS_OUTPUT_NAME                     119
+#define IDS_YES                             120
+#define IDS_NO                              121
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

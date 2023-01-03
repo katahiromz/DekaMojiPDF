@@ -60,6 +60,9 @@ enum
     IDC_PAGE_DIRECTION = cmb2,
     IDC_FONT_NAME = cmb3,
     IDC_TEXT = edt1,
+    IDC_IGNORE_ASPECT = chx1,
+    IDC_ONE_CHAR_PER_PAGE = chx2,
+    IDC_ERASESETTINGS = psh5,
 };
 
 // デカ文字PDFのメインクラス。
@@ -356,9 +359,11 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
 // 既定値。
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
-#define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_PORTRAIT)
+#define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_LANDSCAPE)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
+#define IDC_IGNORE_ASPECT_DEFAULT doLoadString(IDS_YES)
+#define IDC_ONE_CHAR_PER_PAGE_DEFAULT doLoadString(IDS_NO)
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -368,6 +373,8 @@ void DekaMoji::Reset()
     SETTING(IDC_PAGE_DIRECTION) = IDC_PAGE_DIRECTION_DEFAULT;
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
+    SETTING(IDC_IGNORE_ASPECT) = IDC_IGNORE_ASPECT_DEFAULT;
+    SETTING(IDC_ONE_CHAR_PER_PAGE) = IDC_ONE_CHAR_PER_PAGE_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -409,6 +416,17 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
 
+    // チェックボックスからデータを取得する。
+#define GET_CHECK_DATA(id) do { \
+    if (IsDlgButtonChecked(hwnd, id) == BST_CHECKED) \
+        m_settings[TEXT(#id)] = doLoadString(IDS_YES); \
+    else \
+        m_settings[TEXT(#id)] = doLoadString(IDS_NO); \
+} while (0)
+    GET_CHECK_DATA(IDC_IGNORE_ASPECT);
+    GET_CHECK_DATA(IDC_ONE_CHAR_PER_PAGE);
+#undef GET_CHECK_DATA
+
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
     str_trim(szText);
     if (szText[0] == 0)
@@ -431,6 +449,18 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_SIZE);
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
+#undef SET_COMBO_DATA
+
+    // チェックボックスへデータを設定する。
+#define SET_CHECK_DATA(id) do { \
+    if (m_settings[TEXT(#id)] == doLoadString(IDS_YES)) \
+        CheckDlgButton(hwnd, (id), BST_CHECKED); \
+    else \
+        CheckDlgButton(hwnd, (id), BST_UNCHECKED); \
+} while (0)
+    SET_CHECK_DATA(IDC_IGNORE_ASPECT);
+    SET_CHECK_DATA(IDC_ONE_CHAR_PER_PAGE);
+#undef SET_CHECK_DATA
 
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
 
@@ -460,6 +490,8 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
     GET_REG_DATA(IDC_TEXT);
+    GET_REG_DATA(IDC_IGNORE_ASPECT);
+    GET_REG_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef GET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -495,6 +527,8 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
     SET_REG_DATA(IDC_TEXT);
+    SET_REG_DATA(IDC_IGNORE_ASPECT);
+    SET_REG_DATA(IDC_ONE_CHAR_PER_PAGE);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -734,7 +768,8 @@ str_split(T_STR_CONTAINER& container,
 // テキストを描画する。
 void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
                               const char *text,
-                              double x, double y, double width, double height)
+                              double x, double y, double width, double height,
+                              bool ignore_aspect = true)
 {
     char buf[1024];
     StringCchCopyA(buf, _countof(buf), text);
@@ -763,8 +798,16 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
         double line_width = width;
         double line_height = height / rows;
 
-        hpdf_draw_text_2(page, font, font_size, buf, 
-                         line_x, line_y, line_width, line_height, 1);
+        if (ignore_aspect)
+        {
+            hpdf_draw_text_2(page, font, font_size, buf, 
+                             line_x, line_y, line_width, line_height);
+        }
+        else
+        {
+            hpdf_draw_text_1(page, font, font_size, buf, 
+                             line_x, line_y, line_width, line_height);
+        }
     }
 }
 
@@ -841,8 +884,23 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         // フォントサイズ（pt）。
         double font_size = HPDF_MAX_FONTSIZE;
 
+        // アスペクト比を無視する。
+        bool ignore_aspect;
+        if (SETTING(IDC_IGNORE_ASPECT) == doLoadString(IDS_YES))
+            ignore_aspect = true;
+        else
+            ignore_aspect = false;
+
         // 出力ファイル名。
-        string_t output_name = TEXT("DekaMojiPDF");
+        string_t output_name;
+        {
+            SYSTEMTIME st;
+            ::GetLocalTime(&st);
+            TCHAR szText[MAX_PATH];
+            StringCchPrintf(szText, _countof(szText), doLoadString(IDS_OUTPUT_NAME),
+                            st.wYear, st.wMonth, st.wDay);
+            output_name = szText;
+        }
 
         HPDF_Page page; // ページオブジェクト。
         HPDF_Font font; // フォントオブジェクト。
@@ -911,7 +969,8 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #else
             auto text_a = ansi_from_wide(CP932, text.c_str());
 #endif
-            hpdf_draw_multiline_text(page, font, font_size, text_a, content_x, content_y, content_width, content_height);
+            hpdf_draw_multiline_text(page, font, font_size, text_a,
+                content_x, content_y, content_width, content_height, ignore_aspect);
         }
 
         // PDF出力。
@@ -925,7 +984,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             TCHAR szPath[MAX_PATH];
             SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
             PathAppend(szPath, output_name.c_str());
-            StringCchCat(szPath, _countof(szPath), TEXT(".pdf"));
             if (!CopyFile(temp_file.get(), szPath, FALSE))
             {
                 auto err_msg = ansi_from_wide(CP_ACP, doLoadString(IDS_COPYFILEFAILED));
@@ -934,7 +992,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 
             // 成功メッセージを表示。
             StringCchCopy(szPath, _countof(szPath), output_name.c_str());
-            StringCchCat(szPath, _countof(szPath), TEXT(".pdf"));
             TCHAR szText[MAX_PATH];
             StringCchPrintf(szText, _countof(szText), doLoadString(IDS_SUCCEEDED), szPath);
             ret = szText;
@@ -1050,6 +1107,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case IDC_EXIT: // 「終了」ボタン。
         EndDialog(hwnd, id);
+        break;
+    case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
+        OnEraseSettings(hwnd);
         break;
     }
 }
