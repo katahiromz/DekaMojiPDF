@@ -28,6 +28,8 @@
 #define IDS_METHOD_01                       122
 #define IDS_METHOD_02                       123
 #define IDS_METHOD_03                       124
+#define IDS_FIELD_TEXT_COLOR                125
+#define IDS_REASON_VALID_COLOR              126
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

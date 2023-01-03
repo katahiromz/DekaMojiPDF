@@ -4,6 +4,10 @@
 
 完成したPDFファイルはデスクトップに作成されます。
 
+<p>
+	<img src="img/screenshot.png" alt="(スクリーンショット)" />
+</p>
+
 ## 対応環境
 
 - 日本語 Windows XP/Vista/7/10/11

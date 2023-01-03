@@ -2,10 +2,10 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ÉfÉJï∂éöPDF"
-#define MyAppVersion "0.0.0"
+#define MyAppVersion "1.0.0"
 #define MyAppPublisher "ï–éRîéï∂MZ"
 #define MyAppURL "https://katahiromz.web.fc2.com/"
-#define MyAppExeName "DekaMoji.exe"
+#define MyAppExeName "DMPDF.exe"
 #define MyAppCopyright "(c) katahiromz"
 #define MyAppDescription "ëÂÇ´Ç»ï∂éöÇ≈PDFÇê∂ê¨"
 
@@ -26,7 +26,7 @@ DefaultGroupName={#MyAppName}
 LicenseFile=LICENSE.txt
 OutputDir=build
 OutputBaseFilename=DMPDF-{#MyAppVersion}-setup
-SetupIconFile=res\Icon_1.ico
+SetupIconFile=res\1041_Icon_1.ico
 Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\{#MyAppExeName}
@@ -46,7 +46,7 @@ Name: "japanese"; MessagesFile: "compiler:Languages\Japanese.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "build\DekaMoji.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\DMPDF.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion

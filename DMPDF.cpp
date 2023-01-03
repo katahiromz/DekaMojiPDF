@@ -15,6 +15,7 @@
 #include <stdexcept>        // std::runtime_error クラス。
 #include <cassert>          // assertマクロ。
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
+#include "color_value.h"    // 色をパースする。
 #include "TempFile.hpp"     // 一時ファイル操作用のヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
@@ -26,10 +27,10 @@
         /* company registry key */      TEXT("Katayama Hirofumi MZ"),
         /* application registry key */  TEXT("DekaMojiPDF"),
         /* password hash */
-        "e218f83f070a186f886c6dc82bd7ecf3d6c3ea4224fd7d213aa06e9c9713b395",
+        "f7a72f14611fe48739102edbd86a4d3179511007a44d39e1c50a2d3b84127a56",
         /* trial days */                10,
-        /* salt string */               "mJpDxx2D",
-        /* version string */            "0.0.0");
+        /* salt string */               "gsI5AZ",
+        /* version string */            "1.0.0");
 #endif
 
 // 文字列クラス。
@@ -59,6 +60,8 @@ enum
     IDC_FONT_NAME = cmb3,
     IDC_METHOD = cmb5,
     IDC_TEXT = edt1,
+    IDC_TEXT_COLOR = edt2,
+    IDC_TEXT_COLOR_BUTTON = psh1,
     IDC_ERASESETTINGS = psh5,
 };
 
@@ -360,6 +363,7 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
 #define IDC_METHOD_DEFAULT doLoadString(IDS_METHOD_02)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
+#define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -370,6 +374,7 @@ void DekaMoji::Reset()
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
     SETTING(IDC_METHOD) = IDC_METHOD_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
+    SETTING(IDC_TEXT_COLOR) = IDC_TEXT_COLOR_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -437,6 +442,26 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     }
     m_settings[TEXT("IDC_TEXT")] = szText;
 
+    GetDlgItemText(hwnd, IDC_TEXT_COLOR, szText, _countof(szText));
+    str_trim(szText);
+    if (szText[0] == 0)
+    {
+        m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
+        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
+        OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_EMPTY_TEXT);
+        return FALSE;
+    }
+    auto ansi = ansi_from_wide(CP_ACP, szText);
+    auto color_value = color_value_parse(ansi);
+    if (color_value == -1)
+    {
+        m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
+        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
+        OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_VALID_COLOR);
+        return FALSE;
+    }
+    m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
+
     return TRUE;
 }
 
@@ -462,6 +487,7 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
 #undef SET_CHECK_DATA
 
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
+    ::SetDlgItemText(hwnd, IDC_TEXT_COLOR, SETTING(IDC_TEXT_COLOR).c_str());
 
     return TRUE;
 }
@@ -490,6 +516,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_FONT_NAME);
     GET_REG_DATA(IDC_METHOD);
     GET_REG_DATA(IDC_TEXT);
+    GET_REG_DATA(IDC_TEXT_COLOR);
 #undef GET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -526,6 +553,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_FONT_NAME);
     SET_REG_DATA(IDC_METHOD);
     SET_REG_DATA(IDC_TEXT);
+    SET_REG_DATA(IDC_TEXT_COLOR);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -938,6 +966,18 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
         // テキストデータ。
         string_t text_data = SETTING(IDC_TEXT);
 
+        // テキストの色。
+        double r_value, g_value, b_value;
+        {
+            auto text = SETTING(IDC_TEXT_COLOR);
+            auto ansi = ansi_from_wide(CP_ACP, text.c_str());
+            uint32_t text_color = color_value_parse(ansi);
+            text_color = color_value_fix(text_color);
+            r_value = GetRValue(text_color) / 255.5;
+            g_value = GetGValue(text_color) / 255.5;
+            b_value = GetBValue(text_color) / 255.5;
+        }
+
         HPDF_Page page; // ページオブジェクト。
         HPDF_Font font; // フォントオブジェクト。
         double page_width, page_height; // ページサイズ。
@@ -973,10 +1013,10 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
                 HPDF_Page_SetLineWidth(page, 2);
 
                 // 線の色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。
-                HPDF_Page_SetRGBStroke(page, 0, 0, 0);
+                HPDF_Page_SetRGBStroke(page, r_value, g_value, b_value);
 
                 /* 塗りつぶしの色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。*/
-                HPDF_Page_SetRGBFill(page, 0, 0, 0);
+                HPDF_Page_SetRGBFill(page, r_value, g_value, b_value);
 
                 // フォントを指定する。
                 auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
@@ -1027,10 +1067,10 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             HPDF_Page_SetLineWidth(page, 2);
 
             // 線の色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。
-            HPDF_Page_SetRGBStroke(page, 0, 0, 0);
+            HPDF_Page_SetRGBStroke(page, r_value, g_value, b_value);
 
             /* 塗りつぶしの色を RGB で設定する。PDF では RGB 各値を [0,1] で指定することになっている。*/
-            HPDF_Page_SetRGBFill(page, 0, 0, 0);
+            HPDF_Page_SetRGBFill(page, r_value, g_value, b_value);
 
             // フォントを指定する。
             auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
@@ -1182,6 +1222,40 @@ void OnEraseSettings(HWND hwnd)
     pDM->RegFromData(hwnd);
 }
 
+// 「テキストの色」ボタンが押された。
+void OnTextColorButton(HWND hwnd)
+{
+    // テキストの色を取得する。
+    TCHAR szText[64];
+    GetDlgItemText(hwnd, IDC_TEXT_COLOR, szText, _countof(szText));
+    StrTrim(szText, TEXT(" \t\r\n"));
+    auto ansi = ansi_from_wide(CP_ACP, szText);
+    auto text_color = color_value_parse(ansi);
+    if (text_color == -1)
+        text_color = 0;
+    text_color = color_value_fix(text_color);
+
+    static COLORREF custom_colors[16] = {
+        RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255),
+        RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255),
+        RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255),
+        RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255), RGB(255, 255, 255),
+    };
+    CHOOSECOLOR cc = { sizeof(cc), hwnd };
+    cc.rgbResult = text_color;
+    cc.lpCustColors = custom_colors;
+    cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+    if (::ChooseColor(&cc))
+    {
+        StringCchPrintf(szText, _countof(szText), TEXT("#%02X%02X%02X"),
+            GetRValue(cc.rgbResult),
+            GetGValue(cc.rgbResult),
+            GetBValue(cc.rgbResult)
+        );
+        SetDlgItemText(hwnd, IDC_TEXT_COLOR, szText);
+    }
+}
+
 // WM_COMMAND
 // コマンド。
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -1209,7 +1283,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         {
             HWND hEdit = ::GetDlgItem(hwnd, edt1);
-            Edit_SetSel(hEdit, 0, -1);
+            Edit_SetSel(hEdit, 0, -1); // すべて選択。
             ::SetFocus(hEdit);
         }
         break;
@@ -1217,7 +1291,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         {
             HWND hEdit = ::GetDlgItem(hwnd, edt2);
-            Edit_SetSel(hEdit, 0, -1);
+            Edit_SetSel(hEdit, 0, -1); // すべて選択。
             ::SetFocus(hEdit);
         }
         break;
@@ -1229,7 +1303,51 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         ::SetFocus(::GetDlgItem(hwnd, cmb3));
         break;
+    case IDC_TEXT_COLOR: // 「テキストの色」テキストボックス。
+        if (codeNotify == EN_CHANGE)
+        {
+            ::InvalidateRect(::GetDlgItem(hwnd, IDC_TEXT_COLOR_BUTTON), NULL, TRUE);
+            break;
+        }
+    case IDC_TEXT_COLOR_BUTTON: // 「テキストの色」ボタン。
+        if (codeNotify == BN_CLICKED)
+        {
+            OnTextColorButton(hwnd);
+        }
+        break;
     }
+}
+
+// WM_DRAWITEM
+void OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT * lpDrawItem)
+{
+    HWND hButton = ::GetDlgItem(hwnd, IDC_TEXT_COLOR_BUTTON);
+    if (lpDrawItem->hwndItem != hButton)
+        return;
+
+    // テキストの色を取得する。
+    TCHAR szText[64];
+    GetDlgItemText(hwnd, IDC_TEXT_COLOR, szText, _countof(szText));
+    StrTrim(szText, TEXT(" \t\r\n"));
+    auto ansi = ansi_from_wide(CP_ACP, szText);
+    auto text_color = color_value_parse(ansi);
+    if (text_color == -1)
+        text_color = 0;
+    text_color = color_value_fix(text_color);
+
+    BOOL bPressed = !!(lpDrawItem->itemState & ODS_CHECKED);
+
+    // ボタンを描画する。
+    RECT rcItem = lpDrawItem->rcItem;
+    UINT uState = DFCS_BUTTONPUSH | DFCS_ADJUSTRECT;
+    if (bPressed)
+        uState |= DFCS_PUSHED;
+    ::DrawFrameControl(lpDrawItem->hDC, &rcItem, DFC_BUTTON, uState);
+
+    // 色ボタンの内側を描画する。
+    HBRUSH hbr = ::CreateSolidBrush(text_color);
+    ::FillRect(lpDrawItem->hDC, &rcItem, hbr);
+    ::DeleteObject(hbr);
 }
 
 // WM_DESTROY
@@ -1250,6 +1368,7 @@ DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         HANDLE_MSG(hwnd, WM_INITDIALOG, OnInitDialog);
         HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
+        HANDLE_MSG(hwnd, WM_DRAWITEM, OnDrawItem);
         HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
     }
     return 0;

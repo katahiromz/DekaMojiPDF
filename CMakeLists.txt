@@ -44,6 +44,9 @@ endif()
 # Unicode
 add_definitions(-DUNICODE -D_UNICODE)
 
+# color_value
+include_directories(color_value)
+
 # libharu (hpdf)
 set(LIBHPDF_STATIC ON)
 add_subdirectory(libharu)

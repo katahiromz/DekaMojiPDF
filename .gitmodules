@@ -1,3 +1,6 @@
 [submodule "libharu"]
 	path = libharu
 	url = https://github.com/katahiromz/libharu
+[submodule "color_value"]
+	path = color_value
+	url = https://github.com/katahiromz/color_value
