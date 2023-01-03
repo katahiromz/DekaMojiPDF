@@ -543,11 +543,83 @@ void hpdf_draw_box(HPDF_Page page, double x, double y, double width, double heig
     HPDF_Page_Stroke(page);
 }
 
-// テキストを描画する。
-void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
-                    const char *text,
-                    double x, double y, double width, double height,
-                    int draw_box = 0)
+// テキストを描画する。縦横比を考慮。
+void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
+                      const char *text,
+                      double x, double y, double width, double height,
+                      int draw_box = 0)
+{
+    // フォントサイズを制限。
+    if (font_size > HPDF_MAX_FONTSIZE)
+        font_size = HPDF_MAX_FONTSIZE;
+
+    // 長方形を描画する。
+    if (draw_box == 1)
+    {
+        hpdf_draw_box(page, x, y, width, height);
+    }
+
+    // 長方形に収まるフォントサイズを計算する。
+    double text_width, text_height;
+    double ratio2 = 1.0;
+    for (;;)
+    {
+        // フォントとフォントサイズを指定。
+        HPDF_Page_SetFontAndSize(page, font, font_size);
+
+        // テキストの幅と高さを取得する。
+        text_width = HPDF_Page_TextWidth(page, text);
+        text_height = HPDF_Page_GetCurrentFontSize(page);
+
+        text_width *= ratio2;
+        text_height *= ratio2;
+
+        if (text_width > width)
+        {
+            // フォントサイズを少し小さくして再計算。
+            ratio2 *= 0.95;
+            continue;
+        }
+
+        if (text_width * 1.1 < width)
+        {
+            // フォントサイズを少し大きくして再計算。
+            ratio2 *= 1.1;
+            continue;
+        }
+
+        // yを中央そろえ。
+        y += (height - text_height) / 2;
+        break;
+    }
+
+    // テキストを描画する。
+    HPDF_Page_BeginText(page);
+    {
+        // ベースラインからdescentだけずらす。
+        double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
+        descent *= ratio2;
+
+        // 文字をページいっぱいにする。
+        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent);
+
+        // テキストを描画する。
+        HPDF_Page_ShowText(page, text);
+    }
+    HPDF_Page_EndText(page);
+
+    // 長方形を描画する。
+    if (draw_box == 2)
+    {
+        hpdf_draw_box(page, x, y, text_width, text_height);
+    }
+}
+
+// テキストを描画する。縦横比を無視。
+void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
+                      const char *text,
+                      double x, double y, double width, double height,
+                      int draw_box = 0)
 {
     // フォントサイズを制限。
     if (font_size > HPDF_MAX_FONTSIZE)
@@ -762,7 +834,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #else
             auto text_a = ansi_from_wide(CP932, text.c_str());
 #endif
-            hpdf_draw_text(page, font, font_size, text_a, content_x, content_y, content_width, content_height, 1);
+            hpdf_draw_text_1(page, font, font_size, text_a, content_x, content_y, content_width, content_height, 1);
         }
 
         // PDF出力。
