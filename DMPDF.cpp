@@ -937,9 +937,6 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     // 共通コントロール群を初期化する。
     InitCommonControls();
 
-    // リッチテキストライブラリを読み込む。
-    HINSTANCE hinstRichEdit = LoadLibrary(TEXT("RICHED32.DLL"));
-
 #ifndef NO_SHAREWARE
     // デバッガ―が有効、またはシェアウェアを開始できないときは
     if (IsDebuggerPresent() || !g_shareware.Start(NULL))
@@ -954,9 +951,6 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
     // ユーザーデータをパラメータとしてダイアログを開く。
     DialogBoxParam(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc, (LPARAM)&dm);
-
-    // リッチエディトライブラリを解放する。
-    FreeLibrary(hinstRichEdit);
 
     // 正常終了。
     return 0;
