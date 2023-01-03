@@ -29,7 +29,7 @@
         "e218f83f070a186f886c6dc82bd7ecf3d6c3ea4224fd7d213aa06e9c9713b395",
         /* trial days */                10,
         /* salt string */               "mJpDxx2D",
-        /* version string */            "0.9.7");
+        /* version string */            "0.0.0");
 #endif
 
 #define UTF8_SUPPORT // UTF-8サポート。
@@ -56,6 +56,9 @@ enum
 {
     IDC_GENERATE = IDOK,
     IDC_EXIT = IDCANCEL,
+    IDC_PAGE_SIZE = cmb1,
+    IDC_PAGE_DIRECTION = cmb2,
+    IDC_FONT_NAME = cmb3,
 };
 
 // デカ文字PDFのメインクラス。
@@ -350,39 +353,136 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     LoadFontMap();
 }
 
+// 既定値。
+#define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
+#define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_PORTRAIT)
+#define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
+
 // データをリセットする。
 void DekaMoji::Reset()
 {
 #define SETTING(id) m_settings[TEXT(#id)]
+    SETTING(IDC_PAGE_SIZE) = IDC_PAGE_SIZE_DEFAULT;
+    SETTING(IDC_PAGE_DIRECTION) = IDC_PAGE_DIRECTION_DEFAULT;
+    SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
 }
 
 // ダイアログを初期化する。
 void DekaMoji::InitDialog(HWND hwnd)
 {
+    // IDC_PAGE_SIZE: 用紙サイズ。
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A3));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A4));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A5));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B4));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B5));
+
+    // IDC_PAGE_DIRECTION: ページの向き。
+    SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_PORTRAIT));
+    SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_LANDSCAPE));
+
+    // IDC_FONT_NAME: フォント名。
+    if (m_font_map.size())
+    {
+        for (auto& entry : m_font_map)
+        {
+            SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_ADDSTRING, 0, (LPARAM)entry.m_font_name.c_str());
+        }
+    }
 }
 
 // ダイアログからデータへ。
 BOOL DekaMoji::DataFromDialog(HWND hwnd)
 {
+    TCHAR szText[MAX_PATH];
+    // コンボボックスからデータを取得する。
+#define GET_COMBO_DATA(id) do { \
+    getComboText(hwnd, (id), szText, _countof(szText)); \
+    str_trim(szText); \
+    m_settings[TEXT(#id)] = szText; \
+} while (0)
+
+    GET_COMBO_DATA(IDC_PAGE_SIZE);
+    GET_COMBO_DATA(IDC_PAGE_DIRECTION);
+    GET_COMBO_DATA(IDC_FONT_NAME);
     return TRUE;
 }
 
 // データからダイアログへ。
 BOOL DekaMoji::DialogFromData(HWND hwnd)
 {
+    // コンボボックスへデータを設定する。
+#define SET_COMBO_DATA(id) \
+    setComboText(hwnd, (id), m_settings[TEXT(#id)].c_str());
+    SET_COMBO_DATA(IDC_PAGE_SIZE);
+    SET_COMBO_DATA(IDC_PAGE_DIRECTION);
+    SET_COMBO_DATA(IDC_FONT_NAME);
     return TRUE;
 }
 
 // レジストリからデータへ。
 BOOL DekaMoji::DataFromReg(HWND hwnd)
 {
+    // ソフト固有のレジストリキーを開く。
+    HKEY hKey;
+    RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), 0, KEY_READ, &hKey);
+    if (!hKey)
+        return FALSE; // 開けなかった。
+
+    // レジストリからデータを取得する。
+    TCHAR szText[MAX_PATH];
+#define GET_REG_DATA(id) do { \
+    szText[0] = 0; \
+    DWORD cbText = sizeof(szText); \
+    LONG error = RegQueryValueEx(hKey, TEXT(#id), NULL, NULL, (LPBYTE)szText, &cbText); \
+    if (error == ERROR_SUCCESS) { \
+        SETTING(id) = szText; \
+    } \
+} while(0)
+    GET_REG_DATA(IDC_PAGE_SIZE);
+    GET_REG_DATA(IDC_PAGE_DIRECTION);
+    GET_REG_DATA(IDC_FONT_NAME);
+#undef GET_REG_DATA
+
+    // レジストリキーを閉じる。
+    RegCloseKey(hKey);
     return TRUE;
 }
 
 // データからレジストリへ。
 BOOL DekaMoji::RegFromData(HWND hwnd)
 {
-    return TRUE;
+    HKEY hCompanyKey = NULL, hAppKey = NULL;
+
+    // 会社固有のレジストリキーを作成または開く。
+    RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ"), &hCompanyKey);
+    if (hCompanyKey == NULL)
+        return FALSE; // 失敗。
+
+    // ソフト固有のレジストリキーを作成または開く。
+    RegCreateKey(hCompanyKey, TEXT("DekaMojiPDF"), &hAppKey);
+    if (hAppKey == NULL)
+    {
+        RegCloseKey(hCompanyKey);
+        return FALSE; // 失敗。
+    }
+
+    // レジストリにデータを設定する。
+#define SET_REG_DATA(id) do { \
+    auto& str = m_settings[TEXT(#id)]; \
+    DWORD cbText = (str.size() + 1) * sizeof(WCHAR); \
+    RegSetValueEx(hAppKey, TEXT(#id), 0, REG_SZ, (LPBYTE)str.c_str(), cbText); \
+} while(0)
+    SET_REG_DATA(IDC_PAGE_SIZE);
+    SET_REG_DATA(IDC_PAGE_DIRECTION);
+    SET_REG_DATA(IDC_FONT_NAME);
+#undef SET_REG_DATA
+
+    // レジストリキーを閉じる。
+    RegCloseKey(hAppKey);
+    RegCloseKey(hCompanyKey);
+
+    return TRUE; // 成功。
 }
 
 // 文字列中に見つかった部分文字列をすべて置き換える。
@@ -461,6 +561,7 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
 
     // 長方形に収まるフォントサイズを計算する。
     double text_width, text_height;
+    double aspect1, aspect2, ratio1, ratio2 = 1.0;
     for (;;)
     {
         // フォントとフォントサイズを指定。
@@ -470,17 +571,30 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
         text_width = HPDF_Page_TextWidth(page, text);
         text_height = HPDF_Page_GetCurrentFontSize(page);
 
-        // テキストが長方形に収まるか？
-        if (text_width <= width && text_height <= height)
+        // アスペクト比を調整する。
+        aspect1 = text_height / text_width;
+        aspect2 = height / width;
+        ratio1 = aspect2 / aspect1;
+        text_height *= ratio1;
+
+        text_width *= ratio2;
+        text_height *= ratio2;
+
+        if (text_width > width && text_height > height)
         {
-            // x,yを中央そろえ。
-            x += (width - text_width) / 2;
-            y += (height - text_height) / 2;
-            break;
+            // フォントサイズを少し小さくして再計算。
+            ratio2 *= 0.95;
+            continue;
         }
 
-        // フォントサイズを少し小さくして再計算。
-        font_size *= 0.8;
+        if (text_width * 1.1 < width && text_height * 1.1 < height)
+        {
+            // フォントサイズを少し大きくして再計算。
+            ratio2 *= 1.1;
+            continue;
+        }
+
+        break;
     }
 
     // テキストを描画する。
@@ -488,7 +602,13 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
     {
         // ベースラインからdescentだけずらす。
         double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
-        HPDF_Page_TextOut(page, x, y + descent, text);
+        descent *= ratio2 * ratio1;
+
+        // 文字をページいっぱいにする。
+        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent);
+
+        // テキストを描画する。
+        HPDF_Page_ShowText(page, text);
     }
     HPDF_Page_EndText(page);
 
@@ -623,28 +743,26 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
 #else
                 auto logo_a = ansi_from_wide(CP932, doLoadString(IDS_LOGO));
 #endif
-                double logo_x = content_x, logo_y = content_y;
-
                 // フォントとフォントサイズを指定。
-                HPDF_Page_SetFontAndSize(page, font, font_size);
+                HPDF_Page_SetFontAndSize(page, font, 12);
 
                 // テキストを描画する。
                 HPDF_Page_BeginText(page);
                 {
-                    HPDF_Page_TextOut(page, logo_x, logo_y, logo_a);
+                    HPDF_Page_TextOut(page, content_x, content_y, logo_a);
                 }
                 HPDF_Page_EndText(page);
             }
 #endif
 
             // ANSI文字列に変換してテキストを描画する。
-            string_t text = TEXT("This is a test.");
+            string_t text = doLoadString(IDS_LOGO);
 #ifdef UTF8_SUPPORT
             auto text_a = ansi_from_wide(CP_UTF8, text.c_str());
 #else
             auto text_a = ansi_from_wide(CP932, text.c_str());
 #endif
-            hpdf_draw_text(page, font, font_size, text_a, content_x, content_y, content_width, font_size);
+            hpdf_draw_text(page, font, font_size, text_a, content_x, content_y, content_width, content_height, 1);
         }
 
         // PDF出力。
@@ -819,6 +937,9 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     // 共通コントロール群を初期化する。
     InitCommonControls();
 
+    // リッチテキストライブラリを読み込む。
+    HINSTANCE hinstRichEdit = LoadLibrary(TEXT("RICHED32.DLL"));
+
 #ifndef NO_SHAREWARE
     // デバッガ―が有効、またはシェアウェアを開始できないときは
     if (IsDebuggerPresent() || !g_shareware.Start(NULL))
@@ -833,6 +954,9 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
     // ユーザーデータをパラメータとしてダイアログを開く。
     DialogBoxParam(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc, (LPARAM)&dm);
+
+    // リッチエディトライブラリを解放する。
+    FreeLibrary(hinstRichEdit);
 
     // 正常終了。
     return 0;

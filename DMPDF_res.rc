@@ -17,8 +17,8 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 //////////////////////////////////////////////////////////////////////////////
 // RT_DIALOG
 
-1 DIALOG 0, 0, 271, 190
-CAPTION "デカ文字PDF Ver. 0.0 by 片山博文MZ"
+1 DIALOG 0, 0, 270, 190
+CAPTION "デカ文字PDF Ver.0.0.0 by 片山博文MZ"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION
 FONT 9, "Meiryo UI"
 {
@@ -32,11 +32,16 @@ FONT 9, "Meiryo UI"
     EDITTEXT edt2, 70, 120, 50, 10
     PUSHBUTTON "", psh1, 125, 120, 25, 10
     LTEXT "フォント名:", stc4, 5, 135, 60, 10, SS_CENTERIMAGE | NOT WS_GROUP
-    COMBOBOX cmb1, 70, 135, 105, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX cmb3, 70, 135, 105, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     CONTROL "", stc5, "STATIC", SS_BITMAP | WS_GROUP, 5, 155, 120, 30
     DEFPUSHBUTTON "PDF生成", IDOK, 140, 155, 60, 30
     PUSHBUTTON "終了", IDCANCEL, 205, 155, 60, 30
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// RT_GROUP_ICON
+
+1 ICON "res/1041_Icon_1.ico"
 
 //////////////////////////////////////////////////////////////////////////////
 // RT_STRING
@@ -58,6 +63,7 @@ STRINGTABLE
     IDS_SUCCEEDED, "成功しました。"
     IDS_GENERATE, "PDF生成"
     IDS_PROCESSINGNOW, "生成中..."
+    IDS_FONT_01, "ＭＳ ゴシック"
 }
 
 //////////////////////////////////////////////////////////////////////////////

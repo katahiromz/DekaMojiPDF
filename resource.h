@@ -18,6 +18,7 @@
 #define IDS_SUCCEEDED                       112
 #define IDS_GENERATE                        113
 #define IDS_PROCESSINGNOW                   114
+#define IDS_FONT_01                         115
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
