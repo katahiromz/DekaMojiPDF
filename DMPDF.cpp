@@ -1207,11 +1207,19 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case stc3:
         // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
-        ::SetFocus(::GetDlgItem(hwnd, edt1));
+        {
+            HWND hEdit = ::GetDlgItem(hwnd, edt1);
+            Edit_SetSel(hEdit, 0, -1);
+            ::SetFocus(hEdit);
+        }
         break;
     case stc4:
         // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
-        ::SetFocus(::GetDlgItem(hwnd, edt2));
+        {
+            HWND hEdit = ::GetDlgItem(hwnd, edt2);
+            Edit_SetSel(hEdit, 0, -1);
+            ::SetFocus(hEdit);
+        }
         break;
     case stc5:
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
