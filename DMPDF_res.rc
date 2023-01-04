@@ -50,6 +50,33 @@ FONT 9, "Meiryo UI"
 }
 
 //////////////////////////////////////////////////////////////////////////////
+// RT_VERSION
+
+1 VERSIONINFO
+FILEVERSION     1, 0, 1, 0
+PRODUCTVERSION  1, 0, 1, 0
+FILEOS          0x40004
+FILETYPE        0x1
+{
+    BLOCK "StringFileInfo"
+    {
+        BLOCK "041103A4"
+        {
+            VALUE "CompanyName", "Katayama Hirofumi MZ\0"
+            VALUE "FileDescription", "大きな文字のPDF作成\0"
+            VALUE "FileVersion", "1.0.1\0"
+            VALUE "LegalCopyright", "(c) 2022-2023 katahiromz\0"
+            VALUE "ProductName", "デカ文字PDF\0"
+            VALUE "ProductVersion", "1.0.1\0"
+        }
+    }
+    BLOCK "VarFileInfo"
+    {
+        VALUE "Translation", 0x0411, 0x03A4
+    }
+}
+
+//////////////////////////////////////////////////////////////////////////////
 // RT_GROUP_ICON
 
 1 ICON "res/1041_Icon_1.ico"
