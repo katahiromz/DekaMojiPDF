@@ -30,6 +30,7 @@
 #define IDS_METHOD_03                       124
 #define IDS_FIELD_TEXT_COLOR                125
 #define IDS_REASON_VALID_COLOR              126
+#define IDS_FIELD_FONT_NAME                 127
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

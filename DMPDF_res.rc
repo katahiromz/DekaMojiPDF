@@ -113,6 +113,7 @@ STRINGTABLE
     IDS_METHOD_03, "1ページに1文字ずつ配置"
     IDS_FIELD_TEXT_COLOR, "テキストの色"
     IDS_REASON_VALID_COLOR, "有効な色を指定して下さい。"
+    IDS_FIELD_FONT_NAME, "フォント名"
 }
 
 //////////////////////////////////////////////////////////////////////////////

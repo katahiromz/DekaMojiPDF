@@ -431,6 +431,14 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
 } while (0)
 #undef GET_CHECK_DATA
 
+    if (SETTING(IDC_FONT_NAME).empty())
+    {
+        SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
+        ::SetFocus(::GetDlgItem(hwnd, IDC_FONT_NAME));
+        OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_FONT_NAME, IDS_REASON_EMPTY_TEXT);
+        return FALSE;
+    }
+
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
     str_trim(szText);
     if (szText[0] == 0)
@@ -1253,6 +1261,7 @@ void OnTextColorButton(HWND hwnd)
             GetBValue(cc.rgbResult)
         );
         SetDlgItemText(hwnd, IDC_TEXT_COLOR, szText);
+        InvalidateRect(GetDlgItem(hwnd, IDC_TEXT_COLOR_BUTTON), NULL, TRUE);
     }
 }
 
