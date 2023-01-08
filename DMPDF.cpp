@@ -283,6 +283,7 @@ BOOL DekaMoji::LoadFontMap()
             // UTF-8文字列をワイド文字列に変換する。
             WCHAR szText[512];
             MultiByteToWideChar(CP_UTF8, 0, buf, -1, szText, _countof(szText));
+            szText[_countof(szText) - 1] = 0;
 
             // 前後の空白を取り除く。
             str_trim(szText);
