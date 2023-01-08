@@ -226,6 +226,8 @@ LPSTR ansi_from_wide(UINT codepage, LPCWSTR wide)
     }
 
     WideCharToMultiByte(codepage, 0, wide, -1, s_ansi, _countof(s_ansi), geta, NULL);
+    s_ansi[_countof(s_ansi) - 2] = 0;
+    s_ansi[_countof(s_ansi) - 1] = 0;
     return s_ansi;
 }
 
@@ -234,6 +236,7 @@ LPWSTR wide_from_ansi(UINT codepage, LPCSTR ansi)
 {
     static WCHAR s_wide[1024];
     MultiByteToWideChar(codepage, 0, ansi, -1, s_wide, _countof(s_wide));
+    s_wide[_countof(s_wide) - 1] = 0;
     return s_wide;
 }
 
