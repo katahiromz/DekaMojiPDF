@@ -130,21 +130,26 @@ LPCTSTR findLocalFile(LPCTSTR filename)
     static TCHAR szPath[MAX_PATH];
     GetModuleFileName(NULL, szPath, _countof(szPath));
 
-    // ファイルタイトルをfilenameで置き換える。
-    PathRemoveFileSpec(szPath);
+    // 現在のプログラムのあるディレクトリを取得。
+    TCHAR dir[MAX_PATH];
+    StringCchCopy(dir, _countof(dir), szPath);
+    PathRemoveFileSpec(dir);
+
+    /// ファイルの存在確認。
+    StringCchCopy(szPath, _countof(szPath), dir);
     PathAppend(szPath, filename);
     if (PathFileExists(szPath))
         return szPath;
 
-    // 一つ上のフォルダへ。
-    PathRemoveFileSpec(szPath);
+    // 一つ上のフォルダでファイルの存在確認。
+    StringCchCopy(szPath, _countof(szPath), dir);
     PathRemoveFileSpec(szPath);
     PathAppend(szPath, filename);
     if (PathFileExists(szPath))
         return szPath;
 
     // さらに一つ上のフォルダへ。
-    PathRemoveFileSpec(szPath);
+    StringCchCopy(szPath, _countof(szPath), dir);
     PathRemoveFileSpec(szPath);
     PathRemoveFileSpec(szPath);
     PathAppend(szPath, filename);
