@@ -1,10 +1,15 @@
 ﻿; 【デカ文字PDFで利用するフォント情報】
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; このファイルは、自由に変更しても構いません。
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 商標は、商標権を有する会社の商標です。
+; フォント使用の前に利用条件をご確認下さい。
+; ご利用の端末でインストールされているフォントのみ使用可能です。
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 [FONTMAP]
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Windows標準フォント。
+; Windows標準日本語フォント。
 ; 利用条件：編集可能。
 ＭＳ ゴシック=MSGOTHIC.TTC,0
 ＭＳ Ｐゴシック=MSGOTHIC.TTC,2
@@ -18,7 +23,7 @@ Meiryo UI=MEIRYO.TTC,2
 Yu Gothic UI=YUGOTHM.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; BIZ UDPフォント。
+; BIZ UDPフォント(日本語)。
 ; 利用条件：印刷とプレビュー可能。
 BIZ UDゴシック=BIZ-UDGOTHICR.TTC,0
 BIZ UDPゴシック=BIZ-UDGOTHICR.TTC,1
@@ -26,8 +31,11 @@ BIZ UD明朝=BIZ-UDMINCHOM.TTC,0
 BIZ UDP明朝=BIZ-UDMINCHOM.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; RICOHフォント。
+; RICOHフォント(日本語)。
 ; 利用条件：編集可能。
+HGゴシックM=HGRGM.TTC,0
+HGPゴシックM=HGRGM.TTC,1
+HGSゴシックM=HGRGM.TTC,2
 HGゴシックE=HGRGE90.TTC,0
 HGPゴシックE=HGRGE90.TTC,1
 HGSゴシックE=HGRGE90.TTC,2
@@ -41,15 +49,83 @@ HGS創英角ゴシックUB=HGRSGU90.TTC,2
 HG創英角ポップ体=HGRPP190.TTC,0
 HGP創英角ポップ体=HGRPP190.TTC,1
 HGS創英角ポップ体=HGRPP190.TTC,2
+HG行書体=HGRGY.TTC,0
+HGP行書体=HGRGY.TTC,1
+HGS行書体=HGRGY.TTC,2
+HG正楷書体-PRO=HGRSKP.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; 英字フォント。
+; リョービ日本語フォント。
+; 利用条件：印刷とプレビュー可能。
+RFナウ-MM=RFNOWMM.TTC,0
+RFPナウ-MM=RFNOWMM.TTC,1
+RFナウ-GM=RFNOWGM.TTC,0
+RFPナウ-GM=RFNOWGM.TTC,1
+RFG2サンセリフ-U=RFG2SANU.TTC,0
+RFGP2サンセリフ-U=RFG2SANU.TTC,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ニィス日本語フォント。
+; 利用条件：印刷とプレビュー可能。
+JTCウインZ10=Z10-WIN.TTC,0
+JTCウインZ10P=Z10-WIN.TTC,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Windows標準ラテンフォント。
 ; 利用条件：編集可能。
+Arial=ARIAL.TTF
 Arial Bold=ARIALBD.TTF
+Arial Black=ARIBLK.TTF
+Comic Sans MS=COMIC.TTF
 Comic Sans MS Bold=COMICBD.TTF
+Courier New=COUR.TTF
 Courier New Bold=COURBD.TTF
+Franklin Gothic Medium=FRAMD.TTF
+Georgia=GEORGIA.TTF
+Georgia Bold=GEORGIAB.TTF
 Impact=IMPACT.TTF
+Lucida Console=LUCON.TTF
+Microsoft Sans Serif=MICROSS.TTF
+Palatino Linotype=PALA.TTF
+Palatino Linotype Bold=PALAB.TTF
+Segoe UI=SEGOEUI.TTF
 Segoe UI Bold=SEGOEUIB.TTF
+Tahoma=TAHOMA.TTF
 Tahoma Bold=TAHOMABD.TTF
+Times New Roman=TIMES.TTF
 Times New Roman Bold=TIMESBD.TTF
+Verdana=VERDANA.TTF
 Verdana Bold=VERDANAB.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 中国語フォント。
+; 利用条件：編集可能。
+細明體 (MingLiU)=MINGLIU.TTC,0
+新細明體 (PMingLiU)=MINGLIU.TTC,1
+細明體_HKSCS (MingLiU_HKSCS)=MINGLIU.TTC,2
+黑体 (SimHei)=SIMHEI.TTF
+宋体 (SimSun)=SIMSUN.TTC,0
+新宋体 (NSimSun)=SIMSUN.TTC,1
+微軟正黑體 (Microsoft JhengHei)=MSJH.TTC,0
+微軟正黑體 UI (Microsoft JhengHei UI)=MSJH.TTC,1
+微软雅黑 (Microsoft YaHei)=MSYH.TTC,0
+微软雅黑 (Microsoft YaHei Bold)=MSYHBD.TTC,0
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 韓国語フォント。
+; 利用条件：編集可能。
+굴림 (Gulim)=GULIM.TTC,0
+굴림체 (GulimChe)=GULIM.TTC,1
+새굴림 (New Gulim)=NGULIM.TTF
+돋움 (Dotum)=GULIM.TTC,2
+돋움체 (DotumChe)=GULIM.TTC,3
+바탕 (Batang)=BATANG.TTC,0
+바탕체 (BatangChe)=BATANG.TTC,1
+궁서 (Gungsuh)=BATANG.TTC,2
+궁서체 (GungsuhChe)=BATANG.TTC,3
+맑은 고딕 (Malgun Gothic)=MALGUN.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Unicodeフォント。
+; 利用条件：印刷とプレビュー可能。
+Arial Unicode MS=ARIALUNI.TTF

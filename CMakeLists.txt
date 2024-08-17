@@ -36,7 +36,7 @@ endif()
 ##############################################################################
 
 # Shareware?
-option(SHAREWARE "Enable shareware" ON)
+option(SHAREWARE "Enable shareware" OFF)
 if(NOT SHAREWARE)
     add_definitions(-DNO_SHAREWARE)
 endif()

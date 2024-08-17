@@ -27,7 +27,7 @@ LANGUAGE LANG_JAPANESE, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOG 0, 0, 270, 190
-CAPTION "デカ文字PDF Ver.1.0.2 by 片山博文MZ"
+CAPTION "デカ文字PDF Ver.1.0.3 by 片山博文MZ"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 9, "Meiryo UI"
 {
@@ -53,8 +53,8 @@ FONT 9, "Meiryo UI"
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     1, 0, 2, 0
-PRODUCTVERSION  1, 0, 2, 0
+FILEVERSION     1, 0, 3, 0
+PRODUCTVERSION  1, 0, 3, 0
 FILEOS          0x40004
 FILETYPE        0x1
 {
@@ -64,10 +64,10 @@ FILETYPE        0x1
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "大きな文字のPDF作成\0"
-            VALUE "FileVersion", "1.0.2\0"
+            VALUE "FileVersion", "1.0.3\0"
             VALUE "LegalCopyright", "(c) 2022-2023 katahiromz\0"
             VALUE "ProductName", "デカ文字PDF\0"
-            VALUE "ProductVersion", "1.0.2\0"
+            VALUE "ProductVersion", "1.0.3\0"
         }
     }
     BLOCK "VarFileInfo"
