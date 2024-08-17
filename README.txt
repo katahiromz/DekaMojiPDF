@@ -14,7 +14,7 @@
 
 ## 対応環境
 
-- 日本語 Windows XP/Vista/7/10/11
+- 日本語または英語の Windows XP/Vista/7/10/11
 
 ## 注意
 
