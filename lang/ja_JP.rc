@@ -53,7 +53,7 @@ FILESUBTYPE     0x0
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "大きな文字のPDF作成\0"
             VALUE "FileVersion", "1.0.3\0"
-            VALUE "LegalCopyright", "(c) 2022-2023 katahiromz\0"
+            VALUE "LegalCopyright", "(c) 2022-2024 katahiromz\0"
             VALUE "ProductName", "デカ文字PDF\0"
             VALUE "ProductVersion", "1.0.3\0"
         }

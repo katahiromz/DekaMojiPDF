@@ -1,27 +1,24 @@
-﻿# デカ文字PDFの使用許諾契約書
+﻿デカ文字PDFは、以前シェアウェアでしたが、1.0.3から無料になりました。
+ご自由にお使い下さい。
 
-Copyright (c) 2022-2023 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
-All Rights Reserved.
+The MIT License (MIT)
 
-## 概要
+Copyright (C) 2022-2024 Katayama Hirofumi MZ <katayama.hirofumi.mz@gmail.com>.
 
-本ソフトウェア「デカ文字PDF」は、試用期間のある777円（手数料等別途）のシェアウェアです。
-継続して使用する場合はソフト配布サイトのVector（ベクター）で「ライセンスキー」（パスワード）を購入下さい。
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-「ライセンスキー」を入力すると、試用期間が終了し、制限が解除されます。
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-## 購入場所
-
-http://shop.vector.co.jp/service/servlet/NCart.Add?ITEM_NO=SR482981
-
-## 試用期間
-
-10日間。
-
-## 制限内容
-
-試用期間中は、各ページの左下に『「デカ文字PDF」買ってね』と出力されます。
-
-## 免責事項
-
-このプログラムを使って生じた如何なる損害も当方は責任を負いません。
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
