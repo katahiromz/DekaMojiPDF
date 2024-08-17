@@ -31,6 +31,13 @@
 #define IDS_FIELD_TEXT_COLOR                125
 #define IDS_REASON_VALID_COLOR              126
 #define IDS_FIELD_FONT_NAME                 127
+#define IDS_SIZE_LEGAL                      128
+#define IDS_SIZE_LETTER                     129
+#define IDS_SIZE_EXECUTIVE                  130
+#define IDS_SIZE_US4X6                      131
+#define IDS_SIZE_US4X8                      132
+#define IDS_SIZE_US5X7                      133
+#define IDS_SIZE_COMM10                     134
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

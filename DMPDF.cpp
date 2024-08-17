@@ -395,6 +395,13 @@ void DekaMoji::InitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A5));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B4));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B5));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LETTER));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LEGAL));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_EXECUTIVE));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_US4X6));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_US4X8));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_US5X7));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_COMM10));
 
     // IDC_PAGE_DIRECTION: ページの向き。
     SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_PORTRAIT));
@@ -915,6 +922,20 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             page_size = HPDF_PAGE_SIZE_B4;
         else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_B5))
             page_size = HPDF_PAGE_SIZE_B5;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_LETTER))
+            page_size = HPDF_PAGE_SIZE_LETTER;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_LEGAL))
+            page_size = HPDF_PAGE_SIZE_LEGAL;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_EXECUTIVE))
+            page_size = HPDF_PAGE_SIZE_EXECUTIVE;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_US4X6))
+            page_size = HPDF_PAGE_SIZE_US4x6;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_US4X8))
+            page_size = HPDF_PAGE_SIZE_US4x8;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_US5X7))
+            page_size = HPDF_PAGE_SIZE_US5x7;
+        else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_COMM10))
+            page_size = HPDF_PAGE_SIZE_COMM10;
         else
             page_size = HPDF_PAGE_SIZE_A4;
 
@@ -1127,6 +1148,17 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             TCHAR szPath[MAX_PATH];
             SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
             PathAppend(szPath, output_name.c_str());
+            LPTSTR pch = PathFindExtension(szPath);
+            UINT iTry = 1;
+            TCHAR szNum[32];
+            while (PathFileExists(szPath))
+            {
+                *pch = 0;
+                StringCchPrintf(szNum, _countof(szNum), TEXT(" (%u)"), iTry);
+                StringCchCat(szPath, _countof(szPath), szNum);
+                PathAddExtension(szPath, TEXT(".pdf"));
+                ++iTry;
+            }
             if (!CopyFile(temp_file.get(), szPath, FALSE))
             {
                 auto err_msg = ansi_from_wide(CP_ACP, doLoadString(IDS_COPYFILEFAILED));
@@ -1134,9 +1166,8 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             }
 
             // 成功メッセージを表示。
-            StringCchCopy(szPath, _countof(szPath), output_name.c_str());
             TCHAR szText[MAX_PATH];
-            StringCchPrintf(szText, _countof(szText), doLoadString(IDS_SUCCEEDED), szPath);
+            StringCchPrintf(szText, _countof(szText), doLoadString(IDS_SUCCEEDED), PathFindFileName(szPath));
             ret = szText;
         }
     }
