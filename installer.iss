@@ -47,6 +47,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "build\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\libzlib.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
