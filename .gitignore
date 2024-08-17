@@ -16,3 +16,4 @@ lib*.a
 *.dll
 *.pdf
 *.spi
+*~
