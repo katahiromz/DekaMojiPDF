@@ -63,6 +63,7 @@ enum
     IDC_TEXT_COLOR = edt2,
     IDC_TEXT_COLOR_BUTTON = psh1,
     IDC_ERASESETTINGS = psh5,
+    IDC_README = psh6,
 };
 
 // デカ文字PDFのメインクラス。
@@ -1305,6 +1306,21 @@ void OnTextColorButton(HWND hwnd)
     }
 }
 
+void OnReadMe(HWND hwnd)
+{
+    TCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, _countof(szPath));
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, TEXT("README.txt"));
+    if (!PathFileExists(szPath))
+    {
+        PathRemoveFileSpec(szPath);
+        PathRemoveFileSpec(szPath);
+        PathAppend(szPath, TEXT("README.txt"));
+    }
+    ShellExecute(hwnd, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
+}
+
 // WM_COMMAND
 // コマンド。
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -1319,6 +1335,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
         OnEraseSettings(hwnd);
+        break;
+    case IDC_README: // 「README」ボタン。
+        OnReadMe(hwnd);
         break;
     case stc1:
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。

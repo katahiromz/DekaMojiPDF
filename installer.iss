@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ƒfƒJ•¶ŽšPDF"
-#define MyAppVersion "1.0.2"
+#define MyAppVersion "1.0.3"
 #define MyAppPublisher "•ÐŽR”Ž•¶MZ"
 #define MyAppURL "https://katahiromz.web.fc2.com/"
 #define MyAppExeName "DMPDF.exe"
