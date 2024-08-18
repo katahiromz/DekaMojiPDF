@@ -841,7 +841,7 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
     {
         auto line = lines[i];
         StringCchCopyA(buf, _countof(buf), line.c_str());
-        StrTrimA(buf, " \t\r\n");
+        //StrTrimA(buf, " \t\r\n");
 
         double line_x = x;
         double line_y = y + (height / rows) * (rows - i - 1);
