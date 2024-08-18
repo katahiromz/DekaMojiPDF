@@ -457,7 +457,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     }
 
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
-    str_trim(szText);
+    //str_trim(szText);
     if (szText[0] == 0)
     {
         m_settings[TEXT("IDC_TEXT")] = IDC_TEXT_DEFAULT;
@@ -823,7 +823,7 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
 {
     char buf[1024];
     StringCchCopyA(buf, _countof(buf), text);
-    StrTrimA(buf, " \t\r\n");
+    //StrTrimA(buf, " \t\r\n");
 
     std::string str = buf;
     str_replace(str, "\r\n", "\n"); // 改行コード。
