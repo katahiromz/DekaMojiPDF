@@ -9,7 +9,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_DEFAULT
 // RT_DIALOG
 
 1 DIALOG 0, 0, 270, 190
-CAPTION "DekaMoji PDF Ver.1.0.9 by katahiromz"
+CAPTION "DekaMoji PDF Ver.1.1.0 by katahiromz"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 9, "Tahoma"
 {
@@ -41,8 +41,8 @@ FONT 9, "Tahoma"
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     1, 0, 9, 0
-PRODUCTVERSION  1, 0, 9, 0
+FILEVERSION     1, 1, 0, 0
+PRODUCTVERSION  1, 1, 0, 0
 FILEOS          0x40004
 FILETYPE        0x1
 FILESUBTYPE     0x0
@@ -53,10 +53,10 @@ FILESUBTYPE     0x0
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "Create big text PDF\0"
-            VALUE "FileVersion", "1.0.9\0"
+            VALUE "FileVersion", "1.1.0\0"
             VALUE "LegalCopyright", "(c) 2022-2024 katahiromz\0"
             VALUE "ProductName", "DekaMoji PDF\0"
-            VALUE "ProductVersion", "1.0.9\0"
+            VALUE "ProductVersion", "1.1.0\0"
         }
     }
     BLOCK "VarFileInfo"
@@ -83,7 +83,7 @@ STRINGTABLE
     IDS_LOGO, "Buy 'DekaMoji PDF'"
     IDS_COPYFILEFAILED, "Failed to copy file to Desktop."
     IDS_SUCCEEDED, "Created file '%s' on Desktop."
-    IDS_GENERATE, "Make PDF"
+    IDS_GENERATE, "&Make PDF"
     IDS_PROCESSINGNOW, "Generating..."
     IDS_FONT_01, "Arial"
     IDS_SAMPLETEXT, "Maximize\r\nText on Paper!!"
