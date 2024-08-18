@@ -86,7 +86,7 @@ STRINGTABLE
     IDS_GENERATE, "PDF生成(&M)"
     IDS_PROCESSINGNOW, "生成中..."
     IDS_FONT_01, "ＭＳ ゴシック"
-    IDS_SAMPLETEXT, "ページいっぱいに\r\n文字を配置します"
+    IDS_SAMPLETEXT, "用紙いっぱいに\r\n文字を配置します"
     IDS_FIELD_TEXT, "テキスト"
     IDS_REASON_EMPTY_TEXT, "空ではない文字列を指定して下さい。"
     IDS_OUTPUT_NAME, "デカ文字-%04u-%02u-%02u.pdf"
