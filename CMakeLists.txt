@@ -53,7 +53,7 @@ add_subdirectory(libharu)
 include_directories(libharu/include)
 
 # DekaMoji.exe
-add_executable(DekaMoji WIN32 DekaMoji.cpp DekaMoji_res.rc Shareware.cpp SHA-256.cpp)
+add_executable(DekaMoji WIN32 DekaMoji.cpp DekaMoji_res.rc)
 target_link_libraries(DekaMoji comctl32 shlwapi gdiplus hpdf ${PNG_LIBRARY} ${ZLIB_LIBRARY})
 
 ##############################################################################
