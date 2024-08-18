@@ -1174,6 +1174,9 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     // ダイアログにデータを設定。
     pDM->DialogFromData(hwnd);
 
+    // まれにテキストボックスが再描画されないことがあるのでここで再描画。
+    InvalidateRect(GetDlgItem(hwnd, IDC_TEXT), NULL, TRUE);
+
     return TRUE;
 }
 
