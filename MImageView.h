@@ -92,8 +92,8 @@ protected:
         StretchBlt(hdc,
             LONG(center_x - bm.bmWidth * rate3 / 2 + 0.5),
             LONG(center_y - bm.bmHeight * rate3 / 2 + 0.5),
-            LONG(bm.bmWidth * rate3 + 0.5) + 1,
-            LONG(bm.bmHeight * rate3 + 0.5) + 1,
+            LONG(bm.bmWidth * rate3 + 0.5),
+            LONG(bm.bmHeight * rate3 + 0.5),
             hdcMem,
             0, 0, bm.bmWidth, bm.bmHeight,
             SRCCOPY);
