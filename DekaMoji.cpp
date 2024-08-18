@@ -94,6 +94,7 @@ HINSTANCE g_hInstance = NULL; // インスタンス。
 TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
 HICON g_hIcon = NULL; // アイコン（大）。
 HICON g_hIconSm = NULL; // アイコン（小）。
+HFONT g_hTextFont = NULL; // テキストフォント。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -1174,6 +1175,13 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     // ダイアログにデータを設定。
     pDM->DialogFromData(hwnd);
 
+    // 少し大きなフォントをテキストボックスにセット。
+    LOGFONT lf;
+    GetObject(GetWindowFont(hwnd), sizeof(lf), &lf);
+    lf.lfHeight = lf.lfHeight * 4 / 3;
+    g_hTextFont = CreateFontIndirect(&lf);
+    SetWindowFont(GetDlgItem(hwnd, IDC_TEXT), g_hTextFont, TRUE);
+
     // まれにテキストボックスが再描画されないことがあるのでここで再描画。
     InvalidateRect(GetDlgItem(hwnd, IDC_TEXT), NULL, TRUE);
 
@@ -1388,6 +1396,10 @@ void OnDestroy(HWND hwnd)
     DestroyIcon(g_hIcon);
     DestroyIcon(g_hIconSm);
     g_hIcon = g_hIconSm = NULL;
+
+    // フォントを破棄。
+    DeleteObject(g_hTextFont);
+    g_hTextFont = NULL;
 }
 
 // ダイアログプロシージャ。
