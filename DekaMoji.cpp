@@ -1321,10 +1321,19 @@ void OnReadMe(HWND hwnd)
     ShellExecute(hwnd, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
 }
 
+static INT s_nRefreshCounter = 0;
+
 void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 {
+    ++s_nRefreshCounter;
     KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, NULL); // 少し後でプレビューを更新する。
+
+    if (s_nRefreshCounter >= 3)
+    {
+        HBITMAP hbmWait = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_WAIT));
+        g_hwndImageView.setImage(hbmWait);
+    }
 }
 
 // WM_COMMAND
@@ -1469,8 +1478,10 @@ public:
     }
 };
 
-BOOL doUpdate(HWND hwnd)
+BOOL doUpdatePreview(HWND hwnd)
 {
+    s_nRefreshCounter = 0;
+
     // PDFファイル名。
     TCHAR szPdfFile[MAX_PATH];
     ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji.pdf"), szPdfFile, _countof(szPdfFile));
@@ -1579,7 +1590,7 @@ void OnTimer(HWND hwnd, UINT id)
 
     KillTimer(hwnd, id);
 
-    if (!doUpdate(hwnd))
+    if (!doUpdatePreview(hwnd))
     {
         g_hwndImageView.setImage(NULL);
     }
