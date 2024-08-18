@@ -35,12 +35,6 @@ endif()
 
 ##############################################################################
 
-# Shareware?
-option(SHAREWARE "Enable shareware" OFF)
-if(NOT SHAREWARE)
-    add_definitions(-DNO_SHAREWARE)
-endif()
-
 # Unicode
 add_definitions(-DUNICODE -D_UNICODE)
 

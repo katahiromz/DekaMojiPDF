@@ -19,20 +19,6 @@
 #include "TempFile.hpp"     // 一時ファイル操作用のヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
-// シェアウェア情報。
-#ifndef NO_SHAREWARE
-    #include "Shareware.hpp"
-
-    SW_Shareware g_shareware(
-        /* company registry key */      TEXT("Katayama Hirofumi MZ"),
-        /* application registry key */  TEXT("DekaMojiPDF"),
-        /* password hash */
-        "f7a72f14611fe48739102edbd86a4d3179511007a44d39e1c50a2d3b84127a56",
-        /* trial days */                10,
-        /* salt string */               "gsI5AZ",
-        /* version string */            "1.0.2");
-#endif
-
 // 文字列クラス。
 #ifdef UNICODE
     typedef std::wstring string_t;
@@ -1068,23 +1054,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
                 auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
                 font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
-#ifndef NO_SHAREWARE
-                // シェアウェア未登録ならば、ロゴ文字列を描画する。
-                if (!g_shareware.IsRegistered())
-                {
-                    auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
-                    // フォントとフォントサイズを指定。
-                    HPDF_Page_SetFontAndSize(page, font, 12);
-
-                    // テキストを描画する。
-                    HPDF_Page_BeginText(page);
-                    {
-                        HPDF_Page_TextOut(page, content_x, content_y, logo_a);
-                    }
-                    HPDF_Page_EndText(page);
-                }
-#endif
-
                 // ANSI文字列に変換してテキストを描画する。
                 auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
                 hpdf_draw_multiline_text(page, font, font_size, text_a,
@@ -1121,23 +1090,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             // フォントを指定する。
             auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
-
-#ifndef NO_SHAREWARE
-            // シェアウェア未登録ならば、ロゴ文字列を描画する。
-            if (!g_shareware.IsRegistered())
-            {
-                auto logo_a = ansi_from_wide(CP_UTF8, doLoadString(IDS_LOGO));
-                // フォントとフォントサイズを指定。
-                HPDF_Page_SetFontAndSize(page, font, 12);
-
-                // テキストを描画する。
-                HPDF_Page_BeginText(page);
-                {
-                    HPDF_Page_TextOut(page, content_x, content_y, logo_a);
-                }
-                HPDF_Page_EndText(page);
-            }
-#endif
 
             // ANSI文字列に変換してテキストを描画する。
             auto text_a = ansi_from_wide(CP_UTF8, text_data.c_str());
@@ -1457,15 +1409,6 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
     // 共通コントロール群を初期化する。
     InitCommonControls();
-
-#ifndef NO_SHAREWARE
-    // デバッガ―が有効、またはシェアウェアを開始できないときは
-    if (IsDebuggerPresent() || !g_shareware.Start(NULL))
-    {
-        // 失敗。アプリケーションを終了する。
-        return -1;
-    }
-#endif
 
     // ユーザーデータを保持する。
     DekaMoji dm(hInstance, argc, argv);
