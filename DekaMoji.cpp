@@ -15,7 +15,9 @@
 #include <stdexcept>        // std::runtime_error クラス。
 #include <cassert>          // assertマクロ。
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
+#include <gdiplus.h>        // GDI+
 #include "color_value.h"    // 色をパースする。
+#include "MImageView.h"     // イメージプレビュー用のウィンドウ コントロール。
 #include "TempFile.hpp"     // 一時ファイル操作用のヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
@@ -28,6 +30,8 @@
 
 // シフトJIS コードページ（Shift_JIS）。
 #define CP932  932
+
+#define TIMER_ID_REFRESH_PREVIEW 999
 
 struct FONT_ENTRY
 {
@@ -77,7 +81,7 @@ public:
     // ダイアログを初期化する。
     void InitDialog(HWND hwnd);
     // ダイアログからデータへ。
-    BOOL DataFromDialog(HWND hwnd);
+    BOOL DataFromDialog(HWND hwnd, BOOL bNoError = FALSE);
     // データからダイアログへ。
     BOOL DialogFromData(HWND hwnd);
     // レジストリからデータへ。
@@ -86,7 +90,7 @@ public:
     BOOL RegFromData(HWND hwnd);
 
     // メインディッシュ処理。
-    string_t JustDoIt(HWND hwnd);
+    string_t JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName = NULL);
 };
 
 // グローバル変数。
@@ -95,6 +99,7 @@ TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
 HICON g_hIcon = NULL; // アイコン（大）。
 HICON g_hIconSm = NULL; // アイコン（小）。
 HFONT g_hTextFont = NULL; // テキストフォント。
+MImageView g_hwndImageView;
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -415,10 +420,15 @@ void DekaMoji::InitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_01));
     SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_02));
     SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_03));
+
+    g_hwndImageView.doSubclass(GetDlgItem(hwnd, stc7));
+
+    // プレビューを更新する。
+    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, NULL);
 }
 
 // ダイアログからデータへ。
-BOOL DekaMoji::DataFromDialog(HWND hwnd)
+BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
 {
     TCHAR szText[MAX_PATH];
     // コンボボックスからデータを取得する。
@@ -444,9 +454,12 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
 
     if (SETTING(IDC_FONT_NAME).empty())
     {
-        SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
-        ::SetFocus(::GetDlgItem(hwnd, IDC_FONT_NAME));
-        OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_FONT_NAME, IDS_REASON_EMPTY_TEXT);
+        if (!bNoError)
+        {
+            SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
+            ::SetFocus(::GetDlgItem(hwnd, IDC_FONT_NAME));
+            OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_FONT_NAME, IDS_REASON_EMPTY_TEXT);
+        }
         return FALSE;
     }
 
@@ -454,9 +467,12 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     //str_trim(szText);
     if (szText[0] == 0)
     {
-        m_settings[TEXT("IDC_TEXT")] = IDC_TEXT_DEFAULT;
-        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT));
-        OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_TEXT, IDS_REASON_EMPTY_TEXT);
+        if (!bNoError)
+        {
+            m_settings[TEXT("IDC_TEXT")] = IDC_TEXT_DEFAULT;
+            ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT));
+            OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_TEXT, IDS_REASON_EMPTY_TEXT);
+        }
         return FALSE;
     }
     m_settings[TEXT("IDC_TEXT")] = szText;
@@ -465,18 +481,24 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd)
     str_trim(szText);
     if (szText[0] == 0)
     {
-        m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
-        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
-        OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_EMPTY_TEXT);
+        if (!bNoError)
+        {
+            m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
+            ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
+            OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_EMPTY_TEXT);
+        }
         return FALSE;
     }
     auto ansi = ansi_from_wide(CP_ACP, szText);
     auto color_value = color_value_parse(ansi);
     if (color_value == -1)
     {
-        m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
-        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
-        OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_VALID_COLOR);
+        if (!bNoError)
+        {
+            m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
+            ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
+            OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_VALID_COLOR);
+        }
         return FALSE;
     }
     m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
@@ -876,7 +898,7 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
 }
 
 // メインディッシュ処理。
-string_t DekaMoji::JustDoIt(HWND hwnd)
+string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 {
     string_t ret;
     // PDFオブジェクトを作成する。
@@ -1105,20 +1127,28 @@ string_t DekaMoji::JustDoIt(HWND hwnd)
             std::string temp_file_a = ansi_from_wide(CP_ACP, temp_file.make());
             HPDF_SaveToFile(pdf, temp_file_a.c_str());
 
-            // デスクトップにファイルをコピー。
             TCHAR szPath[MAX_PATH];
-            SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
-            PathAppend(szPath, output_name.c_str());
-            LPTSTR pch = PathFindExtension(szPath);
-            UINT iTry = 1;
-            TCHAR szNum[32];
-            while (PathFileExists(szPath))
+            if (pszPdfFileName) // ファイル名指定があれば
             {
-                *pch = 0;
-                StringCchPrintf(szNum, _countof(szNum), TEXT(" (%u)"), iTry);
-                StringCchCat(szPath, _countof(szPath), szNum);
-                PathAddExtension(szPath, TEXT(".pdf"));
-                ++iTry;
+                // それを使う。
+                StringCchCopy(szPath, _countof(szPath), pszPdfFileName);
+            }
+            else // 指定がなければ
+            {
+                // デスクトップにファイルをコピー。
+                SHGetSpecialFolderPath(hwnd, szPath, CSIDL_DESKTOPDIRECTORY, FALSE);
+                PathAppend(szPath, output_name.c_str());
+                LPTSTR pch = PathFindExtension(szPath);
+                UINT iTry = 1;
+                TCHAR szNum[32];
+                while (PathFileExists(szPath))
+                {
+                    *pch = 0;
+                    StringCchPrintf(szNum, _countof(szNum), TEXT(" (%u)"), iTry);
+                    StringCchCat(szPath, _countof(szPath), szNum);
+                    PathAddExtension(szPath, TEXT(".pdf"));
+                    ++iTry;
+                }
             }
             if (!CopyFile(temp_file.get(), szPath, FALSE))
             {
@@ -1291,6 +1321,12 @@ void OnReadMe(HWND hwnd)
     ShellExecute(hwnd, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
 }
 
+void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
+{
+    KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
+    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, NULL); // 少し後でプレビューを更新する。
+}
+
 // WM_COMMAND
 // コマンド。
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -1305,9 +1341,25 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
         OnEraseSettings(hwnd);
+        doRefreshPreview(hwnd, 0);
         break;
     case IDC_README: // 「README」ボタン。
         OnReadMe(hwnd);
+        break;
+    case IDC_TEXT: // テキスト
+        if (codeNotify == EN_CHANGE)
+        {
+            doRefreshPreview(hwnd);
+        }
+        break;
+    case IDC_PAGE_SIZE: // 「用紙サイズ」
+    case IDC_PAGE_DIRECTION: // 「ページの向き」
+    case IDC_METHOD: // 「レイアウト」
+    case IDC_FONT_NAME: // 「フォント名」
+        if (codeNotify == CBN_SELCHANGE || codeNotify == CBN_SELENDOK)
+        {
+            doRefreshPreview(hwnd, 0);
+        }
         break;
     case stc1:
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
@@ -1345,12 +1397,14 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         if (codeNotify == EN_CHANGE)
         {
             ::InvalidateRect(::GetDlgItem(hwnd, IDC_TEXT_COLOR_BUTTON), NULL, TRUE);
+            doRefreshPreview(hwnd, 0);
             break;
         }
     case IDC_TEXT_COLOR_BUTTON: // 「テキストの色」ボタン。
         if (codeNotify == BN_CLICKED)
         {
             OnTextColorButton(hwnd);
+            doRefreshPreview(hwnd, 0);
         }
         break;
     }
@@ -1402,6 +1456,118 @@ void OnDestroy(HWND hwnd)
     g_hTextFont = NULL;
 }
 
+BOOL doUpdate(HWND hwnd)
+{
+    // PDFファイル名。
+    TCHAR szPdfFile[MAX_PATH];
+    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji.pdf"), szPdfFile, _countof(szPdfFile));
+
+    // PNGファイル名。
+    TCHAR szPngFile[MAX_PATH];
+    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji"), szPngFile, _countof(szPngFile));
+    StringCchCat(szPngFile, _countof(szPngFile), L"%d.png");
+
+    // ダイアログからデータを取得。
+    DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    if (!pDM->DataFromDialog(hwnd, TRUE))
+        return FALSE; // 失敗。
+
+    // メインディッシュ処理。
+    string_t success = pDM->JustDoIt(hwnd, szPdfFile);
+    if (success.empty())
+        return FALSE; // 失敗。
+
+    TCHAR szPath[MAX_PATH];
+    GetModuleFileName(NULL, szPath, _countof(szPath));
+    PathRemoveFileSpec(szPath);
+    PathAppend(szPath, TEXT("mutool.exe"));
+
+    if (!PathFileExists(szPath))
+        return FALSE;
+
+    // mutool convertでPDFをPNGに変換。
+    {
+        string_t params;
+        params += TEXT("convert -O resolution=16 -o \"");
+        params += szPngFile;
+        params += TEXT("\" \"");
+        params += szPdfFile;
+        params += TEXT("\" 1");
+
+        SHELLEXECUTEINFO info = { sizeof(info) };
+        info.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
+        info.hwnd = hwnd;
+        info.lpFile = szPath;
+        info.lpParameters = params.c_str();
+        info.nShow = SW_HIDE;
+        if (!ShellExecuteEx(&info))
+            return FALSE; // 失敗。
+
+        WaitForSingleObject(info.hProcess, INFINITE);
+        CloseHandle(info.hProcess);
+    }
+
+    // PNGを読み込む。最初は1ページ。
+    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji"), szPngFile, _countof(szPngFile));
+    StringCchCat(szPngFile, _countof(szPngFile), L"1.png");
+    HBITMAP hbm1 = NULL, hbm2 = NULL;
+    try
+    {
+        Gdiplus::Bitmap image(szPngFile);
+
+        Gdiplus::Color white_color(Gdiplus::Color::White);
+        image.GetHBITMAP(white_color, &hbm1);
+
+        BITMAP bm;
+        GetObject(hbm1, sizeof(bm), &bm);
+
+        const INT margin = 4;
+        BITMAPINFO bmi;
+        ZeroMemory(&bmi, sizeof(bmi));
+        bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
+        bmi.bmiHeader.biWidth = bm.bmWidth + margin * 2;
+        bmi.bmiHeader.biHeight = bm.bmHeight + margin * 2;
+        bmi.bmiHeader.biPlanes = 1;
+        bmi.bmiHeader.biBitCount = 24;
+        HDC hdc1 = CreateCompatibleDC(NULL);
+        HDC hdc2 = CreateCompatibleDC(NULL);
+        LPVOID pvBits;
+        hbm2 = CreateDIBSection(hdc1, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0);
+        if (hbm2)
+        {
+            HGDIOBJ hbm1Old = SelectObject(hdc1, hbm1);
+            HGDIOBJ hbm2Old = SelectObject(hdc2, hbm2);
+            BitBlt(hdc2, margin, margin, bm.bmWidth, bm.bmHeight, hdc1, 0, 0, SRCCOPY);
+            SelectObject(hdc1, hbm1Old);
+            SelectObject(hdc2, hbm2Old);
+
+            g_hwndImageView.setImage(hbm2);
+        }
+        DeleteObject(hbm1);
+    }
+    catch (...)
+    {
+        DeleteObject(hbm1);
+        DeleteObject(hbm2);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+void OnTimer(HWND hwnd, UINT id)
+{
+    if (id != TIMER_ID_REFRESH_PREVIEW)
+        return;
+
+    KillTimer(hwnd, id);
+
+    if (!doUpdate(hwnd))
+    {
+        g_hwndImageView.setImage(NULL);
+    }
+}
+
 // ダイアログプロシージャ。
 INT_PTR CALLBACK
 DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1412,6 +1578,7 @@ DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         HANDLE_MSG(hwnd, WM_COMMAND, OnCommand);
         HANDLE_MSG(hwnd, WM_DRAWITEM, OnDrawItem);
         HANDLE_MSG(hwnd, WM_DESTROY, OnDestroy);
+        HANDLE_MSG(hwnd, WM_TIMER, OnTimer);
     }
     return 0;
 }
@@ -1419,6 +1586,11 @@ DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 // デカ文字PDFのメイン関数。
 INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 {
+    // GDI+を初期化。
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
     // アプリのインスタンスを保持する。
     g_hInstance = hInstance;
 
@@ -1430,6 +1602,9 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
     // ユーザーデータをパラメータとしてダイアログを開く。
     DialogBoxParam(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc, (LPARAM)&dm);
+
+    // GDI+を終了。
+    Gdiplus::GdiplusShutdown(gdiplusToken);
 
     // 正常終了。
     return 0;
