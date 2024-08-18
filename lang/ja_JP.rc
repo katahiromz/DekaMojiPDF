@@ -83,7 +83,7 @@ STRINGTABLE
     IDS_LOGO, "「デカ文字PDF」買ってね"
     IDS_COPYFILEFAILED, "デスクトップへのファイルのコピーに失敗しました。"
     IDS_SUCCEEDED, "デスクトップにファイル「%s」を作成しました。"
-    IDS_GENERATE, "PDF生成 (&M)"
+    IDS_GENERATE, "PDF生成(&M)"
     IDS_PROCESSINGNOW, "生成中..."
     IDS_FONT_01, "ＭＳ ゴシック"
     IDS_SAMPLETEXT, "ページいっぱいに\r\n文字を配置します"
