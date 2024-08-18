@@ -5,7 +5,7 @@
 #define MyAppVersion "1.0.6"
 #define MyAppPublisher "ï–éRîéï∂MZ"
 #define MyAppURL "https://katahiromz.web.fc2.com/"
-#define MyAppExeName "DMPDF.exe"
+#define MyAppExeName "DekaMoji.exe"
 #define MyAppCopyright "(c) katahiromz"
 #define MyAppDescription "ëÂÇ´Ç»ï∂éöÇ≈PDFÇê∂ê¨"
 
@@ -25,7 +25,7 @@ DefaultDirName={pf}\DekaMojiPDF
 DefaultGroupName={#MyAppName}
 LicenseFile=LICENSE.txt
 OutputDir=build
-OutputBaseFilename=DMPDF-{#MyAppVersion}-setup
+OutputBaseFilename=DekaMoji-{#MyAppVersion}-setup
 SetupIconFile=res\1041_Icon_1.ico
 Compression=lzma
 SolidCompression=yes

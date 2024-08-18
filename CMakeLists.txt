@@ -52,8 +52,8 @@ set(LIBHPDF_STATIC ON)
 add_subdirectory(libharu)
 include_directories(libharu/include)
 
-# DMPDF.exe
-add_executable(DMPDF WIN32 DMPDF.cpp DMPDF_res.rc Shareware.cpp SHA-256.cpp)
-target_link_libraries(DMPDF comctl32 shlwapi gdiplus hpdf ${PNG_LIBRARY} ${ZLIB_LIBRARY})
+# DekaMoji.exe
+add_executable(DekaMoji WIN32 DekaMoji.cpp DekaMoji_res.rc Shareware.cpp SHA-256.cpp)
+target_link_libraries(DekaMoji comctl32 shlwapi gdiplus hpdf ${PNG_LIBRARY} ${ZLIB_LIBRARY})
 
 ##############################################################################
