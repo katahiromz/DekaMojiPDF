@@ -568,20 +568,12 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
 // データからレジストリへ。
 BOOL DekaMoji::RegFromData(HWND hwnd)
 {
-    HKEY hCompanyKey = NULL, hAppKey = NULL;
-
-    // 会社固有のレジストリキーを作成または開く。
-    RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ"), &hCompanyKey);
-    if (hCompanyKey == NULL)
-        return FALSE; // 失敗。
+    HKEY hAppKey = NULL;
 
     // ソフト固有のレジストリキーを作成または開く。
-    RegCreateKey(hCompanyKey, TEXT("DekaMojiPDF"), &hAppKey);
+    RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), &hAppKey);
     if (hAppKey == NULL)
-    {
-        RegCloseKey(hCompanyKey);
         return FALSE; // 失敗。
-    }
 
     // レジストリにデータを設定する。
 #define SET_REG_DATA(id) do { \
@@ -599,8 +591,6 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
 
     // レジストリキーを閉じる。
     RegCloseKey(hAppKey);
-    RegCloseKey(hCompanyKey);
-
     return TRUE; // 成功。
 }
 
