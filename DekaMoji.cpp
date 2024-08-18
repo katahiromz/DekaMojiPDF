@@ -568,9 +568,8 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
 // データからレジストリへ。
 BOOL DekaMoji::RegFromData(HWND hwnd)
 {
-    HKEY hAppKey = NULL;
-
     // ソフト固有のレジストリキーを作成または開く。
+    HKEY hAppKey;
     RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), &hAppKey);
     if (hAppKey == NULL)
         return FALSE; // 失敗。
