@@ -52,6 +52,7 @@ Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "fontmap.dat"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\mupdf-1.24.0-windows\mutool.exe"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
