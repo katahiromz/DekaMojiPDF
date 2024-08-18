@@ -334,6 +334,13 @@ BOOL DekaMoji::LoadFontMap()
                 PathAppend(font_pathname, TEXT("Fonts"));
                 PathAppend(font_pathname, font_file);
 
+                // 存在しなかった？ ローカルフォントを試す。
+                if (!PathFileExists(font_pathname))
+                {
+                    ExpandEnvironmentStrings(TEXT("%LOCALAPPDATA%\\Microsoft\\Windows\\Fonts"), font_pathname, _countof(font_pathname));
+                    PathAppend(font_pathname, font_file);
+                }
+
                 // パスファイル名が存在するか？
                 if (PathFileExists(font_pathname))
                 {
