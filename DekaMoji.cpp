@@ -1456,6 +1456,19 @@ void OnDestroy(HWND hwnd)
     g_hTextFont = NULL;
 }
 
+class MFileDeleter
+{
+public:
+    LPCTSTR m_file;
+    MFileDeleter(LPCTSTR file) : m_file(file)
+    {
+    }
+    ~MFileDeleter()
+    {
+        DeleteFile(m_file);
+    }
+};
+
 BOOL doUpdate(HWND hwnd)
 {
     // PDFファイル名。
@@ -1476,6 +1489,8 @@ BOOL doUpdate(HWND hwnd)
     string_t success = pDM->JustDoIt(hwnd, szPdfFile);
     if (success.empty())
         return FALSE; // 失敗。
+
+    MFileDeleter pdfFileDeleter(szPdfFile);
 
     TCHAR szPath[MAX_PATH];
     GetModuleFileName(NULL, szPath, _countof(szPath));
@@ -1510,6 +1525,8 @@ BOOL doUpdate(HWND hwnd)
     // PNGを読み込む。最初は1ページ。
     ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji"), szPngFile, _countof(szPngFile));
     StringCchCat(szPngFile, _countof(szPngFile), L"1.png");
+    MFileDeleter pngFileDeleter(szPngFile);
+
     HBITMAP hbm1 = NULL, hbm2 = NULL;
     try
     {
