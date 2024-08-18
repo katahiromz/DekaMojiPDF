@@ -1197,7 +1197,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     // 少し大きなフォントをテキストボックスにセット。
     LOGFONT lf;
     GetObject(GetWindowFont(hwnd), sizeof(lf), &lf);
-    lf.lfHeight = lf.lfHeight * 4 / 3;
+    lf.lfHeight = lf.lfHeight * 5 / 4;
     g_hTextFont = CreateFontIndirect(&lf);
     SetWindowFont(GetDlgItem(hwnd, IDC_TEXT), g_hTextFont, TRUE);
 
