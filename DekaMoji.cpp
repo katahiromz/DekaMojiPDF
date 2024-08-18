@@ -17,7 +17,7 @@
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
 #include <gdiplus.h>        // GDI+
 #include "color_value.h"    // 色をパースする。
-#include "MImageView.h"     // イメージプレビュー用のウィンドウ コントロール。
+#include "MImageViewEx.h"     // イメージプレビュー用のウィンドウ コントロール。
 #include "TempFile.hpp"     // 一時ファイル操作用のヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
@@ -99,7 +99,7 @@ TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
 HICON g_hIcon = NULL; // アイコン（大）。
 HICON g_hIconSm = NULL; // アイコン（小）。
 HFONT g_hTextFont = NULL; // テキストフォント。
-MImageView g_hwndImageView;
+MImageViewEx g_hwndImageView;
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -1478,6 +1478,7 @@ public:
     }
 };
 
+// プレビューを更新する。
 BOOL doUpdatePreview(HWND hwnd)
 {
     s_nRefreshCounter = 0;
