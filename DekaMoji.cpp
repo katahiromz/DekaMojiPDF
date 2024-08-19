@@ -574,6 +574,9 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_V_ADJUST);
 #undef GET_REG_DATA
 
+    // 符号なし(REG_DWORD)から符号付きの値に直す。
+    SETTING(IDC_V_ADJUST) = std::to_wstring(_ttoi(SETTING(IDC_V_ADJUST).c_str()));
+
     // レジストリキーを閉じる。
     RegCloseKey(hKey);
     return TRUE;
@@ -1352,8 +1355,10 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case IDC_EXIT: // 「終了」ボタン。
         {
             DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
-            pDM->DataFromDialog(hwnd, TRUE);
-            pDM->RegFromData(hwnd);
+            if (pDM->DataFromDialog(hwnd, TRUE))
+            {
+                pDM->RegFromData(hwnd);
+            }
             EndDialog(hwnd, id);
         }
         break;
