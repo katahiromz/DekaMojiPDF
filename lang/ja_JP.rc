@@ -19,7 +19,7 @@ IDR_SETTINGS_MENU MENU
     {
         MENUITEM "(なし)", -1, GRAYED
         MENUITEM SEPARATOR
-        MENUITEM "設定に名前を付けて保存(&A)...", ID_SAVESETTINGSAS
+        MENUITEM "現在の設定に名前を付けて保存(&A)...", ID_SAVESETTINGSAS
         MENUITEM "削除したい設定名を選ぶ(&C)...", ID_CHOOSESETTINGSTODELETE
         MENUITEM SEPARATOR
         MENUITEM "すべての設定をファイルに保存する(&S)...", ID_SAVEALLTOREGFILE
