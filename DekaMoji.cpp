@@ -54,6 +54,7 @@ enum
     IDC_TEXT_COLOR_BUTTON = psh1,
     IDC_ERASESETTINGS = psh5,
     IDC_README = psh6,
+    IDC_V_ADJUST = edt3,
 };
 
 // デカ文字PDFのメインクラス。
@@ -99,7 +100,8 @@ TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
 HICON g_hIcon = NULL; // アイコン（大）。
 HICON g_hIconSm = NULL; // アイコン（小）。
 HFONT g_hTextFont = NULL; // テキストフォント。
-MImageViewEx g_hwndImageView;
+MImageViewEx g_hwndImageView; // プレビューを表示する。
+LONG g_nVAdjust = 0; // 垂直位置補正。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -373,6 +375,7 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_METHOD_DEFAULT doLoadString(IDS_METHOD_02)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 #define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
+#define IDC_V_ADJUST_DEFAULT TEXT("0")
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -384,6 +387,7 @@ void DekaMoji::Reset()
     SETTING(IDC_METHOD) = IDC_METHOD_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
     SETTING(IDC_TEXT_COLOR) = IDC_TEXT_COLOR_DEFAULT;
+    SETTING(IDC_V_ADJUST) = IDC_V_ADJUST_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -421,7 +425,11 @@ void DekaMoji::InitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_02));
     SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_03));
 
+    // MImageViewExを使えるようにする。
     g_hwndImageView.doSubclass(GetDlgItem(hwnd, stc7));
+
+    // 垂直位置補正のスピンコントロール。
+    SendDlgItemMessage(hwnd, scr1, UDM_SETRANGE, 0, MAKELONG(100, -100));
 
     // プレビューを更新する。
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, NULL);
@@ -503,6 +511,10 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     }
     m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
 
+    auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, NULL, TRUE);
+    m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
+    g_nVAdjust = nAdjust * -8;
+
     return TRUE;
 }
 
@@ -529,6 +541,7 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
 
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
     ::SetDlgItemText(hwnd, IDC_TEXT_COLOR, SETTING(IDC_TEXT_COLOR).c_str());
+    ::SetDlgItemInt(hwnd, IDC_V_ADJUST, _ttoi(SETTING(IDC_V_ADJUST).c_str()), TRUE);
 
     return TRUE;
 }
@@ -558,6 +571,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
     GET_REG_DATA(IDC_METHOD);
     GET_REG_DATA(IDC_TEXT);
     GET_REG_DATA(IDC_TEXT_COLOR);
+    GET_REG_DATA(IDC_V_ADJUST);
 #undef GET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -586,6 +600,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd)
     SET_REG_DATA(IDC_METHOD);
     SET_REG_DATA(IDC_TEXT);
     SET_REG_DATA(IDC_TEXT_COLOR);
+    SET_REG_DATA(IDC_V_ADJUST);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -710,7 +725,7 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
         descent *= ratio2;
 
         // 文字をページいっぱいにする。
-        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent);
+        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent - g_nVAdjust);
 
         // テキストを描画する。
         HPDF_Page_ShowText(page, text);
@@ -789,7 +804,7 @@ void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
         descent *= ratio2 * ratio1;
 
         // 文字をページいっぱいにする。
-        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent);
+        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent - g_nVAdjust);
 
         // テキストを描画する。
         HPDF_Page_ShowText(page, text);
@@ -1335,7 +1350,12 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         OnOK(hwnd);
         break;
     case IDC_EXIT: // 「終了」ボタン。
-        EndDialog(hwnd, id);
+        {
+            DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+            pDM->DataFromDialog(hwnd, TRUE);
+            pDM->RegFromData(hwnd);
+            EndDialog(hwnd, id);
+        }
         break;
     case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
         OnEraseSettings(hwnd);
@@ -1357,6 +1377,12 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         if (codeNotify == CBN_SELCHANGE || codeNotify == CBN_SELENDOK)
         {
             doRefreshPreview(hwnd, 0);
+        }
+        break;
+    case IDC_V_ADJUST:
+        if (codeNotify == EN_CHANGE)
+        {
+            doRefreshPreview(hwnd);
         }
         break;
     case stc1:
@@ -1489,7 +1515,10 @@ BOOL doUpdatePreview(HWND hwnd)
     // メインディッシュ処理。
     string_t success = pDM->JustDoIt(hwnd, szPdfFile);
     if (success.empty())
+    {
+        assert(0);
         return FALSE; // 失敗。
+    }
 
     // poppler/pdftoppm.exe を使う。
     TCHAR szExe[MAX_PATH];
@@ -1497,7 +1526,10 @@ BOOL doUpdatePreview(HWND hwnd)
     PathRemoveFileSpec(szExe);
     PathAppend(szExe, TEXT("poppler\\pdftoppm.exe"));
     if (!PathFileExists(szExe))
+    {
+        assert(0);
         return FALSE;
+    }
 
     // poppler/pdftoppm.exeでPDFをPNGに変換。
     {
@@ -1561,6 +1593,7 @@ BOOL doUpdatePreview(HWND hwnd)
     }
     catch (...)
     {
+        assert(0);
         DeleteObject(hbm1);
         DeleteObject(hbm2);
         return FALSE;
