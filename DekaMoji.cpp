@@ -14,6 +14,7 @@
 #include <map>              // std::map クラス。
 #include <stdexcept>        // std::runtime_error クラス。
 #include <algorithm>        // std::reverse。
+#include <cmath>            // C言語の数学ライブラリ。
 #include <cassert>          // assertマクロ。
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
 #include <gdiplus.h>        // GDI+
@@ -56,6 +57,7 @@ enum
     IDC_SETTINGS = psh5,
     IDC_README = psh6,
     IDC_V_ADJUST = edt3,
+    IDC_VERTICAL = chx1,
 };
 
 // デカ文字PDFのメインクラス。
@@ -103,6 +105,7 @@ HICON g_hIconSm = NULL; // アイコン（小）。
 HFONT g_hTextFont = NULL; // テキストフォント。
 MImageViewEx g_hwndImageView; // プレビューを表示する。
 LONG g_nVAdjust = 0; // 垂直位置補正。
+BOOL g_bVertical = FALSE; // 縦書きかどうか。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -415,6 +418,7 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 #define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
 #define IDC_V_ADJUST_DEFAULT TEXT("0")
+#define IDC_VERTICAL_DEFAULT TEXT("0")
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -427,6 +431,7 @@ void DekaMoji::Reset()
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
     SETTING(IDC_TEXT_COLOR) = IDC_TEXT_COLOR_DEFAULT;
     SETTING(IDC_V_ADJUST) = IDC_V_ADJUST_DEFAULT;
+    SETTING(IDC_VERTICAL) = IDC_VERTICAL_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -554,6 +559,10 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
     g_nVAdjust = nAdjust * -8;
 
+    BOOL bVertical = (IsDlgButtonChecked(hwnd, IDC_VERTICAL) == BST_CHECKED);
+    m_settings[TEXT("IDC_VERTICAL")] = std::to_wstring(bVertical);
+    g_bVertical = bVertical;
+
     return TRUE;
 }
 
@@ -581,6 +590,11 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
     ::SetDlgItemText(hwnd, IDC_TEXT_COLOR, SETTING(IDC_TEXT_COLOR).c_str());
     ::SetDlgItemInt(hwnd, IDC_V_ADJUST, _ttoi(SETTING(IDC_V_ADJUST).c_str()), TRUE);
+
+    if (_ttoi(SETTING(IDC_VERTICAL).c_str()))
+        CheckDlgButton(hwnd, IDC_VERTICAL, BST_CHECKED);
+    else
+        CheckDlgButton(hwnd, IDC_VERTICAL, BST_UNCHECKED);
 
     return TRUE;
 }
@@ -619,6 +633,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
     GET_REG_DATA(IDC_TEXT);
     GET_REG_DATA(IDC_TEXT_COLOR);
     GET_REG_DATA(IDC_V_ADJUST);
+    GET_REG_DATA(IDC_VERTICAL);
 #undef GET_REG_DATA
 
     // 符号なし(REG_DWORD)から符号付きの値に直す。
@@ -656,6 +671,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     SET_REG_DATA(IDC_TEXT);
     SET_REG_DATA(IDC_TEXT_COLOR);
     SET_REG_DATA(IDC_V_ADJUST);
+    SET_REG_DATA(IDC_VERTICAL);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -721,11 +737,59 @@ void hpdf_draw_box(HPDF_Page page, double x, double y, double width, double heig
     HPDF_Page_Stroke(page);
 }
 
-// テキストを描画する。縦横比を考慮。
+double MyHPDF_Page_VTextWidth(HPDF_Page page, const char *text)
+{
+    auto wide = wide_from_ansi(CP_UTF8, text);
+    double max_width = 0;
+    for (size_t ich = 0; wide[ich]; ++ich)
+    {
+        WCHAR sz[2] = { wide[ich], 0 };
+        auto ansi = ansi_from_wide(CP_UTF8, sz);
+        double width = HPDF_Page_TextWidth(page, ansi);
+        if (max_width < width)
+            max_width = width;
+    }
+    return max_width;
+}
+
+double MyHPDF_Page_VTextHeight(HPDF_Page page, const char *text)
+{
+    auto wide = wide_from_ansi(CP_UTF8, text);
+    double height = 0;
+    for (size_t ich = 0; wide[ich]; ++ich)
+    {
+        height += HPDF_Page_GetCurrentFontSize(page);
+    }
+    return height;
+}
+
+void MyHPDF_Page_ShowVText(HPDF_Page page,
+    double width, double height, HPDF_Font font, double font_size,
+    const char *text, double x, double y, double ratio1, double ratio2)
+{
+    auto wide = wide_from_ansi(CP_UTF8, text);
+    size_t cch = lstrlenW(wide);
+    double dx = 0, dy = -g_nVAdjust;
+    double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
+    descent *= ratio1 * ratio2;
+    dy += descent;
+    for (size_t ich = cch - 1; ich < cch; --ich)
+    {
+        WCHAR sz[2] = { wide[ich], 0 };
+        auto ansi = ansi_from_wide(CP_UTF8, sz);
+        double char_width = HPDF_Page_TextWidth(page, ansi) * ratio2;
+        dx = (width - char_width) / 2;
+        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx, y + dy);
+        HPDF_Page_ShowText(page, ansi);
+        dy += HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
+    }
+}
+
+// 横書きテキストを描画する。縦横比を考慮。
 void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text,
                       double x, double y, double width, double height,
-                      int draw_box = 0)
+                      int draw_box = 0, BOOL bVertical = FALSE)
 {
     // フォントサイズを制限。
     if (font_size > HPDF_MAX_FONTSIZE)
@@ -746,8 +810,16 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
         HPDF_Page_SetFontAndSize(page, font, font_size);
 
         // テキストの幅と高さを取得する。
-        text_width = HPDF_Page_TextWidth(page, text);
-        text_height = HPDF_Page_GetCurrentFontSize(page);
+        if (bVertical)
+        {
+            text_width = MyHPDF_Page_VTextWidth(page, text);
+            text_height = MyHPDF_Page_VTextHeight(page, text);
+        }
+        else
+        {
+            text_width = HPDF_Page_TextWidth(page, text);
+            text_height = HPDF_Page_GetCurrentFontSize(page);
+        }
 
         text_width *= ratio2;
         text_height *= ratio2;
@@ -779,11 +851,19 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
         double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
         descent *= ratio2;
 
-        // 文字をページいっぱいにする。
-        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent - g_nVAdjust);
-
-        // テキストを描画する。
-        HPDF_Page_ShowText(page, text);
+        if (bVertical)
+        {
+            // 文字をページいっぱいにする。
+            x -= (width - text_width) / 2;
+            MyHPDF_Page_ShowVText(page, width, height, font, font_size, text, x, y, 1.0, ratio2);
+        }
+        else
+        {
+            // 文字をページいっぱいにする。
+            HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio2, x, y + descent - g_nVAdjust);
+            // テキストを描画する。
+            HPDF_Page_ShowText(page, text);
+        }
     }
     HPDF_Page_EndText(page);
 
@@ -798,7 +878,7 @@ void hpdf_draw_text_1(HPDF_Page page, HPDF_Font font, double font_size,
 void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text,
                       double x, double y, double width, double height,
-                      int draw_box = 0)
+                      int draw_box = 0, BOOL bVertical = FALSE)
 {
     // フォントサイズを制限。
     if (font_size > HPDF_MAX_FONTSIZE)
@@ -819,8 +899,16 @@ void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
         HPDF_Page_SetFontAndSize(page, font, font_size);
 
         // テキストの幅と高さを取得する。
-        text_width = HPDF_Page_TextWidth(page, text);
-        text_height = HPDF_Page_GetCurrentFontSize(page);
+        if (bVertical)
+        {
+            text_width = MyHPDF_Page_VTextWidth(page, text);
+            text_height = MyHPDF_Page_VTextHeight(page, text);
+        }
+        else
+        {
+            text_width = HPDF_Page_TextWidth(page, text);
+            text_height = HPDF_Page_GetCurrentFontSize(page);
+        }
 
         // アスペクト比を調整する。
         aspect1 = text_height / text_width;
@@ -858,11 +946,19 @@ void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
         double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
         descent *= ratio2 * ratio1;
 
-        // 文字をページいっぱいにする。
-        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent - g_nVAdjust);
-
-        // テキストを描画する。
-        HPDF_Page_ShowText(page, text);
+        if (bVertical)
+        {
+            // テキストを描画する。
+            x -= (width - text_width) / 2;
+            MyHPDF_Page_ShowVText(page, width, height, font, font_size, text, x, y, ratio1, ratio2);
+        }
+        else
+        {
+            // 文字をページいっぱいにする。
+            HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent - g_nVAdjust);
+            // テキストを描画する。
+            HPDF_Page_ShowText(page, text);
+        }
     }
     HPDF_Page_EndText(page);
 
@@ -894,7 +990,7 @@ str_split(T_STR_CONTAINER& container,
 void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
                               const char *text,
                               double x, double y, double width, double height,
-                              bool ignore_aspect = true)
+                              bool ignore_aspect, BOOL bVertical)
 {
     char buf[1024];
     StringCchCopyA(buf, _countof(buf), text);
@@ -912,26 +1008,54 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
     if (rows == 0)
         return;
 
-    for (size_t i = 0; i < rows; ++i)
+    if (bVertical)
     {
-        auto line = lines[i];
-        StringCchCopyA(buf, _countof(buf), line.c_str());
-        //StrTrimA(buf, " \t\r\n");
-
-        double line_x = x;
-        double line_y = y + (height / rows) * (rows - i - 1);
-        double line_width = width;
-        double line_height = height / rows;
-
-        if (ignore_aspect)
+        for (size_t i = 0; i < rows; ++i)
         {
-            hpdf_draw_text_2(page, font, font_size, buf, 
-                             line_x, line_y, line_width, line_height);
+            auto line = lines[i];
+            StringCchCopyA(buf, _countof(buf), line.c_str());
+            //StrTrimA(buf, " \t\r\n");
+
+            double line_x = x + (width / rows) * (rows - i - 1);
+            double line_y = y;
+            double line_width = width / rows;
+            double line_height = height;
+
+            if (ignore_aspect)
+            {
+                hpdf_draw_text_2(page, font, font_size, buf, 
+                                 line_x, line_y, line_width, line_height, 0, bVertical);
+            }
+            else
+            {
+                hpdf_draw_text_1(page, font, font_size, buf, 
+                                 line_x, line_y, line_width, line_height, 0, bVertical);
+            }
         }
-        else
+    }
+    else
+    {
+        for (size_t i = 0; i < rows; ++i)
         {
-            hpdf_draw_text_1(page, font, font_size, buf, 
-                             line_x, line_y, line_width, line_height);
+            auto line = lines[i];
+            StringCchCopyA(buf, _countof(buf), line.c_str());
+            //StrTrimA(buf, " \t\r\n");
+
+            double line_x = x;
+            double line_y = y + (height / rows) * (rows - i - 1);
+            double line_width = width;
+            double line_height = height / rows;
+
+            if (ignore_aspect)
+            {
+                hpdf_draw_text_2(page, font, font_size, buf, 
+                                 line_x, line_y, line_width, line_height, 0, bVertical);
+            }
+            else
+            {
+                hpdf_draw_text_1(page, font, font_size, buf, 
+                                 line_x, line_y, line_width, line_height, 0, bVertical);
+            }
         }
     }
 }
@@ -956,6 +1080,18 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
     }
 }
 
+BOOL IsTextAscii(const char *text)
+{
+    const BYTE *pb = (const BYTE *)text;
+    while (*pb)
+    {
+        if (*pb > 0x7F)
+            return FALSE;
+        ++pb;
+    }
+    return TRUE;
+}
+
 // メインディッシュ処理。
 string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 {
@@ -967,15 +1103,12 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 
     try
     {
-        // エンコーディング 90ms-RKSJ-H, 90ms-RKSJ-V, 90msp-RKSJ-H, EUC-H, EUC-V が利用可能となる
-        HPDF_UseJPEncodings(pdf);
+        // 縦書きかどうか？
+        BOOL bVertical = (BOOL)_ttoi(SETTING(IDC_VERTICAL).c_str());
 
         // エンコーディング "UTF-8" が利用可能に？？？
         HPDF_UseUTFEncodings(pdf);
         HPDF_SetCurrentEncoder(pdf, "UTF-8");
-
-        // 日本語フォントの MS-(P)Mincyo, MS-(P)Gothic が利用可能となる
-        //HPDF_UseJPFonts(pdf);
 
         // 用紙の向き。
         HPDF_PageDirection direction;
@@ -1025,7 +1158,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             if (entry.m_font_name != SETTING(IDC_FONT_NAME))
                 continue;
 
-            auto ansi = ansi_from_wide(CP_ACP, entry.m_pathname.c_str());
+            auto ansi = ansi_from_wide(CP_UTF8, entry.m_pathname.c_str());
             if (entry.m_index != -1)
             {
                 std::string font_name_a = HPDF_LoadTTFontFromFile2(pdf, ansi, entry.m_index, HPDF_TRUE);
@@ -1136,10 +1269,19 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
                 font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
+                // 縦書きで非英字フォントのときは全角に変換。
+                if (bVertical && !IsTextAscii(font_name_a))
+                {
+                    TCHAR szText[1024];
+                    LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
+                                LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
+                    text_data = szText;
+                }
+
                 // ANSI文字列に変換してテキストを描画する。
                 auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
                 hpdf_draw_multiline_text(page, font, font_size, text_a,
-                    content_x, content_y, content_width, content_height, ignore_aspect);
+                    content_x, content_y, content_width, content_height, ignore_aspect, bVertical);
             }
         }
         else
@@ -1173,10 +1315,19 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
+            // 縦書きで非英字フォントのときは全角に変換。
+            if (bVertical && !IsTextAscii(font_name_a))
+            {
+                TCHAR szText[1024];
+                LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
+                            LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
+                text_data = szText;
+            }
+
             // ANSI文字列に変換してテキストを描画する。
             auto text_a = ansi_from_wide(CP_UTF8, text_data.c_str());
             hpdf_draw_multiline_text(page, font, font_size, text_a,
-                content_x, content_y, content_width, content_height, ignore_aspect);
+                content_x, content_y, content_width, content_height, ignore_aspect, bVertical);
         }
 
         // PDF出力。
@@ -1717,6 +1868,16 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         if (codeNotify == EN_CHANGE)
         {
             doRefreshPreview(hwnd, 250);
+        }
+        break;
+    case IDC_VERTICAL:
+        if (codeNotify == BN_CLICKED)
+        {
+            if (IsDlgButtonChecked(hwnd, IDC_VERTICAL) == BST_CHECKED)
+                SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 0, 0);
+            else
+                SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 1, 0);
+            doRefreshPreview(hwnd, 0);
         }
         break;
     case stc1:
