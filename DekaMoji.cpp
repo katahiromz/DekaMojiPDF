@@ -1384,7 +1384,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
             doRefreshPreview(hwnd, 0);
         }
         break;
-    case IDC_V_ADJUST:
+    case IDC_V_ADJUST: // 「垂直位置補正」
         if (codeNotify == EN_CHANGE)
         {
             doRefreshPreview(hwnd, 250);
