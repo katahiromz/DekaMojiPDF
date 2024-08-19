@@ -1,4 +1,4 @@
-# ![](img/Deka-32x32.png "") デカ文字PDF by 片山博文MZ
+# ![](img/DekaMoji-32x32.png "") デカ文字PDF by 片山博文MZ
 
 「デカ文字PDF」は、用紙いっぱいの大きな文字列でPDFファイルを出力するソフトです。
 
