@@ -86,9 +86,9 @@ public:
     // データからダイアログへ。
     BOOL DialogFromData(HWND hwnd);
     // レジストリからデータへ。
-    BOOL DataFromReg(HWND hwnd);
+    BOOL DataFromReg(HWND hwnd, LPCTSTR pszSubKey = NULL);
     // データからレジストリへ。
-    BOOL RegFromData(HWND hwnd);
+    BOOL RegFromData(HWND hwnd, LPCTSTR pszSubKey = NULL);
 
     // メインディッシュ処理。
     string_t JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName = NULL);
@@ -547,11 +547,16 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
 }
 
 // レジストリからデータへ。
-BOOL DekaMoji::DataFromReg(HWND hwnd)
+BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
 {
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    if (pszSubKey)
+        PathAppend(szKey, pszSubKey);
+
     // ソフト固有のレジストリキーを開く。
     HKEY hKey;
-    RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), 0, KEY_READ, &hKey);
+    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ, &hKey);
     if (!hKey)
         return FALSE; // 開けなかった。
 
@@ -583,11 +588,16 @@ BOOL DekaMoji::DataFromReg(HWND hwnd)
 }
 
 // データからレジストリへ。
-BOOL DekaMoji::RegFromData(HWND hwnd)
+BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
 {
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    if (pszSubKey)
+        PathAppend(szKey, pszSubKey);
+
     // ソフト固有のレジストリキーを作成または開く。
     HKEY hAppKey;
-    RegCreateKey(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), &hAppKey);
+    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
     if (hAppKey == NULL)
         return FALSE; // 失敗。
 
