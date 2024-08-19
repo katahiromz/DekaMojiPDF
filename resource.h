@@ -46,12 +46,14 @@
 #define IDS_SIZE_US4X8                      132
 #define IDS_SIZE_US5X7                      133
 #define IDS_SIZE_COMM10                     134
+#define IDS_REGFILTER                       135
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001
 #define ID_INITAPP                          1002
 #define ID_CHOOSESETTINGSTODELETE           1003
-#define ID_SETTINGS_0000                    1004
+#define ID_SAVEALLTOREGFILE                 1004
+#define ID_SETTINGS_0000                    1005
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS

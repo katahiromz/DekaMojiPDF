@@ -22,6 +22,8 @@ IDR_SETTINGS_MENU MENU
         MENUITEM "設定に名前を付けて保存(&A)...", ID_SAVESETTINGSAS
         MENUITEM "削除したい設定名を選ぶ(&C)...", ID_CHOOSESETTINGSTODELETE
         MENUITEM SEPARATOR
+        MENUITEM "すべての設定をファイルに保存する(&S)...", ID_SAVEALLTOREGFILE
+        MENUITEM SEPARATOR
         MENUITEM "設定のリセット(&R)", ID_RESETSETTINGS
         MENUITEM "アプリの初期化(&I)", ID_INITAPP
     }
@@ -154,6 +156,7 @@ STRINGTABLE
     IDS_SIZE_US4X8, "US 4x8"
     IDS_SIZE_US5X7, "US 5x7"
     IDS_SIZE_COMM10, "Comm 10"
+    IDS_REGFILTER, "レジストリ ファイル (*.reg)|*.reg||"
 }
 
 //////////////////////////////////////////////////////////////////////////////

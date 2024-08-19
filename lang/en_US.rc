@@ -22,6 +22,8 @@ IDR_SETTINGS_MENU MENU
         MENUITEM "Save settings &as...", ID_SAVESETTINGSAS
         MENUITEM "&Choose setting names to delete...", ID_CHOOSESETTINGSTODELETE
         MENUITEM SEPARATOR
+        MENUITEM "&Save all settings to file...", ID_SAVEALLTOREGFILE
+        MENUITEM SEPARATOR
         MENUITEM "&Reset settings", ID_RESETSETTINGS
         MENUITEM "&Initialize app", ID_INITAPP
     }
@@ -154,6 +156,7 @@ STRINGTABLE
     IDS_SIZE_US4X8, "US 4x8"
     IDS_SIZE_US5X7, "US 5x7"
     IDS_SIZE_COMM10, "Comm 10"
+    IDS_REGFILTER, "Registry File (*.reg)|*.reg||"
 }
 
 //////////////////////////////////////////////////////////////////////////////

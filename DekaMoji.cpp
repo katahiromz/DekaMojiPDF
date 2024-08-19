@@ -585,11 +585,14 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     return TRUE;
 }
 
+// アプリのレジストリキー。
+#define REGKEY_APP TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF")
+
 // レジストリからデータへ。
 BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
 {
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
     if (pszSubKey)
         PathAppend(szKey, pszSubKey);
 
@@ -630,7 +633,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
 BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
 {
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
     if (pszSubKey)
         PathAppend(szKey, pszSubKey);
 
@@ -1331,7 +1334,7 @@ void OnEraseSettings(HWND hwnd)
 void OnEraseSubSettings(HWND hwnd)
 {
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
 
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
@@ -1353,7 +1356,7 @@ void OnRestoreSubSettings(HWND hwnd, INT id)
     id -= ID_SETTINGS_0000;
 
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
 
     HKEY hAppKey;
     RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
@@ -1379,7 +1382,7 @@ void ChooseDelete_OnInitDialog(HWND hwnd)
     HWND hwndLst1 = GetDlgItem(hwnd, lst1);
 
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
 
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ, &hAppKey);
@@ -1406,7 +1409,7 @@ void ChooseDelete_OnDeleteSettings(HWND hwnd)
     HWND hwndLst1 = GetDlgItem(hwnd, lst1);
 
     TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
 
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
@@ -1540,8 +1543,7 @@ void OnSettings(HWND hwnd)
     HMENU hSubMenu = GetSubMenu(hMenu, 0);
 
     HKEY hAppKey;
-    RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), 0,
-                 KEY_READ, &hAppKey);
+    RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ, &hAppKey);
 
     if (hAppKey)
     {
@@ -1624,6 +1626,51 @@ void OnSaveSubSettingsAs(HWND hwnd)
         EncodeName(szName);
         pDM->RegFromData(hwnd, szName);
     }
+}
+
+// 「すべての設定をREGファイルに保存」
+void OnSaveAllToRegFile(HWND hwnd)
+{
+    // レジストリをダイアログに従って更新する。
+    DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    if (!pDM->DataFromDialog(hwnd, FALSE))
+        return;
+    pDM->RegFromData(hwnd);
+
+    // フィルター文字列を取得する。
+    TCHAR szFilter[MAX_PATH];
+    LoadString(g_hInstance, IDS_REGFILTER, szFilter, _countof(szFilter));
+    for (INT ich = 0; szFilter[ich]; ++ich)
+    {
+        if (szFilter[ich] == TEXT('|'))
+            szFilter[ich] = 0;
+    }
+
+    // ユーザーにREGファイル名を問い合わせる。
+    OPENFILENAME ofn = { OPENFILENAME_SIZE_VERSION_400, hwnd };
+    TCHAR szFile[MAX_PATH] = TEXT("");
+    ofn.lpstrFilter = szFilter;
+    ofn.lpstrFile = szFile;
+    ofn.nMaxFile = _countof(szFile);
+    ofn.Flags = OFN_EXPLORER | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT |
+                OFN_ENABLESIZING;
+    ofn.lpstrDefExt = TEXT("reg");
+    if (!GetSaveFileName(&ofn))
+        return; // キャンセルか失敗。
+
+    // "reg export"を使ってレジストリ設定をファイルに保存する。
+    string_t params;
+    params += TEXT("export \"HKCU\\");
+    params += REGKEY_APP;
+    params += TEXT("\" \"");
+    params += szFile;
+    params += TEXT("\"");
+    SHELLEXECUTEINFO info = { sizeof(info) };
+    info.hwnd = hwnd;
+    info.lpFile = TEXT("reg.exe");
+    info.lpParameters = params.c_str();
+    info.nShow = SW_HIDE;
+    ShellExecuteEx(&info);
 }
 
 // WM_COMMAND
@@ -1732,6 +1779,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case ID_CHOOSESETTINGSTODELETE: // 「削除したい設定名を選ぶ」
         OnChooseEraseSettings(hwnd);
+        break;
+    case ID_SAVEALLTOREGFILE: // 「すべての設定をREGファイルに保存」
+        OnSaveAllToRegFile(hwnd);
         break;
     default:
         if (ID_SETTINGS_0000 <= id && id <= ID_SETTINGS_0000 + 9999) // サブ設定。
