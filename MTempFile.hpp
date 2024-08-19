@@ -1,11 +1,11 @@
-// TempFile.hpp --- 一時ファイルを自動化する by katahiromz
+// MTempFile.hpp --- 一時ファイルを自動化する by katahiromz
 #pragma once
 
 #include <strsafe.h> // 文字列を安全に扱う関数(StringCc*)。
 #include <cassert> // assertマクロ。
 
 // 一時ファイルを扱うクラス。
-class TempFile
+class MTempFile
 {
 protected:
     DWORD m_old_value;
@@ -35,19 +35,19 @@ protected:
 
 public:
     // コンストラクタ。
-    TempFile() : m_old_value(::GetTickCount())
+    MTempFile() : m_old_value(::GetTickCount())
     {
         m_tempfile[0] = m_temppath[0] = m_prefix[0] = m_dot_ext[0] = 0;
     }
 
     // コンストラクタ。
-    TempFile(LPCTSTR prefix, LPCTSTR dot_ext) : m_old_value(::GetTickCount())
+    MTempFile(LPCTSTR prefix, LPCTSTR dot_ext) : m_old_value(::GetTickCount())
     {
         init(prefix, dot_ext);
     }
 
     // デストラクタ。
-    ~TempFile()
+    ~MTempFile()
     {
         // 自動的に削除する。
         erase();
@@ -90,7 +90,7 @@ public:
     }
 
     // パスファイル名を返す。
-    LPCTSTR get() const
+    LPTSTR get()
     {
         assert(m_tempfile[0] != 0); // make first!
 
@@ -98,6 +98,11 @@ public:
             return m_tempfile;
 
         return NULL;
+    }
+
+    operator LPTSTR()
+    {
+        return get();
     }
 
     // 一時ファイルを削除する。

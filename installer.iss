@@ -52,7 +52,22 @@ Source: "README.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "HISTORY.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "fontmap.dat"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\mupdf-1.24.0-windows\mutool.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\libcurl.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\liblzma.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\libpng16.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\libssh2.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\openjp2.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\pdftoppm.exe"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\poppler.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\tiff.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\zlib.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\zstd.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\deflate.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\freetype.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\jpeg8.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\lcms2.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+Source: "..\poppler-24.07.0\Library\bin\Lerc.dll"; DestDir: "{app}\poppler"; Flags: ignoreversion
+
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]

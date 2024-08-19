@@ -17,8 +17,8 @@
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
 #include <gdiplus.h>        // GDI+
 #include "color_value.h"    // 色をパースする。
-#include "MImageViewEx.h"     // イメージプレビュー用のウィンドウ コントロール。
-#include "TempFile.hpp"     // 一時ファイル操作用のヘッダ。
+#include "MImageViewEx.h"   // イメージプレビュー用のウィンドウ コントロール。
+#include "MTempFile.hpp"    // 一時ファイル操作用のヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
 // 文字列クラス。
@@ -1112,7 +1112,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         // PDF出力。
         {
             // PDFを一時ファイルに保存する。
-            TempFile temp_file(TEXT("DM2"), TEXT(".pdf"));
+            MTempFile temp_file(TEXT("DM2"), TEXT(".pdf"));
             std::string temp_file_a = ansi_from_wide(CP_ACP, temp_file.make());
             HPDF_SaveToFile(pdf, temp_file_a.c_str());
 
@@ -1473,13 +1473,13 @@ BOOL doUpdatePreview(HWND hwnd)
     s_nRefreshCounter = 0;
 
     // PDFファイル名。
-    TCHAR szPdfFile[MAX_PATH];
-    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji.pdf"), szPdfFile, _countof(szPdfFile));
+    MTempFile szPdfFile(TEXT("DeM"), TEXT(".pdf"));
+    szPdfFile.make();
 
     // PNGファイル名。
-    TCHAR szPngFile[MAX_PATH];
-    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji"), szPngFile, _countof(szPngFile));
-    StringCchCat(szPngFile, _countof(szPngFile), L"%d.png");
+    MTempFile szPngFile(TEXT("DeM"), TEXT(".png"));
+    szPngFile.make();
+    PathRemoveExtension(szPngFile);
 
     // ダイアログからデータを取得。
     DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
@@ -1491,29 +1491,27 @@ BOOL doUpdatePreview(HWND hwnd)
     if (success.empty())
         return FALSE; // 失敗。
 
-    MFileDeleter pdfFileDeleter(szPdfFile);
-
-    TCHAR szPath[MAX_PATH];
-    GetModuleFileName(NULL, szPath, _countof(szPath));
-    PathRemoveFileSpec(szPath);
-    PathAppend(szPath, TEXT("mutool.exe"));
-
-    if (!PathFileExists(szPath))
+    // poppler/pdftoppm.exe を使う。
+    TCHAR szExe[MAX_PATH];
+    GetModuleFileName(NULL, szExe, _countof(szExe));
+    PathRemoveFileSpec(szExe);
+    PathAppend(szExe, TEXT("poppler\\pdftoppm.exe"));
+    if (!PathFileExists(szExe))
         return FALSE;
 
-    // mutool convertでPDFをPNGに変換。
+    // poppler/pdftoppm.exeでPDFをPNGに変換。
     {
         string_t params;
-        params += TEXT("convert -O resolution=16 -o \"");
-        params += szPngFile;
-        params += TEXT("\" \"");
+        params += TEXT("-png -singlefile -r 16 \"");
         params += szPdfFile;
-        params += TEXT("\" 1");
+        params += TEXT("\" \"");
+        params += szPngFile;
+        params += TEXT("\"");
 
         SHELLEXECUTEINFO info = { sizeof(info) };
         info.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS;
         info.hwnd = hwnd;
-        info.lpFile = szPath;
+        info.lpFile = szExe;
         info.lpParameters = params.c_str();
         info.nShow = SW_HIDE;
         if (!ShellExecuteEx(&info))
@@ -1523,10 +1521,8 @@ BOOL doUpdatePreview(HWND hwnd)
         CloseHandle(info.hProcess);
     }
 
-    // PNGを読み込む。最初は1ページ。
-    ExpandEnvironmentStrings(TEXT("%TEMP%\\dekamoji"), szPngFile, _countof(szPngFile));
-    StringCchCat(szPngFile, _countof(szPngFile), L"1.png");
-    MFileDeleter pngFileDeleter(szPngFile);
+    // PNGを読み込む。
+    PathAddExtension(szPngFile, TEXT(".png"));
 
     HBITMAP hbm1 = NULL, hbm2 = NULL;
     try
