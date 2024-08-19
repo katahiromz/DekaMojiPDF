@@ -1387,7 +1387,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case IDC_V_ADJUST:
         if (codeNotify == EN_CHANGE)
         {
-            doRefreshPreview(hwnd);
+            doRefreshPreview(hwnd, 250);
         }
         break;
     case stc1:
