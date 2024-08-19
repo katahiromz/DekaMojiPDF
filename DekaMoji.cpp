@@ -13,6 +13,7 @@
 #include <vector>           // std::vector クラス。
 #include <map>              // std::map クラス。
 #include <stdexcept>        // std::runtime_error クラス。
+#include <algorithm>        // std::reverse。
 #include <cassert>          // assertマクロ。
 #include <hpdf.h>           // PDF出力用のライブラリlibharuのヘッダ。
 #include <gdiplus.h>        // GDI+
@@ -52,7 +53,7 @@ enum
     IDC_TEXT = edt1,
     IDC_TEXT_COLOR = edt2,
     IDC_TEXT_COLOR_BUTTON = psh1,
-    IDC_ERASESETTINGS = psh5,
+    IDC_SETTINGS = psh5,
     IDC_README = psh6,
     IDC_V_ADJUST = edt3,
 };
@@ -116,6 +117,44 @@ LPTSTR doLoadString(INT nID)
 void str_trim(LPWSTR text)
 {
     StrTrimW(text, L" \t\r\n\x3000");
+}
+
+// レジストリに設定名を保存するためにエンコードする。
+void EncodeName(LPWSTR szName)
+{
+    WCHAR szEncoded[MAX_PATH], szHEX[16];
+    LPWSTR pch0 = szName, pch1 = szEncoded;
+    while (*pch0)
+    {
+        StringCchPrintfW(szHEX, _countof(szHEX), L"%04X", *pch0++);
+        *pch1++ = szHEX[0];
+        *pch1++ = szHEX[1];
+        *pch1++ = szHEX[2];
+        *pch1++ = szHEX[3];
+    }
+    *pch1 = 0;
+    StringCchCopyW(szName, MAX_PATH, szEncoded);
+}
+
+// レジストリに保存した設定名を復元するためにデコードする。
+void DecodeName(LPWSTR szName)
+{
+    WCHAR szDecoded[MAX_PATH], szHEX[16];
+    LPWSTR pch0 = szName, pch1 = szDecoded;
+    while (*pch0)
+    {
+        szHEX[0] = *pch0++;
+        if (!*pch0) break;
+        szHEX[1] = *pch0++;
+        if (!*pch0) break;
+        szHEX[2] = *pch0++;
+        if (!*pch0) break;
+        szHEX[3] = *pch0++;
+        szHEX[4] = 0;
+        *pch1++ = (WCHAR)wcstoul(szHEX, NULL, 16);
+    }
+    *pch1 = 0;
+    StringCchCopyW(szName, MAX_PATH, szDecoded);
 }
 
 // ローカルのファイルのパス名を取得する。
@@ -597,7 +636,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
 
     // ソフト固有のレジストリキーを作成または開く。
     HKEY hAppKey;
-    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
+    RegCreateKeyEx(HKEY_CURRENT_USER, szKey, 0, NULL, 0, KEY_READ | KEY_WRITE, NULL, &hAppKey, NULL);
     if (hAppKey == NULL)
         return FALSE; // 失敗。
 
@@ -1288,6 +1327,141 @@ void OnEraseSettings(HWND hwnd)
     pDM->RegFromData(hwnd);
 }
 
+// サブ設定を削除。
+void OnEraseSubSettings(HWND hwnd)
+{
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+
+    HKEY hAppKey;
+    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
+    if (!hAppKey)
+        return;
+
+    TCHAR szName[MAX_PATH];
+    while (RegEnumKey(hAppKey, 0, szName, _countof(szName)) == ERROR_SUCCESS)
+    {
+        RegDeleteKey(hAppKey, szName);
+    }
+
+    RegCloseKey(hAppKey);
+}
+
+// サブ設定を復元する。
+void OnRestoreSubSettings(HWND hwnd, INT id)
+{
+    id -= ID_SETTINGS_0000;
+
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+
+    HKEY hAppKey;
+    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
+    if (!hAppKey)
+    {
+        assert(0);
+        return;
+    }
+
+    TCHAR szName[MAX_PATH];
+    if (RegEnumKey(hAppKey, id, szName, _countof(szName)) == ERROR_SUCCESS)
+    {
+        DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+        pDM->DataFromReg(hwnd, szName);
+        pDM->DialogFromData(hwnd);
+    }
+
+    RegCloseKey(hAppKey);
+}
+
+void ChooseDelete_OnInitDialog(HWND hwnd)
+{
+    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
+
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+
+    HKEY hAppKey;
+    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ, &hAppKey);
+    if (!hAppKey)
+    {
+        assert(0);
+        return;
+    }
+
+    TCHAR szName[MAX_PATH];
+    for (DWORD dwIndex = 0; dwIndex <= 9999; dwIndex++)
+    {
+        if (RegEnumKey(hAppKey, dwIndex, szName, _countof(szName)) == ERROR_SUCCESS)
+        {
+            DecodeName(szName);
+            ListBox_AddString(hwndLst1, szName);
+        }
+    }
+}
+
+// リストボックスで選択した設定名を削除する。
+void ChooseDelete_OnDeleteSettings(HWND hwnd)
+{
+    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
+
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"));
+
+    HKEY hAppKey;
+    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
+    if (!hAppKey)
+    {
+        assert(0);
+        return;
+    }
+
+    std::vector<INT> selItems;
+    INT cSelections = (INT)SendMessage(hwndLst1, LB_GETSELCOUNT, 0, 0);
+    selItems.resize(cSelections);
+    SendMessage(hwndLst1, LB_GETSELITEMS, cSelections, (LPARAM)&selItems[0]);
+    std::reverse(selItems.begin(), selItems.end());
+
+    for (INT iItem : selItems)
+    {
+        TCHAR szName[MAX_PATH];
+        SendMessage(hwndLst1, LB_GETTEXT, iItem, (LPARAM)szName);
+        EncodeName(szName);
+        RegDeleteKey(hAppKey, szName);
+    }
+
+    RegCloseKey(hAppKey);
+}
+
+INT_PTR CALLBACK
+ChooseDeleteDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    switch (uMsg)
+    {
+    case WM_INITDIALOG:
+        ChooseDelete_OnInitDialog(hwnd);
+        return TRUE;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+            ChooseDelete_OnDeleteSettings(hwnd);
+            EndDialog(hwnd, IDOK);
+            break;
+        case IDCANCEL:
+            EndDialog(hwnd, IDCANCEL);
+            break;
+        }
+        break;
+    }
+    return 0;
+}
+
+void OnChooseEraseSettings(HWND hwnd)
+{
+    DialogBox(g_hInstance, MAKEINTRESOURCE(IDD_CHOOSEDELETESETTINGS), hwnd, ChooseDeleteDlgProc);
+}
+
 // 「テキストの色」ボタンが押された。
 void OnTextColorButton(HWND hwnd)
 {
@@ -1353,6 +1527,105 @@ void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
     }
 }
 
+// 「設定」ボタン。
+void OnSettings(HWND hwnd)
+{
+    // ボタンの位置を取得する。
+    RECT rc;
+    GetWindowRect(GetDlgItem(hwnd, psh5), &rc);
+    POINT pt = { rc.left, (rc.top + rc.bottom) / 2 };
+
+    // メニューを読み込む。
+    HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_SETTINGS_MENU));
+    HMENU hSubMenu = GetSubMenu(hMenu, 0);
+
+    HKEY hAppKey;
+    RegOpenKeyEx(HKEY_CURRENT_USER, TEXT("Software\\Katayama Hirofumi MZ\\DekaMojiPDF"), 0,
+                 KEY_READ, &hAppKey);
+
+    if (hAppKey)
+    {
+        for (DWORD dwIndex = 0; dwIndex < 9999; ++dwIndex)
+        {
+            TCHAR szName[MAX_PATH];
+            LONG error = RegEnumKey(hAppKey, dwIndex, szName, _countof(szName));
+            if (error)
+                break;
+
+            if (dwIndex == 0)
+                DeleteMenu(hSubMenu, 0, MF_BYPOSITION);
+
+            DecodeName(szName);
+            InsertMenu(hSubMenu, dwIndex, MF_BYPOSITION, ID_SETTINGS_0000 + dwIndex, szName);
+        }
+
+        RegCloseKey(hAppKey);
+    }
+
+    // ポップアップメニューを表示し、コマンドが選択されるのを待つ。
+    TPMPARAMS params = { sizeof(params), rc };
+    SetForegroundWindow(hwnd);
+    enum { flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL | TPM_RETURNCMD };
+    const auto id = TrackPopupMenuEx(hSubMenu, flags, pt.x, pt.y, hwnd, &params);
+
+    if (id != 0 && id != -1)
+    {
+        ::PostMessageW(hwnd, WM_COMMAND, id, 0);
+    }
+
+    ::DestroyMenu(hMenu);
+}
+
+INT_PTR CALLBACK
+NameSettingsDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    static LPTSTR s_szName = NULL;
+    TCHAR szText[MAX_PATH];
+    switch (uMsg)
+    {
+    case WM_INITDIALOG:
+        s_szName = (LPTSTR)lParam;
+        SendDlgItemMessage(hwnd, edt1, EM_SETLIMITTEXT, 40, 0);
+        return TRUE;
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDOK:
+            GetDlgItemText(hwnd, edt1, szText, _countof(szText));
+            StrTrim(szText, TEXT(" \t\r\n\x3000"));
+            if (szText[0])
+            {
+                StringCchCopy(s_szName, MAX_PATH, szText);
+            }
+            EndDialog(hwnd, IDOK);
+            break;
+        case IDCANCEL:
+            EndDialog(hwnd, IDCANCEL);
+            break;
+        }
+    }
+    return 0;
+}
+
+// 「設定に名前を付けて保存」
+void OnSaveSubSettingsAs(HWND hwnd)
+{
+    DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    if (!pDM->DataFromDialog(hwnd, FALSE))
+    {
+        assert(0);
+        return;
+    }
+
+    TCHAR szName[MAX_PATH];
+    if (DialogBoxParam(g_hInstance, MAKEINTRESOURCE(IDD_NAMESETTINGS), hwnd,
+                       NameSettingsDlgProc, (LPARAM)szName) == IDOK)
+    {
+        EncodeName(szName);
+        pDM->RegFromData(hwnd, szName);
+    }
+}
+
 // WM_COMMAND
 // コマンド。
 void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
@@ -1372,9 +1645,8 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
             EndDialog(hwnd, id);
         }
         break;
-    case IDC_ERASESETTINGS: // 「設定の初期化」ボタン。
-        OnEraseSettings(hwnd);
-        doRefreshPreview(hwnd, 0);
+    case IDC_SETTINGS: // 「設定の初期化」ボタン。
+        OnSettings(hwnd);
         break;
     case IDC_README: // 「README」ボタン。
         OnReadMe(hwnd);
@@ -1443,6 +1715,28 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         if (codeNotify == BN_CLICKED)
         {
             OnTextColorButton(hwnd);
+            doRefreshPreview(hwnd, 0);
+        }
+        break;
+    case ID_SAVESETTINGSAS: // 「設定に名前を付けて保存」
+        OnSaveSubSettingsAs(hwnd);
+        break;
+    case ID_RESETSETTINGS: // 「設定のリセット」
+        OnEraseSettings(hwnd);
+        doRefreshPreview(hwnd, 0);
+        break;
+    case ID_INITAPP: // 「アプリの初期化」
+        OnEraseSettings(hwnd);
+        OnEraseSubSettings(hwnd);
+        doRefreshPreview(hwnd, 0);
+        break;
+    case ID_CHOOSESETTINGSTODELETE: // 「削除したい設定名を選ぶ」
+        OnChooseEraseSettings(hwnd);
+        break;
+    default:
+        if (ID_SETTINGS_0000 <= id && id <= ID_SETTINGS_0000 + 9999) // サブ設定。
+        {
+            OnRestoreSubSettings(hwnd, id);
             doRefreshPreview(hwnd, 0);
         }
         break;
@@ -1663,7 +1957,7 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     DekaMoji dm(hInstance, argc, argv);
 
     // ユーザーデータをパラメータとしてダイアログを開く。
-    DialogBoxParam(hInstance, MAKEINTRESOURCE(1), NULL, DialogProc, (LPARAM)&dm);
+    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAINDLG), NULL, DialogProc, (LPARAM)&dm);
 
     // GDI+を終了。
     Gdiplus::GdiplusShutdown(gdiplusToken);

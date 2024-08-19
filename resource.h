@@ -5,6 +5,12 @@
 
 #define IDB_WAIT                            100
 
+#define IDD_MAINDLG                         100
+#define IDD_NAMESETTINGS                    101
+#define IDD_CHOOSEDELETESETTINGS            102
+
+#define IDR_SETTINGS_MENU                   100
+
 #define IDS_APPNAME                         100
 #define IDS_INVALIDSTRING                   101
 #define IDS_TEXTTOOLONG                     102
@@ -41,11 +47,17 @@
 #define IDS_SIZE_US5X7                      133
 #define IDS_SIZE_COMM10                     134
 
+#define ID_SAVESETTINGSAS                   1000
+#define ID_RESETSETTINGS                    1001
+#define ID_INITAPP                          1002
+#define ID_CHOOSESETTINGSTODELETE           1003
+#define ID_SETTINGS_0000                    1004
+
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
         #define _APS_NO_MFC                 1
-        #define _APS_NEXT_RESOURCE_VALUE    100
-        #define _APS_NEXT_COMMAND_VALUE     100
+        #define _APS_NEXT_RESOURCE_VALUE    101
+        #define _APS_NEXT_COMMAND_VALUE     1005
         #define _APS_NEXT_CONTROL_VALUE     1000
         #define _APS_NEXT_SYMED_VALUE       300
     #endif
