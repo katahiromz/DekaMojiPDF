@@ -33,9 +33,6 @@
 #define IDS_OUTPUT_NAME                     119
 #define IDS_YES                             120
 #define IDS_NO                              121
-#define IDS_METHOD_01                       122
-#define IDS_METHOD_02                       123
-#define IDS_METHOD_03                       124
 #define IDS_FIELD_TEXT_COLOR                125
 #define IDS_REASON_VALID_COLOR              126
 #define IDS_FIELD_FONT_NAME                 127
@@ -65,7 +62,7 @@
     #ifndef APSTUDIO_READONLY_SYMBOLS
         #define _APS_NO_MFC                 1
         #define _APS_NEXT_RESOURCE_VALUE    101
-        #define _APS_NEXT_COMMAND_VALUE     1006
+        #define _APS_NEXT_COMMAND_VALUE     2006
         #define _APS_NEXT_CONTROL_VALUE     1000
         #define _APS_NEXT_SYMED_VALUE       300
     #endif

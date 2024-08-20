@@ -74,7 +74,6 @@ enum
     IDC_PAGE_SIZE = cmb1,
     IDC_PAGE_DIRECTION = cmb2,
     IDC_FONT_NAME = cmb3,
-    IDC_METHOD = cmb5,
     IDC_TEXT = edt1,
     IDC_TEXT_COLOR = edt2,
     IDC_TEXT_COLOR_BUTTON = psh1,
@@ -82,6 +81,7 @@ enum
     IDC_README = psh6,
     IDC_V_ADJUST = edt3,
     IDC_VERTICAL = chx1,
+    IDC_ONE_LETTER_PER_PAPER = chx2,
 };
 
 // デカ文字PDFのメインクラス。
@@ -130,6 +130,7 @@ HFONT g_hTextFont = NULL; // テキストフォント。
 MImageViewEx g_hwndImageView; // プレビューを表示する。
 LONG g_nVAdjust = 0; // 垂直位置補正。
 BOOL g_bVertical = FALSE; // 縦書きかどうか。
+BOOL g_bOneLetterPerPaper = FALSE; // 用紙1枚に1文字だけ。
 std::vector<string_t> g_open_parens, g_close_parens; // カッコ。
 std::vector<string_t> g_comma_period; // 句読点。
 std::vector<string_t> g_hyphen_dash; // ハイフン・ダッシュなどの横線。
@@ -442,11 +443,11 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_LANDSCAPE)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
-#define IDC_METHOD_DEFAULT doLoadString(IDS_METHOD_02)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 #define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
 #define IDC_V_ADJUST_DEFAULT TEXT("0")
 #define IDC_VERTICAL_DEFAULT TEXT("0")
+#define IDC_ONE_LETTER_PER_PAPER_DEFAULT TEXT("0")
 
 // データをリセットする。
 void DekaMoji::Reset()
@@ -455,11 +456,11 @@ void DekaMoji::Reset()
     SETTING(IDC_PAGE_SIZE) = IDC_PAGE_SIZE_DEFAULT;
     SETTING(IDC_PAGE_DIRECTION) = IDC_PAGE_DIRECTION_DEFAULT;
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
-    SETTING(IDC_METHOD) = IDC_METHOD_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
     SETTING(IDC_TEXT_COLOR) = IDC_TEXT_COLOR_DEFAULT;
     SETTING(IDC_V_ADJUST) = IDC_V_ADJUST_DEFAULT;
     SETTING(IDC_VERTICAL) = IDC_VERTICAL_DEFAULT;
+    SETTING(IDC_ONE_LETTER_PER_PAPER) = IDC_ONE_LETTER_PER_PAPER_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -492,11 +493,6 @@ void DekaMoji::InitDialog(HWND hwnd)
         }
     }
 
-    // IDC_METHOD: テキストの配置方法。
-    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_01));
-    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_02));
-    SendDlgItemMessage(hwnd, IDC_METHOD, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_METHOD_03));
-
     // MImageViewExを使えるようにする。
     g_hwndImageView.doSubclass(GetDlgItem(hwnd, stc7));
 
@@ -521,7 +517,6 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     GET_COMBO_DATA(IDC_PAGE_SIZE);
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
-    GET_COMBO_DATA(IDC_METHOD);
 
     // チェックボックスからデータを取得する。
 #define GET_CHECK_DATA(id) do { \
@@ -595,9 +590,11 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
     g_nVAdjust = nAdjust * -8;
 
-    BOOL bVertical = (IsDlgButtonChecked(hwnd, IDC_VERTICAL) == BST_CHECKED);
-    m_settings[TEXT("IDC_VERTICAL")] = std::to_wstring(bVertical);
-    g_bVertical = bVertical;
+    g_bVertical = (IsDlgButtonChecked(hwnd, IDC_VERTICAL) == BST_CHECKED);
+    m_settings[TEXT("IDC_VERTICAL")] = std::to_wstring(g_bVertical);
+
+    g_bOneLetterPerPaper = (IsDlgButtonChecked(hwnd, IDC_ONE_LETTER_PER_PAPER) == BST_CHECKED);
+    m_settings[TEXT("IDC_ONE_LETTER_PER_PAPER")] = std::to_wstring(g_bOneLetterPerPaper);
 
     return TRUE;
 }
@@ -611,7 +608,6 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_SIZE);
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
-    SET_COMBO_DATA(IDC_METHOD);
 #undef SET_COMBO_DATA
 
     // チェックボックスへデータを設定する。
@@ -631,6 +627,11 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_CHECKED);
     else
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_UNCHECKED);
+
+    if (_ttoi(SETTING(IDC_ONE_LETTER_PER_PAPER).c_str()))
+        CheckDlgButton(hwnd, IDC_ONE_LETTER_PER_PAPER, BST_CHECKED);
+    else
+        CheckDlgButton(hwnd, IDC_ONE_LETTER_PER_PAPER, BST_UNCHECKED);
 
     return TRUE;
 }
@@ -665,11 +666,11 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
     GET_REG_DATA(IDC_PAGE_SIZE);
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
-    GET_REG_DATA(IDC_METHOD);
     GET_REG_DATA(IDC_TEXT);
     GET_REG_DATA(IDC_TEXT_COLOR);
     GET_REG_DATA(IDC_V_ADJUST);
     GET_REG_DATA(IDC_VERTICAL);
+    GET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
 #undef GET_REG_DATA
 
     // 符号なし(REG_DWORD)から符号付きの値に直す。
@@ -703,11 +704,11 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     SET_REG_DATA(IDC_PAGE_SIZE);
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
-    SET_REG_DATA(IDC_METHOD);
     SET_REG_DATA(IDC_TEXT);
     SET_REG_DATA(IDC_TEXT_COLOR);
     SET_REG_DATA(IDC_V_ADJUST);
     SET_REG_DATA(IDC_VERTICAL);
+    SET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -1249,18 +1250,6 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
     }
 }
 
-BOOL IsTextAscii(const char *text)
-{
-    const BYTE *pb = (const BYTE *)text;
-    while (*pb)
-    {
-        if (*pb > 0x7F)
-            return FALSE;
-        ++pb;
-    }
-    return TRUE;
-}
-
 BOOL IsTextAscii(const wchar_t *text)
 {
     while (*text)
@@ -1364,27 +1353,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         // アスペクト比を無視する。
         bool ignore_aspect = true;
         // 1ページに1文字ずつ配置する。
-        bool one_char_per_page = false;
-        if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_01))
-        {
-            ignore_aspect = false;
-            one_char_per_page = false;
-        }
-        else if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_02))
-        {
-            ignore_aspect = true;
-            one_char_per_page = false;
-        }
-        else if (SETTING(IDC_METHOD) == doLoadString(IDS_METHOD_03))
-        {
-            ignore_aspect = false;
-            one_char_per_page = true;
-        }
-        else
-        {
-            ignore_aspect = true;
-            one_char_per_page = false;
-        }
+        BOOL one_char_per_page = (BOOL)_ttoi(SETTING(IDC_ONE_LETTER_PER_PAPER).c_str());
 
         // 出力ファイル名。
         string_t output_name;
@@ -1471,7 +1440,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 // ANSI文字列に変換してテキストを描画する。
                 auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
                 hpdf_draw_multiline_text(page, font, font_size, text_a,
-                    content_x, content_y, content_width, content_height, ignore_aspect, bVertical);
+                    content_x, content_y, content_width, content_height, ignore_aspect, FALSE);
             }
         }
         else
@@ -2062,7 +2031,6 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         break;
     case IDC_PAGE_SIZE: // 「用紙サイズ」
     case IDC_PAGE_DIRECTION: // 「ページの向き」
-    case IDC_METHOD: // 「レイアウト」
     case IDC_FONT_NAME: // 「フォント名」
         if (codeNotify == CBN_SELCHANGE || codeNotify == CBN_SELENDOK)
         {
@@ -2082,6 +2050,12 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
                 SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 0, 0);
             else
                 SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 1, 0);
+            doRefreshPreview(hwnd, 0);
+        }
+        break;
+    case IDC_ONE_LETTER_PER_PAPER:
+        if (codeNotify == BN_CLICKED)
+        {
             doRefreshPreview(hwnd, 0);
         }
         break;
@@ -2108,10 +2082,6 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
             Edit_SetSel(hEdit, 0, -1); // すべて選択。
             ::SetFocus(hEdit);
         }
-        break;
-    case stc5:
-        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
-        ::SetFocus(::GetDlgItem(hwnd, cmb5));
         break;
     case stc6:
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
