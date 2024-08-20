@@ -19,8 +19,10 @@ MS UI Gothic=MSGOTHIC.TTC,1
 ;メイリオ=MEIRYO.TTC,0 ;「メイリオ」には行間の問題があるので読み込まない。
 Meiryo UI=MEIRYO.TTC,2
 游ゴシック=YUGOTHR.TTC,0
+游ゴシック Bold=YUGOTHB.TTC,0
 游明朝=YUMIN.TTF
 Yu Gothic UI=YUGOTHM.TTC,1
+Yu Gothic UI Bold=YUGOTHB.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BIZ UDPフォント(日本語)。
@@ -29,6 +31,13 @@ BIZ UDゴシック=BIZ-UDGOTHICR.TTC,0
 BIZ UDPゴシック=BIZ-UDGOTHICR.TTC,1
 BIZ UD明朝=BIZ-UDMINCHOM.TTC,0
 BIZ UDP明朝=BIZ-UDMINCHOM.TTC,1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; UDフォント(日本語)。
+; 利用条件：印刷とプレビュー可能。
+UDデジタル教科書体N-R=UDDIGIKYOKASHON-R.TTC,0
+UDデジタル教科書体NP-R=UDDIGIKYOKASHON-R.TTC,1
+UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; RICOHフォント(日本語)。
@@ -71,6 +80,24 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 ;JTCウインZ10P=Z10-WIN.TTC,1 ; エラーコード 0x105F: 'Unsupported ttf format.'が発生するので無効化。
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; モトヤ日本語フォント。
+モトヤ教科書3=MTK3KP.TTC,0
+モトヤ教科書3等幅=MTK3KP.TTC,1
+モトヤ教科書3KP=MTK3KP.TTC,2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 梅フォント。
+梅ゴシック=UME-TGO4.TTF
+梅Pゴシック=UME-PGO4.TTF
+梅明朝=UME-TMO3.TTF
+梅P明朝=UME-PMO3.TTF
+梅UIゴシック=UME-UGO4.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; その他の日本語フォント。
+ふい字=HUIFONT29.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Windows標準ラテンフォント。
 ; 利用条件：編集可能。
 Arial=ARIAL.TTF
@@ -88,6 +115,12 @@ Lucida Console=LUCON.TTF
 Microsoft Sans Serif=MICROSS.TTF
 Palatino Linotype=PALA.TTF
 Palatino Linotype Bold=PALAB.TTF
+Roboto=ROBOTO-REGULAR.TTF
+Roboto Bold=ROBOTO-BOLD.TTF
+Segoe Print=SEGOEPR.TTF
+Segoe Print Bold=SEGOEPRB.TTF
+Segoe Script=SEGOESC.TTF
+Segoe Script Bold=SEGOESCB.TTF
 Segoe UI=SEGOEUI.TTF
 Segoe UI Bold=SEGOEUIB.TTF
 Tahoma=TAHOMA.TTF
@@ -103,13 +136,19 @@ Verdana Bold=VERDANAB.TTF
 細明體 (MingLiU)=MINGLIU.TTC,0
 新細明體 (PMingLiU)=MINGLIU.TTC,1
 細明體_HKSCS (MingLiU_HKSCS)=MINGLIU.TTC,2
+MingLiU-ExtB=MINGLIUB.TTC,0
+PMingLiU-ExtB=MINGLIUB.TTC,1
+MingLiU_HKSCS-ExtB=MINGLIUB.TTC,2
 黑体 (SimHei)=SIMHEI.TTF
 宋体 (SimSun)=SIMSUN.TTC,0
+SimSun-ExtB=SIMSUNB.TTF
 新宋体 (NSimSun)=SIMSUN.TTC,1
 微軟正黑體 (Microsoft JhengHei)=MSJH.TTC,0
 微軟正黑體 UI (Microsoft JhengHei UI)=MSJH.TTC,1
 微软雅黑 (Microsoft YaHei)=MSYH.TTC,0
+微软雅黑UI (Microsoft YaHei UI)=MSYH.TTC,1
 微软雅黑 (Microsoft YaHei Bold)=MSYHBD.TTC,0
+微软雅黑UI Bold (Microsoft YaHei UI Bold)=MSYHBD.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 韓国語フォント。
@@ -126,7 +165,17 @@ Verdana Bold=VERDANAB.TTF
 맑은 고딕 (Malgun Gothic)=MALGUN.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; タイ語フォント。
+Microsoft Tai Le=TAILE.TTF
+Microsoft Tai Le Bold=TAILEB.TTF
+Microsoft New Tai Lue=NTAILU.TTF
+Microsoft New Tai Lue Bold=NTAILUB.TTF
+Leelawadee UI=LEELAWUI.TTF
+Leelawadee UI Bold=LEELAUIB.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Unicodeフォント。
 ; 利用条件：印刷とプレビュー可能。
 Arial Unicode MS=ARIALUNI.TTF
 Segoe UI Emoji=SEGUIEMJ.TTF
+EmojiOne Color=EMOJIONECOLOR-SVGINOT.TTF

@@ -1261,6 +1261,23 @@ BOOL IsTextAscii(const char *text)
     return TRUE;
 }
 
+BOOL IsTextAscii(const wchar_t *text)
+{
+    while (*text)
+    {
+        if (*text > 0x7F)
+            return FALSE;
+        ++text;
+    }
+    return TRUE;
+}
+
+BOOL IsCJKFontNameLikely(const wchar_t *name)
+{
+    return !IsTextAscii(name) ||
+           !lstrcmpiW(name, L"Arial Unicode MS");
+}
+
 // メインディッシュ処理。
 string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 {
@@ -1440,12 +1457,15 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
                 // 縦書きで非英字フォントのときは全角に変換。
-                if (bVertical && !IsTextAscii(font_name_a))
+                if (bVertical && IsCJKFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
                 {
                     TCHAR szText[1024];
                     LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
                                 LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
                     text_data = szText;
+                    // 半角カッコを全角カッコに。
+                    str_replace(text_data, L"(", L"\xFF08");
+                    str_replace(text_data, L")", L"\xFF09");
                 }
 
                 // ANSI文字列に変換してテキストを描画する。
@@ -1486,12 +1506,15 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
             // 縦書きで非英字フォントのときは全角に変換。
-            if (bVertical && !IsTextAscii(font_name_a))
+            if (bVertical && IsCJKFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
             {
                 TCHAR szText[1024];
                 LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
                             LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
                 text_data = szText;
+                // 半角カッコを全角カッコに。
+                str_replace(text_data, L"(", L"\xFF08");
+                str_replace(text_data, L")", L"\xFF09");
             }
 
             // ANSI文字列に変換してテキストを描画する。
