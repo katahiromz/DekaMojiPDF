@@ -531,8 +531,11 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
 
     GetDlgItemText(hwnd, IDC_TEXT_COLOR, szText, _countof(szText));
     str_trim(szText);
+    BOOL bColorError = FALSE;
     if (szText[0] == 0)
     {
+        bColorError = TRUE;
+#if 0
         if (!bNoError)
         {
             m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
@@ -540,11 +543,14 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
             OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_EMPTY_TEXT);
         }
         return FALSE;
+#endif
     }
     auto ansi = ansi_from_wide(CP_ACP, szText);
     auto color_value = color_value_parse(ansi);
     if (color_value == -1)
     {
+        bColorError = TRUE;
+#if 0
         if (!bNoError)
         {
             m_settings[TEXT("IDC_TEXT_COLOR")] = IDC_TEXT_COLOR_DEFAULT;
@@ -552,8 +558,10 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
             OnInvalidString(hwnd, IDC_TEXT_COLOR, IDS_FIELD_TEXT_COLOR, IDS_REASON_VALID_COLOR);
         }
         return FALSE;
+#endif
     }
-    m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
+    if (!bColorError)
+        m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
 
     auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, NULL, TRUE);
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
