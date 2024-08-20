@@ -47,6 +47,9 @@
 #define IDS_SIZE_US5X7                      133
 #define IDS_SIZE_COMM10                     134
 #define IDS_REGFILTER                       135
+#define IDS_OPEN_PARENS                     136
+#define IDS_CLOSE_PARENS                    137
+#define IDS_COMMA_PERIOD                    138
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001

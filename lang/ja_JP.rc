@@ -162,6 +162,9 @@ STRINGTABLE
     IDS_SIZE_US5X7, "US 5x7"
     IDS_SIZE_COMM10, "Comm 10"
     IDS_REGFILTER, "レジストリ ファイル (*.reg)|*.reg||"
+    IDS_OPEN_PARENS, "(（[［「『【"
+    IDS_CLOSE_PARENS, "】』」］）)"
+    IDS_COMMA_PERIOD, "、。，．"
 }
 
 //////////////////////////////////////////////////////////////////////////////

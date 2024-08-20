@@ -130,6 +130,8 @@ HFONT g_hTextFont = NULL; // テキストフォント。
 MImageViewEx g_hwndImageView; // プレビューを表示する。
 LONG g_nVAdjust = 0; // 垂直位置補正。
 BOOL g_bVertical = FALSE; // 縦書きかどうか。
+std::vector<string_t> g_open_parens, g_close_parens; // カッコ。
+std::vector<string_t> g_comma_period; // 句読点。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -795,6 +797,44 @@ double MyHPDF_Page_VTextHeight(HPDF_Page page, const char *text)
     return height;
 }
 
+// かっこか？
+BOOL IsParen(const string_t& str, BOOL bOpen)
+{
+    if (bOpen)
+    {
+        for (auto& paren : g_open_parens)
+        {
+            if (paren == str)
+            {
+                return TRUE;
+            }
+        }
+    }
+    else
+    {
+        for (auto& paren : g_close_parens)
+        {
+            if (paren == str)
+            {
+                return TRUE;
+            }
+        }
+    }
+    return FALSE;
+}
+
+BOOL IsCommaPeriod(const string_t& str)
+{
+    for (auto& paren : g_comma_period)
+    {
+        if (paren == str)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
 void MyHPDF_Page_ShowVText(HPDF_Page page,
     double width, double height, HPDF_Font font, double font_size,
     const char *text, double x, double y, double ratio1, double ratio2)
@@ -831,9 +871,34 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
     {
         double char_width = HPDF_Page_TextWidth(page, ansi.c_str()) * ratio2;
         dx = (width - char_width) / 2;
-        HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx, y + dy);
+
+        auto wide_str = wide_from_ansi(CP_UTF8, ansi.c_str());
+        double char_height = HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
+        if (IsParen(wide_str, TRUE)) // 開いたカッコか？
+        {
+            double dx2 = char_width * 0.1;
+            double dy2 = char_height;
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
+        }
+        else if (IsParen(wide_str, FALSE)) // 閉じたカッコか？
+        {
+            double dx2 = char_width * 0.1;
+            double dy2 = char_height * 0.7;
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
+        }
+        else if (IsCommaPeriod(wide_str)) // 句読点か？
+        {
+            double dx2 = char_width * 0.5;
+            double dy2 = char_height * 0.5;
+            HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx + dx2, y + dy + dy2);
+        }
+        else
+        {
+            HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx, y + dy);
+        }
+
         HPDF_Page_ShowText(page, ansi.c_str());
-        dy += HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
+        dy += char_height;
     }
 }
 
@@ -2241,6 +2306,32 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 
     // アプリのインスタンスを保持する。
     g_hInstance = hInstance;
+
+    TCHAR szText[MAX_PATH];
+
+    // 縦書き用の情報を初期化する。
+    LoadString(g_hInstance, IDS_OPEN_PARENS, szText, _countof(szText));
+    string_t str;
+    for (size_t ich = 0; szText[ich]; ++ich)
+    {
+        str.clear();
+        str += szText[ich];
+        g_open_parens.push_back(str);
+    }
+    LoadString(g_hInstance, IDS_CLOSE_PARENS, szText, _countof(szText));
+    for (size_t ich = 0; szText[ich]; ++ich)
+    {
+        str.clear();
+        str += szText[ich];
+        g_close_parens.push_back(str);
+    }
+    LoadString(g_hInstance, IDS_COMMA_PERIOD, szText, _countof(szText));
+    for (size_t ich = 0; szText[ich]; ++ich)
+    {
+        str.clear();
+        str += szText[ich];
+        g_comma_period.push_back(str);
+    }
 
     // 共通コントロール群を初期化する。
     InitCommonControls();
