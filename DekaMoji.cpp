@@ -21,6 +21,7 @@
 #include "color_value.h"    // 色をパースする。
 #include "MImageViewEx.h"   // イメージプレビュー用のウィンドウ コントロール。
 #include "MTempFile.hpp"    // 一時ファイル操作用のヘッダ。
+#include "MCenterWindow.h"  // ウィンドウの中央寄せ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
 // 文字列クラス。
@@ -204,7 +205,7 @@ void OnInvalidString(HWND hwnd, INT nItemID, INT nFieldId, INT nReasonId)
     string_t reason = doLoadString(nReasonId);
     TCHAR szText[256];
     StringCchPrintf(szText, _countof(szText), doLoadString(IDS_INVALIDSTRING), field.c_str(), reason.c_str());
-    MessageBox(hwnd, szText, g_szAppName, MB_ICONERROR);
+    MsgBoxDx(hwnd, szText, g_szAppName, MB_ICONERROR);
 }
 
 // コンボボックスのテキストを取得する。
@@ -1384,7 +1385,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
     {
         // 失敗。
         auto wide = wide_from_ansi(CP_ACP, err.what());
-        MessageBoxW(hwnd, wide, NULL, MB_ICONERROR);
+        MsgBoxDx(hwnd, wide, NULL, MB_ICONERROR);
         return TEXT("");
     }
 
@@ -1398,6 +1399,8 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 // ダイアログの初期化。
 BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
+    CenterWindowDx(hwnd);
+
     // ユーザデータ。
     DekaMoji* pDM = (DekaMoji*)lParam;
 
@@ -1467,7 +1470,7 @@ BOOL OnOK(HWND hwnd)
     // 必要なら結果をメッセージボックスとして表示する。
     if (success.size())
     {
-        MessageBox(hwnd, success.c_str(), g_szAppName, MB_ICONINFORMATION);
+        MsgBoxDx(hwnd, success.c_str(), g_szAppName, MB_ICONINFORMATION);
     }
 
     return TRUE; // 成功。
@@ -1601,6 +1604,7 @@ ChooseDeleteDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_INITDIALOG:
+        CenterWindowDx(hwnd);
         ChooseDelete_OnInitDialog(hwnd);
         return TRUE;
     case WM_COMMAND:
@@ -1745,6 +1749,7 @@ NameSettingsDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_INITDIALOG:
+        CenterWindowDx(hwnd);
         s_szName = (LPTSTR)lParam;
         SendDlgItemMessage(hwnd, edt1, EM_SETLIMITTEXT, 40, 0);
         return TRUE;
