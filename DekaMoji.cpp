@@ -2176,6 +2176,10 @@ void OnDrawItem(HWND hwnd, const DRAWITEMSTRUCT * lpDrawItem)
     HBRUSH hbr = ::CreateSolidBrush(text_color);
     ::FillRect(lpDrawItem->hDC, &rcItem, hbr);
     ::DeleteObject(hbr);
+
+    // フォーカスを描画する。
+    if (GetFocus() == hButton)
+        ::DrawFocusRect(lpDrawItem->hDC, &rcItem);
 }
 
 // WM_DESTROY
