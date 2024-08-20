@@ -477,7 +477,7 @@ void DekaMoji::Reset()
 void DekaMoji::OnInitDialog(HWND hwnd)
 {
     g_hMainWnd = hwnd;
-    g_pageMgr.m_hWnd = hwnd;
+    g_pageMgr.m_hWnd = GetDlgItem(hwnd, stc7);
 
     // IDC_PAGE_SIZE: 用紙サイズ。
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A3));
