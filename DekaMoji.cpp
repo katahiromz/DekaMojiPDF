@@ -542,6 +542,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
 } while (0)
 #undef GET_CHECK_DATA
 
+    // フォント名。
     if (SETTING(IDC_FONT_NAME).empty())
     {
         if (!bNoError)
@@ -553,6 +554,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
         return FALSE;
     }
 
+    // テキスト。
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
     //str_trim(szText);
     if (szText[0] == 0)
@@ -567,6 +569,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     }
     m_settings[TEXT("IDC_TEXT")] = szText;
 
+    // テキストの色。
     GetDlgItemText(hwnd, IDC_TEXT_COLOR, szText, _countof(szText));
     str_trim(szText);
     BOOL bColorError = FALSE;
@@ -601,6 +604,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     if (!bColorError)
         m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
 
+    // 文字の縦横比。
     GetDlgItemText(hwnd, IDC_TEXT_ASPECT, szText, _countof(szText));
     //str_trim(szText);
     if (szText[0] == 0)
@@ -617,6 +621,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     else
         m_settings[TEXT("IDC_TEXT_ASPECT")] = szText;
 
+    // その他。
     auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, NULL, TRUE);
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
     g_nVAdjust = nAdjust * -8;
@@ -650,16 +655,22 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
 } while (0)
 #undef SET_CHECK_DATA
 
+    // テキスト。
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
+    // テキストの色。
     ::SetDlgItemText(hwnd, IDC_TEXT_COLOR, SETTING(IDC_TEXT_COLOR).c_str());
+    // 文字の縦横比。
     ::SetDlgItemText(hwnd, IDC_TEXT_ASPECT, SETTING(IDC_TEXT_ASPECT).c_str());
+    // 垂直位置調整。
     ::SetDlgItemInt(hwnd, IDC_V_ADJUST, _ttoi(SETTING(IDC_V_ADJUST).c_str()), TRUE);
 
+    // 縦書き。
     if (_ttoi(SETTING(IDC_VERTICAL).c_str()))
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_CHECKED);
     else
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_UNCHECKED);
 
+    // 各用紙1文字ずつ出力。
     if (_ttoi(SETTING(IDC_ONE_LETTER_PER_PAPER).c_str()))
         CheckDlgButton(hwnd, IDC_ONE_LETTER_PER_PAPER, BST_CHECKED);
     else
@@ -808,6 +819,7 @@ void hpdf_draw_box(HPDF_Page page, double x, double y, double width, double heig
     HPDF_Page_Stroke(page);
 }
 
+// 縦書きテキストの幅を計算する。
 double MyHPDF_Page_VTextWidth(HPDF_Page page, const char *text)
 {
     auto wide = wide_from_ansi(CP_UTF8, text);
@@ -823,6 +835,7 @@ double MyHPDF_Page_VTextWidth(HPDF_Page page, const char *text)
     return max_width;
 }
 
+// 縦書きテキストの高さを計算する。
 double MyHPDF_Page_VTextHeight(HPDF_Page page, const char *text)
 {
     auto wide = wide_from_ansi(CP_UTF8, text);
@@ -834,7 +847,7 @@ double MyHPDF_Page_VTextHeight(HPDF_Page page, const char *text)
     return height;
 }
 
-// かっこか？
+// カッコか？
 BOOL IsParen(const string_t& str, BOOL bOpen)
 {
     if (bOpen)
@@ -899,7 +912,7 @@ BOOL IsSmallKana(const string_t& str)
     return FALSE;
 }
 
-
+// 縦書きテキストをPDFに出力する。
 void MyHPDF_Page_ShowVText(HPDF_Page page,
     double width, double height, HPDF_Font font, double font_size,
     const char *text, double x, double y, double ratio1, double ratio2)
@@ -937,6 +950,7 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
         double char_width = HPDF_Page_TextWidth(page, ansi.c_str()) * ratio2;
         dx = (width - char_width) / 2;
 
+        // 文字種によって位置とサイズの計算処理を変える。
         auto wide_str = wide_from_ansi(CP_UTF8, ansi.c_str());
         double char_height = HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
         if (IsParen(wide_str, TRUE)) // 開いたカッコか？
@@ -980,7 +994,7 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
 }
 
 // テキストを描画する。
-void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
+void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text, double aspect_ratio_threshould,
                       double x, double y, double width, double height,
                       int draw_box = 0, BOOL bVertical = FALSE)
@@ -1111,6 +1125,7 @@ void hpdf_draw_text_2(HPDF_Page page, HPDF_Font font, double font_size,
     }
 }
 
+// 文字列を分割する。
 template <typename T_STR_CONTAINER>
 inline void
 str_split(T_STR_CONTAINER& container,
@@ -1150,7 +1165,7 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
     if (rows == 0)
         return;
 
-    if (bVertical)
+    if (bVertical) // 縦書きか？
     {
         for (size_t i = 0; i < rows; ++i)
         {
@@ -1163,8 +1178,8 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
             double line_width = width / rows;
             double line_height = height;
 
-            hpdf_draw_text_2(page, font, font_size, buf, aspect_ratio_threshould,
-                             line_x, line_y, line_width, line_height, 0, bVertical);
+            hpdf_draw_text(page, font, font_size, buf, aspect_ratio_threshould,
+                           line_x, line_y, line_width, line_height, 0, bVertical);
         }
     }
     else
@@ -1180,8 +1195,8 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
             double line_width = width;
             double line_height = height / rows;
 
-            hpdf_draw_text_2(page, font, font_size, buf, aspect_ratio_threshould,
-                             line_x, line_y, line_width, line_height, 0, bVertical);
+            hpdf_draw_text(page, font, font_size, buf, aspect_ratio_threshould,
+                           line_x, line_y, line_width, line_height, 0, bVertical);
         }
     }
 }
@@ -1190,6 +1205,8 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
 void split_text_data(std::vector<string_t>& chars, const string_t& text)
 {
     string_t data = text;
+
+    // 空白を消す。
     str_replace(data, L" ", L"");
     str_replace(data, L"\t", L"");
     str_replace(data, L"\r", L"");
@@ -1216,6 +1233,7 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
     }
 }
 
+// 文字列はASCIIテキストか？
 BOOL IsTextAscii(const wchar_t *text)
 {
     while (*text)
@@ -1227,6 +1245,7 @@ BOOL IsTextAscii(const wchar_t *text)
     return TRUE;
 }
 
+// CJK (中国、日本、韓国）フォントっぽいか？
 BOOL IsCJKFontNameLikely(const wchar_t *name)
 {
     return !IsTextAscii(name) ||
@@ -1526,6 +1545,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 // ダイアログの初期化。
 BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
 {
+    // 中央寄せする。
     CenterWindowDx(hwnd);
 
     // ユーザデータ。
@@ -1625,17 +1645,20 @@ void OnEraseSettings(HWND hwnd)
 // サブ設定を削除。
 void OnEraseSubSettings(HWND hwnd)
 {
+    // レジストリを開く。
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ | KEY_WRITE, &hAppKey);
     if (!hAppKey)
         return;
 
+    // 削除を繰り返す。
     TCHAR szName[MAX_PATH];
     while (RegEnumKey(hAppKey, 0, szName, _countof(szName)) == ERROR_SUCCESS)
     {
         RegDeleteKey(hAppKey, szName);
     }
 
+    // レジストリを閉じる。
     RegCloseKey(hAppKey);
 }
 
@@ -1666,8 +1689,7 @@ void OnRestoreSubSettings(HWND hwnd, INT id)
 
 void ChooseDelete_OnInitDialog(HWND hwnd)
 {
-    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
-
+    // レジストリを開く。
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ, &hAppKey);
     if (!hAppKey)
@@ -1676,7 +1698,9 @@ void ChooseDelete_OnInitDialog(HWND hwnd)
         return;
     }
 
+    // サブ設定の名前を追加する。
     TCHAR szName[MAX_PATH];
+    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
     for (DWORD dwIndex = 0; dwIndex <= 9999; dwIndex++)
     {
         if (RegEnumKey(hAppKey, dwIndex, szName, _countof(szName)) == ERROR_SUCCESS)
@@ -1685,11 +1709,15 @@ void ChooseDelete_OnInitDialog(HWND hwnd)
             ListBox_AddString(hwndLst1, szName);
         }
     }
+
+    // レジストリを閉じる。
+    RegCloseKey(hAppKey);
 }
 
 // リストボックスで選択した設定名を削除する。
 void ChooseDelete_OnDeleteSettings(HWND hwnd)
 {
+    // レジストリを開く。
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ | KEY_WRITE, &hAppKey);
     if (!hAppKey)
@@ -1698,13 +1726,15 @@ void ChooseDelete_OnDeleteSettings(HWND hwnd)
         return;
     }
 
+    // 選択された項目を取得する。
     HWND hwndLst1 = GetDlgItem(hwnd, lst1);
     std::vector<INT> selItems;
     INT cSelections = (INT)SendMessage(hwndLst1, LB_GETSELCOUNT, 0, 0);
     selItems.resize(cSelections);
     SendMessage(hwndLst1, LB_GETSELITEMS, cSelections, (LPARAM)&selItems[0]);
-    std::reverse(selItems.begin(), selItems.end());
 
+    // 選択されていた項目を逆順で削除する。
+    std::reverse(selItems.begin(), selItems.end());
     for (INT iItem : selItems)
     {
         TCHAR szName[MAX_PATH];
@@ -1713,6 +1743,7 @@ void ChooseDelete_OnDeleteSettings(HWND hwnd)
         RegDeleteKey(hAppKey, szName);
     }
 
+    // レジストリを閉じる。
     RegCloseKey(hAppKey);
 }
 
@@ -1722,6 +1753,7 @@ ChooseDeleteDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     switch (uMsg)
     {
     case WM_INITDIALOG:
+        // 中央寄せする。
         CenterWindowDx(hwnd);
         ChooseDelete_OnInitDialog(hwnd);
         return TRUE;
@@ -1796,8 +1828,10 @@ void OnReadMe(HWND hwnd)
     ShellExecute(hwnd, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
 }
 
+// プレビューのリフレッシュを数えるカウンタ変数。
 static INT s_nRefreshCounter = 0;
 
+// プレビューのリフレッシュを始める。
 void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 {
     // フォーカスを持ったコントロールを無効化するとWindowsの不具合が生じるので、
@@ -1808,13 +1842,16 @@ void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
         SetFocus(GetDlgItem(hwnd, IDC_TEXT_COLOR));
     }
 
+    // いったん、ページ移動を無効化する。
     EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), FALSE);
     EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), FALSE);
 
-    ++s_nRefreshCounter;
+    // 頻繁に更新するのではなく、タイマーを使ってUI/UXを改善する。
     KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, NULL); // 少し後でプレビューを更新する。
 
+    // リフレッシュが頻繁な場合はユーザーに待つように指示する。
+    ++s_nRefreshCounter;
     if (s_nRefreshCounter >= 3)
     {
         HBITMAP hbmWait = LoadBitmap(g_hInstance, MAKEINTRESOURCE(IDB_WAIT));
@@ -1835,11 +1872,12 @@ void OnSettings(HWND hwnd)
     HMENU hSubMenu = GetSubMenu(hMenu, 0);
     HMENU hSubSubMenu = GetSubMenu(hSubMenu, 3); // 「次の設定に上書き保存(&O)」
 
+    // レジストリを開く。
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ, &hAppKey);
-
     if (hAppKey)
     {
+        // メニューに項目を追加する。
         for (DWORD dwIndex = 0; dwIndex < 9999; ++dwIndex)
         {
             TCHAR szName[MAX_PATH];
@@ -1854,10 +1892,12 @@ void OnSettings(HWND hwnd)
             }
 
             DecodeName(szName);
+
             InsertMenu(hSubMenu, dwIndex, MF_BYPOSITION, ID_SETTINGS_000 + dwIndex, szName);
             InsertMenu(hSubSubMenu, dwIndex, MF_BYPOSITION, ID_OVERWRITE_SETTINGS_000 + dwIndex, szName);
         }
 
+        // レジストリを閉じる。
         RegCloseKey(hAppKey);
     }
 
@@ -1867,39 +1907,49 @@ void OnSettings(HWND hwnd)
     enum { flags = TPM_LEFTALIGN | TPM_LEFTBUTTON | TPM_VERTICAL | TPM_RETURNCMD };
     const auto id = TrackPopupMenuEx(hSubMenu, flags, pt.x, pt.y, hwnd, &params);
 
+    // 選択項目が有効ならば、メインウィンドウにコマンドを投函する。
     if (id != 0 && id != -1)
     {
         ::PostMessageW(hwnd, WM_COMMAND, id, 0);
     }
 
+    // メニューを破棄する。
     ::DestroyMenu(hMenu);
 }
 
 INT_PTR CALLBACK
 NameSettingsDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    static LPTSTR s_szName = NULL;
+    static LPTSTR s_szName = NULL; // 名前へのポインタを保持する。
     TCHAR szText[MAX_PATH];
     switch (uMsg)
     {
     case WM_INITDIALOG:
+        // 中央寄せする。
         CenterWindowDx(hwnd);
+        // 名前へのポインタを保持する。
         s_szName = (LPTSTR)lParam;
+        // 文字数を制限する。
         SendDlgItemMessage(hwnd, edt1, EM_SETLIMITTEXT, 40, 0);
         return TRUE;
     case WM_COMMAND:
         switch (LOWORD(wParam))
         {
         case IDOK:
+            // 名前を取得する。
             GetDlgItemText(hwnd, edt1, szText, _countof(szText));
+            // 前後の空白を無視する。
             StrTrim(szText, TEXT(" \t\r\n\x3000"));
+            // 名前を格納する。
             if (szText[0])
             {
                 StringCchCopy(s_szName, MAX_PATH, szText);
             }
-            EndDialog(hwnd, IDOK);
+            // ダイアログを終了する。
+            EndDialog(hwnd, szText[0] ? IDOK : IDCANCEL);
             break;
         case IDCANCEL:
+            // ダイアログを終了する。
             EndDialog(hwnd, IDCANCEL);
             break;
         }
@@ -2123,20 +2173,19 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SAVEALLTOREGFILE: // 「すべての設定をREGファイルに保存」
         OnSaveAllToRegFile(hwnd);
         break;
-    case IDC_PAGE_LEFT:
+    case IDC_PAGE_LEFT: // 「前のページへ」
         if (g_pageMgr.hasBack())
         {
             g_pageMgr.goBack();
             doRefreshPreview(hwnd, 0);
         }
         break;
-    case IDC_PAGE_RIGHT:
+    case IDC_PAGE_RIGHT: // 「次のページへ」
         if (g_pageMgr.hasNext())
         {
             g_pageMgr.goNext();
             doRefreshPreview(hwnd, 0);
         }
-        break;
         break;
     default:
         if (ID_SETTINGS_000 <= id && id <= ID_SETTINGS_000 + 999) // サブ設定。
