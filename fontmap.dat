@@ -166,12 +166,12 @@ SimSun-ExtB=SIMSUNB.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; タイ語フォント。
+Leelawadee UI=LEELAWUI.TTF
+Leelawadee UI Bold=LEELAUIB.TTF
 Microsoft Tai Le=TAILE.TTF
 Microsoft Tai Le Bold=TAILEB.TTF
 Microsoft New Tai Lue=NTAILU.TTF
 Microsoft New Tai Lue Bold=NTAILUB.TTF
-Leelawadee UI=LEELAWUI.TTF
-Leelawadee UI Bold=LEELAUIB.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Unicodeフォント。
