@@ -2344,7 +2344,7 @@ BOOL doUpdatePreview(HWND hwnd)
         BITMAP bm;
         GetObject(hbm1, sizeof(bm), &bm);
 
-        const INT margin = 4;
+        const INT margin = 2;
         BITMAPINFO bmi;
         ZeroMemory(&bmi, sizeof(bmi));
         bmi.bmiHeader.biSize = sizeof(bmi.bmiHeader);
