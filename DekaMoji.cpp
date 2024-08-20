@@ -133,6 +133,7 @@ BOOL g_bVertical = FALSE; // 縦書きかどうか。
 std::vector<string_t> g_open_parens, g_close_parens; // カッコ。
 std::vector<string_t> g_comma_period; // 句読点。
 std::vector<string_t> g_hyphen_dash; // ハイフン・ダッシュなどの横線。
+std::vector<string_t> g_small_kata; // 小さいかな文字。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -850,6 +851,20 @@ BOOL IsHyphenDash(const string_t& str)
     return FALSE;
 }
 
+// 小さいカナ文字か？
+BOOL IsSmallKana(const string_t& str)
+{
+    for (auto& paren : g_small_kata)
+    {
+        if (paren == str)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+
 void MyHPDF_Page_ShowVText(HPDF_Page page,
     double width, double height, HPDF_Font font, double font_size,
     const char *text, double x, double y, double ratio1, double ratio2)
@@ -912,6 +927,12 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
             double dx2 = char_width * 0.8;
             double dy2 = char_height * 0.9;
             HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, -ratio2, 0, x + dx2, y + dy + dy2);
+        }
+        else if (IsSmallKana(wide_str)) // 小さいカナ文字か？
+        {
+            double dx2 = char_width * 0.3;
+            double dy2 = char_height * 0.1;
+            HPDF_Page_SetTextMatrix(page, ratio2 * 0.7, 0, 0, ratio1 * ratio2, x + dx + dx2, y + dy + dy2);
         }
         else
         {
@@ -2359,6 +2380,13 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
         str.clear();
         str += szText[ich];
         g_hyphen_dash.push_back(str);
+    }
+    LoadString(g_hInstance, IDS_SMALL_KANA, szText, _countof(szText));
+    for (size_t ich = 0; szText[ich]; ++ich)
+    {
+        str.clear();
+        str += szText[ich];
+        g_small_kata.push_back(str);
     }
 
     // 共通コントロール群を初期化する。
