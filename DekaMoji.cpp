@@ -1515,7 +1515,7 @@ void OnEraseSubSettings(HWND hwnd)
 // サブ設定を復元する。
 void OnRestoreSubSettings(HWND hwnd, INT id)
 {
-    id -= ID_SETTINGS_0000;
+    id -= ID_SETTINGS_000;
 
     TCHAR szKey[MAX_PATH];
     StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
@@ -1704,6 +1704,7 @@ void OnSettings(HWND hwnd)
     // メニューを読み込む。
     HMENU hMenu = LoadMenu(g_hInstance, MAKEINTRESOURCE(IDR_SETTINGS_MENU));
     HMENU hSubMenu = GetSubMenu(hMenu, 0);
+    HMENU hSubSubMenu = GetSubMenu(hSubMenu, 3); // 「次の設定に上書き保存(&O)」
 
     HKEY hAppKey;
     RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ, &hAppKey);
@@ -1718,10 +1719,14 @@ void OnSettings(HWND hwnd)
                 break;
 
             if (dwIndex == 0)
+            {
                 DeleteMenu(hSubMenu, 0, MF_BYPOSITION);
+                DeleteMenu(hSubSubMenu, 0, MF_BYPOSITION);
+            }
 
             DecodeName(szName);
-            InsertMenu(hSubMenu, dwIndex, MF_BYPOSITION, ID_SETTINGS_0000 + dwIndex, szName);
+            InsertMenu(hSubMenu, dwIndex, MF_BYPOSITION, ID_SETTINGS_000 + dwIndex, szName);
+            InsertMenu(hSubSubMenu, dwIndex, MF_BYPOSITION, ID_OVERWRITE_SETTINGS_000 + dwIndex, szName);
         }
 
         RegCloseKey(hAppKey);
@@ -1790,6 +1795,38 @@ void OnSaveSubSettingsAs(HWND hwnd)
         EncodeName(szName);
         pDM->RegFromData(hwnd, szName);
     }
+}
+
+// 「設定を上書き」
+void OnOverwriteSubSettings(HWND hwnd, INT id)
+{
+    id -= ID_OVERWRITE_SETTINGS_000;
+
+    DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
+    if (!pDM->DataFromDialog(hwnd, FALSE))
+    {
+        assert(0);
+        return;
+    }
+
+    TCHAR szKey[MAX_PATH];
+    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
+
+    HKEY hAppKey;
+    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
+    if (!hAppKey)
+    {
+        assert(0);
+        return;
+    }
+
+    TCHAR szName[MAX_PATH];
+    if (RegEnumKey(hAppKey, id, szName, _countof(szName)) == ERROR_SUCCESS)
+    {
+        pDM->RegFromData(hwnd, szName);
+    }
+
+    RegCloseKey(hAppKey);
 }
 
 // 「すべての設定をREGファイルに保存」
@@ -1958,10 +1995,16 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         OnSaveAllToRegFile(hwnd);
         break;
     default:
-        if (ID_SETTINGS_0000 <= id && id <= ID_SETTINGS_0000 + 9999) // サブ設定。
+        if (ID_SETTINGS_000 <= id && id <= ID_SETTINGS_000 + 999) // サブ設定。
         {
             OnRestoreSubSettings(hwnd, id);
             doRefreshPreview(hwnd, 0);
+            break;
+        }
+        if (ID_OVERWRITE_SETTINGS_000 <= id && id <= ID_OVERWRITE_SETTINGS_000 + 999) // サブ設定上書き。
+        {
+            OnOverwriteSubSettings(hwnd, id);
+            break;
         }
         break;
     }

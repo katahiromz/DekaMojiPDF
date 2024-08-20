@@ -20,6 +20,10 @@ IDR_SETTINGS_MENU MENU
         MENUITEM "(None)", -1, GRAYED
         MENUITEM SEPARATOR
         MENUITEM "Save current settings &as...", ID_SAVESETTINGSAS
+        POPUP "&Overwrite settings to"
+        {
+            MENUITEM "(None)", -1, GRAYED
+        }
         MENUITEM "&Choose setting names to delete...", ID_CHOOSESETTINGSTODELETE
         MENUITEM SEPARATOR
         MENUITEM "&Save all settings to file...", ID_SAVEALLTOREGFILE

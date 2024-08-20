@@ -53,7 +53,8 @@
 #define ID_INITAPP                          1002
 #define ID_CHOOSESETTINGSTODELETE           1003
 #define ID_SAVEALLTOREGFILE                 1004
-#define ID_SETTINGS_0000                    1005
+#define ID_SETTINGS_000                     1005
+#define ID_OVERWRITE_SETTINGS_000           2005
 
 #ifdef APSTUDIO_INVOKED
     #ifndef APSTUDIO_READONLY_SYMBOLS
