@@ -134,11 +134,11 @@ Verdana Bold=VERDANAB.TTF
 ; 中国語フォント。
 ; 利用条件：編集可能。
 細明體 (MingLiU)=MINGLIU.TTC,0
-新細明體 (PMingLiU)=MINGLIU.TTC,1
-細明體_HKSCS (MingLiU_HKSCS)=MINGLIU.TTC,2
 細明體-ExtB (MingLiU-ExtB)=MINGLIUB.TTC,0
+新細明體 (PMingLiU)=MINGLIU.TTC,1
 新細明體-ExtB (PMingLiU-ExtB)=MINGLIUB.TTC,1
-細明體_HKSCS ExtB (MingLiU_HKSCS-ExtB)=MINGLIUB.TTC,2
+細明體_HKSCS (MingLiU_HKSCS)=MINGLIU.TTC,2
+細明體_HKSCS-ExtB (MingLiU_HKSCS-ExtB)=MINGLIUB.TTC,2
 黑体 (SimHei)=SIMHEI.TTF
 宋体 (SimSun)=SIMSUN.TTC,0
 宋体-ExtB (SimSun-ExtB)=SIMSUNB.TTF
@@ -146,8 +146,8 @@ Verdana Bold=VERDANAB.TTF
 微軟正黑體 (Microsoft JhengHei)=MSJH.TTC,0
 微軟正黑體 UI (Microsoft JhengHei UI)=MSJH.TTC,1
 微软雅黑 (Microsoft YaHei)=MSYH.TTC,0
+微软雅黑 Bold (Microsoft YaHei Bold)=MSYHBD.TTC,0
 微软雅黑UI (Microsoft YaHei UI)=MSYH.TTC,1
-微软雅黑 (Microsoft YaHei Bold)=MSYHBD.TTC,0
 微软雅黑UI Bold (Microsoft YaHei UI Bold)=MSYHBD.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
