@@ -1570,6 +1570,9 @@ BOOL OnOK(HWND hwnd)
     // 設定をレジストリに保存。
     pDM->RegFromData(hwnd);
 
+    // 一貫性のために再度ダイアログを更新。
+    pDM->DialogFromData(hwnd);
+
     // メインディッシュ処理。
     string_t success = pDM->JustDoIt(hwnd);
 
