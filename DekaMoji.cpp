@@ -1495,11 +1495,8 @@ void OnEraseSettings(HWND hwnd)
 // サブ設定を削除。
 void OnEraseSubSettings(HWND hwnd)
 {
-    TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
-
     HKEY hAppKey;
-    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
+    RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ | KEY_WRITE, &hAppKey);
     if (!hAppKey)
         return;
 
@@ -1512,42 +1509,37 @@ void OnEraseSubSettings(HWND hwnd)
     RegCloseKey(hAppKey);
 }
 
+// サブ設定の名前を取得する。
+BOOL getSubSettingsName(LPTSTR pszName, INT index)
+{
+    HKEY hAppKey;
+    RegCreateKey(HKEY_CURRENT_USER, REGKEY_APP, &hAppKey);
+    if (!hAppKey)
+        return FALSE;
+
+    BOOL ret = (RegEnumKey(hAppKey, index, pszName, MAX_PATH) == ERROR_SUCCESS);
+    RegCloseKey(hAppKey);
+    return ret;
+}
+
 // サブ設定を復元する。
 void OnRestoreSubSettings(HWND hwnd, INT id)
 {
-    id -= ID_SETTINGS_000;
-
-    TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
-
-    HKEY hAppKey;
-    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
-    if (!hAppKey)
-    {
-        assert(0);
-        return;
-    }
-
     TCHAR szName[MAX_PATH];
-    if (RegEnumKey(hAppKey, id, szName, _countof(szName)) == ERROR_SUCCESS)
+    if (getSubSettingsName(szName, id - ID_SETTINGS_000))
     {
         DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
         pDM->DataFromReg(hwnd, szName);
         pDM->DialogFromData(hwnd);
     }
-
-    RegCloseKey(hAppKey);
 }
 
 void ChooseDelete_OnInitDialog(HWND hwnd)
 {
     HWND hwndLst1 = GetDlgItem(hwnd, lst1);
 
-    TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
-
     HKEY hAppKey;
-    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ, &hAppKey);
+    RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ, &hAppKey);
     if (!hAppKey)
     {
         assert(0);
@@ -1568,19 +1560,15 @@ void ChooseDelete_OnInitDialog(HWND hwnd)
 // リストボックスで選択した設定名を削除する。
 void ChooseDelete_OnDeleteSettings(HWND hwnd)
 {
-    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
-
-    TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
-
     HKEY hAppKey;
-    RegOpenKeyEx(HKEY_CURRENT_USER, szKey, 0, KEY_READ | KEY_WRITE, &hAppKey);
+    RegOpenKeyEx(HKEY_CURRENT_USER, REGKEY_APP, 0, KEY_READ | KEY_WRITE, &hAppKey);
     if (!hAppKey)
     {
         assert(0);
         return;
     }
 
+    HWND hwndLst1 = GetDlgItem(hwnd, lst1);
     std::vector<INT> selItems;
     INT cSelections = (INT)SendMessage(hwndLst1, LB_GETSELCOUNT, 0, 0);
     selItems.resize(cSelections);
@@ -1800,8 +1788,6 @@ void OnSaveSubSettingsAs(HWND hwnd)
 // 「設定を上書き」
 void OnOverwriteSubSettings(HWND hwnd, INT id)
 {
-    id -= ID_OVERWRITE_SETTINGS_000;
-
     DekaMoji* pDM = (DekaMoji*)GetWindowLongPtr(hwnd, GWLP_USERDATA);
     if (!pDM->DataFromDialog(hwnd, FALSE))
     {
@@ -1809,24 +1795,9 @@ void OnOverwriteSubSettings(HWND hwnd, INT id)
         return;
     }
 
-    TCHAR szKey[MAX_PATH];
-    StringCchCopy(szKey, _countof(szKey), REGKEY_APP);
-
-    HKEY hAppKey;
-    RegCreateKey(HKEY_CURRENT_USER, szKey, &hAppKey);
-    if (!hAppKey)
-    {
-        assert(0);
-        return;
-    }
-
     TCHAR szName[MAX_PATH];
-    if (RegEnumKey(hAppKey, id, szName, _countof(szName)) == ERROR_SUCCESS)
-    {
+    if (getSubSettingsName(szName, id - ID_OVERWRITE_SETTINGS_000))
         pDM->RegFromData(hwnd, szName);
-    }
-
-    RegCloseKey(hAppKey);
 }
 
 // 「すべての設定をREGファイルに保存」
