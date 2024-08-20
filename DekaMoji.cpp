@@ -1800,6 +1800,14 @@ static INT s_nRefreshCounter = 0;
 
 void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 {
+    // フォーカスを持ったコントロールを無効化するとWindowsの不具合が生じるので、
+    // フォーカスを移動して回避。
+    if (GetFocus() == GetDlgItem(hwnd, IDC_PAGE_LEFT) ||
+        GetFocus() == GetDlgItem(hwnd, IDC_PAGE_RIGHT))
+    {
+        SetFocus(GetDlgItem(hwnd, IDC_TEXT_COLOR));
+    }
+
     EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), FALSE);
     EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), FALSE);
 
@@ -2313,6 +2321,14 @@ BOOL doUpdatePreview(HWND hwnd)
 
         auto page_info = g_pageMgr.print();
         SetDlgItemText(hwnd, IDC_PAGE_INFO, page_info.c_str());
+
+        // フォーカスを持ったコントロールを無効化するとWindowsの不具合が生じるので、
+        // フォーカスを移動して回避。
+        if (!g_pageMgr.hasBack() && GetFocus() == GetDlgItem(hwnd, IDC_PAGE_LEFT))
+            SetFocus(GetDlgItem(hwnd, IDC_TEXT_COLOR));
+        else if (!g_pageMgr.hasNext() && GetFocus() == GetDlgItem(hwnd, IDC_PAGE_RIGHT))
+            SetFocus(GetDlgItem(hwnd, IDC_TEXT_COLOR));
+
         EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
         EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
     }
