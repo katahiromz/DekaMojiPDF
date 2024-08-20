@@ -906,13 +906,13 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
         double char_height = HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
         if (IsParen(wide_str, TRUE)) // 開いたカッコか？
         {
-            double dx2 = char_width * 0.1;
+            double dx2 = char_width * 0.15;
             double dy2 = char_height;
             HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
         }
         else if (IsParen(wide_str, FALSE)) // 閉じたカッコか？
         {
-            double dx2 = char_width * 0.1;
+            double dx2 = char_width * 0.15;
             double dy2 = char_height * 0.7;
             HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
         }
