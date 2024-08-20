@@ -22,6 +22,7 @@
 #include "MImageViewEx.h"   // イメージプレビュー用のウィンドウ コントロール。
 #include "MTempFile.hpp"    // 一時ファイル操作用のヘッダ。
 #include "MCenterWindow.h"  // ウィンドウの中央寄せ。
+#include "MPageMgr.h"       // ページマネージャ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
 // 文字列クラス。
@@ -83,6 +84,9 @@ enum
     IDC_V_ADJUST = edt3,
     IDC_VERTICAL = chx1,
     IDC_ONE_LETTER_PER_PAPER = chx2,
+    IDC_PAGE_LEFT = psh7,
+    IDC_PAGE_INFO = stc5,
+    IDC_PAGE_RIGHT = psh8,
 };
 
 // デカ文字PDFのメインクラス。
@@ -108,7 +112,7 @@ public:
     // データをリセットする。
     void Reset();
     // ダイアログを初期化する。
-    void InitDialog(HWND hwnd);
+    void OnInitDialog(HWND hwnd);
     // ダイアログからデータへ。
     BOOL DataFromDialog(HWND hwnd, BOOL bNoError = FALSE);
     // データからダイアログへ。
@@ -124,6 +128,7 @@ public:
 
 // グローバル変数。
 HINSTANCE g_hInstance = NULL; // インスタンス。
+HWND g_hMainWnd = NULL; // メイン ウィンドウ。
 TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
 HICON g_hIcon = NULL; // アイコン（大）。
 HICON g_hIconSm = NULL; // アイコン（小）。
@@ -136,6 +141,8 @@ std::vector<string_t> g_open_parens, g_close_parens; // カッコ。
 std::vector<string_t> g_comma_period; // 句読点。
 std::vector<string_t> g_hyphen_dash; // ハイフン・ダッシュなどの横線。
 std::vector<string_t> g_small_kata; // 小さいかな文字。
+
+MPageMgr g_pageMgr;
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -467,8 +474,11 @@ void DekaMoji::Reset()
 }
 
 // ダイアログを初期化する。
-void DekaMoji::InitDialog(HWND hwnd)
+void DekaMoji::OnInitDialog(HWND hwnd)
 {
+    g_hMainWnd = hwnd;
+    g_pageMgr.m_hWnd = hwnd;
+
     // IDC_PAGE_SIZE: 用紙サイズ。
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A3));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A4));
@@ -1337,6 +1347,9 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             b_value = GetBValue(text_color) / 255.5;
         }
 
+        // ページ総数をクリアする。
+        g_pageMgr.setPageCount(0);
+
         HPDF_Page page; // ページオブジェクト。
         HPDF_Font font; // フォントオブジェクト。
         double page_width, page_height; // ページサイズ。
@@ -1354,6 +1367,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
 
                 // ページを追加する。
                 page = HPDF_AddPage(pdf);
+                g_pageMgr.addPage();
 
                 // ページサイズと用紙の向きを指定。
                 HPDF_Page_SetSize(page, page_size, direction);
@@ -1403,6 +1417,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         {
             // ページを追加する。
             page = HPDF_AddPage(pdf);
+            g_pageMgr.addPage();
 
             // ページサイズと用紙の向きを指定。
             HPDF_Page_SetSize(page, page_size, direction);
@@ -1447,6 +1462,9 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             hpdf_draw_multiline_text(page, font, font_size, text_a,
                 content_x, content_y, content_width, content_height, aspect_ratio_threshould, bVertical);
         }
+
+        // ページ番号を修正する。
+        g_pageMgr.fixPage();
 
         // PDF出力。
         {
@@ -1527,7 +1545,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     SendMessage(hwnd, WM_SETICON, ICON_SMALL, (WPARAM)g_hIconSm);
 
     // 初期化。
-    pDM->InitDialog(hwnd);
+    pDM->OnInitDialog(hwnd);
 
     // レジストリからデータを読み込む。
     pDM->DataFromReg(hwnd);
@@ -1782,6 +1800,9 @@ static INT s_nRefreshCounter = 0;
 
 void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 {
+    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), FALSE);
+    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), FALSE);
+
     ++s_nRefreshCounter;
     KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, NULL); // 少し後でプレビューを更新する。
@@ -2084,6 +2105,21 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case ID_SAVEALLTOREGFILE: // 「すべての設定をREGファイルに保存」
         OnSaveAllToRegFile(hwnd);
         break;
+    case IDC_PAGE_LEFT:
+        if (g_pageMgr.hasBack())
+        {
+            g_pageMgr.goBack();
+            doRefreshPreview(hwnd, 0);
+        }
+        break;
+    case IDC_PAGE_RIGHT:
+        if (g_pageMgr.hasNext())
+        {
+            g_pageMgr.goNext();
+            doRefreshPreview(hwnd, 0);
+        }
+        break;
+        break;
     default:
         if (ID_SETTINGS_000 <= id && id <= ID_SETTINGS_000 + 999) // サブ設定。
         {
@@ -2200,7 +2236,11 @@ BOOL doUpdatePreview(HWND hwnd)
     // poppler/pdftoppm.exeでPDFをPNGに変換。
     {
         string_t params;
-        params += TEXT("-png -singlefile -r 16 \"");
+        params += TEXT("-png -singlefile -r 16 -f ");
+        params += std::to_wstring(g_pageMgr.m_iPage);
+        params += TEXT(" -l ");
+        params += std::to_wstring(g_pageMgr.m_iPage);
+        params += TEXT(" \"");
         params += szPdfFile;
         params += TEXT("\" \"");
         params += szPngFile;
@@ -2256,6 +2296,11 @@ BOOL doUpdatePreview(HWND hwnd)
             g_hwndImageView.setImage(hbm2);
         }
         DeleteObject(hbm1);
+
+        auto page_info = g_pageMgr.print();
+        SetDlgItemText(hwnd, IDC_PAGE_INFO, page_info.c_str());
+        EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
+        EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
     }
     catch (...)
     {

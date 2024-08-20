@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MImageView.h"
+#include "MPageMgr.h"
 
 class MImageViewEx : public MImageView
 {
