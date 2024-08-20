@@ -49,6 +49,7 @@
 #define IDS_COMMA_PERIOD                    138
 #define IDS_HYPHEN_DASH                     139
 #define IDS_SMALL_KANA                      140
+#define IDS_REASON_INVALID_INTEGER          141
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001

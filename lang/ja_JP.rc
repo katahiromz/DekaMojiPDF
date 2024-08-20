@@ -59,7 +59,11 @@ FONT 10, "ＭＳ Ｐゴシック"
     CONTROL "", scr1, "msctls_updown32", UDS_NOTHOUSANDS | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_ALIGNRIGHT | UDS_SETBUDDYINT, 245, 135, 12, 20
     AUTOCHECKBOX "縦書き(&V)", chx1, 5, 130, 80, 14
     AUTOCHECKBOX "用紙1枚に1文字だけ(&L)", chx2, 95, 130, 115, 15
-    DEFPUSHBUTTON "PDF生成(&M)", IDOK, 140, 155, 60, 30
+    LTEXT "文字の縦横比は(&H):", -1, 5, 150, 70, 10
+    EDITTEXT edt4, 80, 150, 30, 15, ES_AUTOHSCROLL
+    CONTROL "", scr2, "msctls_updown32", UDS_NOTHOUSANDS | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_ALIGNRIGHT | UDS_SETBUDDYINT, 120, 155, 10, 20
+    LTEXT "％未満", -1, 110, 150, 25, 10
+    DEFPUSHBUTTON "PDF作成(&M)", IDOK, 140, 155, 60, 30
     PUSHBUTTON "終了(&X)", IDCANCEL, 205, 155, 60, 30
     PUSHBUTTON "設定(&E)... ▼", psh5, 5, 170, 60, 15
     PUSHBUTTON "&README を開く", psh6, 70, 170, 60, 15
@@ -163,6 +167,7 @@ STRINGTABLE
     IDS_COMMA_PERIOD, "、。，．"
     IDS_HYPHEN_DASH, "-－―ー=＝≡～"
     IDS_SMALL_KANA, "ぁぃぅぇぉっゃゅょゎゕゖァィゥェォヵㇰヶㇱㇲッㇳㇴㇵㇶㇷㇸㇹㇺャュョㇻㇼㇽㇾㇿヮ"
+    IDS_REASON_INVALID_INTEGER, "有効な整数を入力して下さい。"
 }
 
 //////////////////////////////////////////////////////////////////////////////

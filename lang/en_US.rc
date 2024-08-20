@@ -59,6 +59,10 @@ FONT 10, "Tahoma"
     CONTROL "", scr1, "msctls_updown32", UDS_NOTHOUSANDS | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_ALIGNRIGHT | UDS_SETBUDDYINT, 245, 135, 12, 20
     AUTOCHECKBOX "&Vertical writing", chx1, 5, 130, 80, 14
     AUTOCHECKBOX "One &letter per paper", chx2, 95, 130, 115, 15
+    LTEXT "C&haracter aspect ratio is less than:", -1, 5, 145, 70, 20
+    EDITTEXT edt4, 80, 150, 30, 15, ES_AUTOHSCROLL
+    CONTROL "", scr2, "msctls_updown32", UDS_NOTHOUSANDS | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_ALIGNRIGHT | UDS_SETBUDDYINT, 120, 155, 10, 20
+    LTEXT "%", -1, 115, 155, 15, 10
     DEFPUSHBUTTON "&Make PDF", IDOK, 140, 155, 60, 30
     PUSHBUTTON "E&xit", IDCANCEL, 205, 155, 60, 30
     PUSHBUTTON "S&ettings... ˅", psh5, 5, 170, 60, 15
