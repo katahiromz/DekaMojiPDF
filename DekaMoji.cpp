@@ -34,6 +34,29 @@
 // シフトJIS コードページ（Shift_JIS）。
 #define CP932  932
 
+// The ranges of the surrogate pairs
+#define HIGH_SURROGATE_MIN 0xD800U
+#define HIGH_SURROGATE_MAX 0xDBFFU
+#define LOW_SURROGATE_MIN  0xDC00U
+#define LOW_SURROGATE_MAX  0xDFFFU
+//#define IS_HIGH_SURROGATE(ch0) (HIGH_SURROGATE_MIN <= (ch0) && (ch0) <= HIGH_SURROGATE_MAX)
+//#define IS_LOW_SURROGATE(ch1)  (LOW_SURROGATE_MIN  <= (ch1) && (ch1) <=  LOW_SURROGATE_MAX)
+
+// サロゲートペアを考慮した文字列の文字数を返す関数。
+INT ucchStrLen(LPCWSTR text)
+{
+    INT ucch = 0;
+    while (*text)
+    {
+        if (IS_HIGH_SURROGATE(text[0]) && IS_LOW_SURROGATE(text[1]))
+            ++text;
+        ++ucch;
+        ++text;
+    }
+    return ucch;
+}
+
+// プレビューを再描画するタイマーID。
 #define TIMER_ID_REFRESH_PREVIEW 999
 
 struct FONT_ENTRY
@@ -778,18 +801,38 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
 {
     auto wide = wide_from_ansi(CP_UTF8, text);
     size_t cch = lstrlenW(wide);
+    size_t ucch = ucchStrLen(wide);
     double dx = 0, dy = -g_nVAdjust;
     double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
     descent *= ratio1 * ratio2;
     dy += descent;
-    for (size_t ich = cch - 1; ich < cch; --ich)
+    std::vector<std::string> ansi_chars;
+
+    for (size_t ich = 0, uich = 0; ich < cch; ++uich, ++ich)
     {
-        WCHAR sz[2] = { wide[ich], 0 };
-        auto ansi = ansi_from_wide(CP_UTF8, sz);
-        double char_width = HPDF_Page_TextWidth(page, ansi) * ratio2;
+        BOOL bSurrogatePair = IS_HIGH_SURROGATE(wide[ich]) && IS_LOW_SURROGATE(wide[ich + 1]);
+        string_t sz;
+        if (bSurrogatePair)
+        {
+            sz = { wide[ich], wide[ich + 1], 0 };
+            ++ich;
+        }
+        else
+        {
+            sz = { wide[ich], 0 };
+        }
+        auto ansi = ansi_from_wide(CP_UTF8, sz.c_str());
+        ansi_chars.push_back(ansi);
+    }
+
+    std::reverse(ansi_chars.begin(), ansi_chars.end());
+
+    for (auto& ansi : ansi_chars)
+    {
+        double char_width = HPDF_Page_TextWidth(page, ansi.c_str()) * ratio2;
         dx = (width - char_width) / 2;
         HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx, y + dy);
-        HPDF_Page_ShowText(page, ansi);
+        HPDF_Page_ShowText(page, ansi.c_str());
         dy += HPDF_Page_GetCurrentFontSize(page) * ratio1 * ratio2;
     }
 }
@@ -1080,12 +1123,22 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
     str_replace(data, L"\r", L"");
     str_replace(data, L"\x3000", L""); // 全角空白「　」
 
-    for (auto& ch : data)
+    size_t ich, cch = lstrlen(data.c_str());
+    size_t icch, ucch = ucchStrLen(data.c_str());
+    for (ich = icch = 0; ich < cch; ++ich, ++ucch)
     {
-        WCHAR sz[2];
-        sz[0] = ch;
-        sz[1] = 0;
-        chars.push_back(sz);
+        string_t sz;
+        BOOL bSurrogatePair = IS_HIGH_SURROGATE(data[ich]) && IS_LOW_SURROGATE(data[ich + 1]);
+        if (bSurrogatePair)
+        {
+            sz = { data[ich], data[ich + 1], 0 };
+            ++ich;
+        }
+        else
+        {
+            sz = { data[ich], 0 };
+        }
+        chars.push_back(sz.c_str());
     }
 }
 
@@ -1168,14 +1221,15 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 continue;
 
             auto ansi = ansi_from_wide(CP_UTF8, entry.m_pathname.c_str());
+            std::string font_name_a;
             if (entry.m_index != -1)
             {
-                std::string font_name_a = HPDF_LoadTTFontFromFile2(pdf, ansi, entry.m_index, HPDF_TRUE);
+                font_name_a = HPDF_LoadTTFontFromFile2(pdf, ansi, entry.m_index, HPDF_TRUE);
                 font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
             }
             else
             {
-                std::string font_name_a = HPDF_LoadTTFontFromFile(pdf, ansi, HPDF_TRUE);
+                font_name_a = HPDF_LoadTTFontFromFile(pdf, ansi, HPDF_TRUE);
                 font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
             }
         }
