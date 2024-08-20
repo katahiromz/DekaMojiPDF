@@ -2073,13 +2073,23 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         ::SetFocus(::GetDlgItem(hwnd, cmb3));
         break;
+    case stc8:
+        // エディットコントロールの前のラベルをクリックしたら、対応するエディットコントロールにフォーカスを当てる。
+        SendDlgItemMessage(hwnd, edt4, EM_SETSEL, 0, -1);
+        ::SetFocus(::GetDlgItem(hwnd, edt4));
+        break;
+    case stc9:
+        // エディットコントロールの前のラベルをクリックしたら、対応するエディットコントロールにフォーカスを当てる。
+        SendDlgItemMessage(hwnd, edt3, EM_SETSEL, 0, -1);
+        ::SetFocus(::GetDlgItem(hwnd, edt3));
+        break;
     case IDC_TEXT_COLOR: // 「テキストの色」テキストボックス。
         if (codeNotify == EN_CHANGE)
         {
             ::InvalidateRect(::GetDlgItem(hwnd, IDC_TEXT_COLOR_BUTTON), NULL, TRUE);
             doRefreshPreview(hwnd, 0);
-            break;
         }
+        break;
     case IDC_TEXT_COLOR_BUTTON: // 「テキストの色」ボタン。
         if (codeNotify == BN_CLICKED)
         {
@@ -2323,6 +2333,8 @@ void OnTimer(HWND hwnd, UINT id)
     if (!doUpdatePreview(hwnd))
     {
         g_hwndImageView.setImage(NULL);
+        g_pageMgr.init();
+        SetDlgItemText(hwnd, IDC_PAGE_INFO, NULL);
     }
 }
 
