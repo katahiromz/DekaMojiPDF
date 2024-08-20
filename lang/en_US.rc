@@ -165,6 +165,7 @@ STRINGTABLE
     IDS_OPEN_PARENS, "(（[［「『【"
     IDS_CLOSE_PARENS, "】』」］）)"
     IDS_COMMA_PERIOD, "、。，．"
+    IDS_HYPHEN_DASH, "-－―ー=＝≡～"
 }
 
 //////////////////////////////////////////////////////////////////////////////

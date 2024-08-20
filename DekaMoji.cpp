@@ -132,6 +132,7 @@ LONG g_nVAdjust = 0; // 垂直位置補正。
 BOOL g_bVertical = FALSE; // 縦書きかどうか。
 std::vector<string_t> g_open_parens, g_close_parens; // カッコ。
 std::vector<string_t> g_comma_period; // 句読点。
+std::vector<string_t> g_hyphen_dash; // ハイフン・ダッシュなどの横線。
 
 // リソース文字列を読み込む。
 LPTSTR doLoadString(INT nID)
@@ -823,9 +824,23 @@ BOOL IsParen(const string_t& str, BOOL bOpen)
     return FALSE;
 }
 
+// 句読点か？
 BOOL IsCommaPeriod(const string_t& str)
 {
     for (auto& paren : g_comma_period)
+    {
+        if (paren == str)
+        {
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+// ハイフン・ダッシュなどの横線か？
+BOOL IsHyphenDash(const string_t& str)
+{
+    for (auto& paren : g_hyphen_dash)
     {
         if (paren == str)
         {
@@ -891,6 +906,12 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
             double dx2 = char_width * 0.5;
             double dy2 = char_height * 0.5;
             HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x + dx + dx2, y + dy + dy2);
+        }
+        else if (IsHyphenDash(wide_str)) // 横線か？
+        {
+            double dx2 = char_width * 0.8;
+            double dy2 = char_height * 0.9;
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, -ratio2, 0, x + dx2, y + dy + dy2);
         }
         else
         {
@@ -2331,6 +2352,13 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
         str.clear();
         str += szText[ich];
         g_comma_period.push_back(str);
+    }
+    LoadString(g_hInstance, IDS_HYPHEN_DASH, szText, _countof(szText));
+    for (size_t ich = 0; szText[ich]; ++ich)
+    {
+        str.clear();
+        str += szText[ich];
+        g_hyphen_dash.push_back(str);
     }
 
     // 共通コントロール群を初期化する。
