@@ -75,9 +75,9 @@ enum
     IDC_PAGE_SIZE = cmb1,
     IDC_PAGE_DIRECTION = cmb2,
     IDC_FONT_NAME = cmb3,
+    IDC_LETTER_ASPECT = cmb4,
     IDC_TEXT = edt1,
     IDC_TEXT_COLOR = edt2,
-    IDC_TEXT_ASPECT = edt4,
     IDC_TEXT_COLOR_BUTTON = psh1,
     IDC_SETTINGS = psh5,
     IDC_README = psh6,
@@ -451,9 +451,9 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_PAGE_SIZE_DEFAULT doLoadString(IDS_A4)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_LANDSCAPE)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
+#define IDC_LETTER_ASPECT_DEFAULT doLoadString(IDS_ASPECT_250)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 #define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
-#define IDC_TEXT_ASPECT_DEFAULT TEXT("275")
 #define IDC_V_ADJUST_DEFAULT TEXT("0")
 #define IDC_VERTICAL_DEFAULT TEXT("0")
 #define IDC_ONE_LETTER_PER_PAPER_DEFAULT TEXT("0")
@@ -467,10 +467,10 @@ void DekaMoji::Reset()
     SETTING(IDC_FONT_NAME) = IDC_FONT_NAME_DEFAULT;
     SETTING(IDC_TEXT) = IDC_TEXT_DEFAULT;
     SETTING(IDC_TEXT_COLOR) = IDC_TEXT_COLOR_DEFAULT;
-    SETTING(IDC_TEXT_ASPECT) = IDC_TEXT_ASPECT_DEFAULT;
     SETTING(IDC_V_ADJUST) = IDC_V_ADJUST_DEFAULT;
     SETTING(IDC_VERTICAL) = IDC_VERTICAL_DEFAULT;
     SETTING(IDC_ONE_LETTER_PER_PAPER) = IDC_ONE_LETTER_PER_PAPER_DEFAULT;
+    SETTING(IDC_LETTER_ASPECT) = IDC_LETTER_ASPECT_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -506,13 +506,20 @@ void DekaMoji::OnInitDialog(HWND hwnd)
         }
     }
 
+    // IDC_LETTER_ASPECT: 文字のアスペクト比。
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_100));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_150));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_200));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_250));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_300));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_400));
+    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_NO_LIMIT));
+
     // MImageViewExを使えるようにする。
     g_hwndImageView.doSubclass(GetDlgItem(hwnd, stc7));
 
     // 垂直位置補正のスピンコントロール。
     SendDlgItemMessage(hwnd, scr1, UDM_SETRANGE, 0, MAKELONG(100, -100));
-    // アスペクト比のスピンコントロール。
-    SendDlgItemMessage(hwnd, scr2, UDM_SETRANGE, 0, MAKELONG(800, 100));
 
     // プレビューを更新する。
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, NULL);
@@ -532,6 +539,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     GET_COMBO_DATA(IDC_PAGE_SIZE);
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
+    GET_COMBO_DATA(IDC_LETTER_ASPECT);
 
     // チェックボックスからデータを取得する。
 #define GET_CHECK_DATA(id) do { \
@@ -552,6 +560,12 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
             OnInvalidString(hwnd, IDC_TEXT, IDS_FIELD_FONT_NAME, IDS_REASON_EMPTY_TEXT);
         }
         return FALSE;
+    }
+
+    // フォント名。
+    if (SETTING(IDC_LETTER_ASPECT).empty())
+    {
+        SETTING(IDC_LETTER_ASPECT) = IDC_LETTER_ASPECT_DEFAULT;
     }
 
     // テキスト。
@@ -604,23 +618,6 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     if (!bColorError)
         m_settings[TEXT("IDC_TEXT_COLOR")] = szText;
 
-    // 文字の縦横比。
-    GetDlgItemText(hwnd, IDC_TEXT_ASPECT, szText, _countof(szText));
-    //str_trim(szText);
-    if (szText[0] == 0)
-    {
-        if (!bNoError)
-        {
-            m_settings[TEXT("IDC_TEXT_ASPECT")] = IDC_TEXT_ASPECT_DEFAULT;
-            ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_ASPECT));
-            OnInvalidString(hwnd, IDC_TEXT_ASPECT, IDS_FIELD_TEXT, IDS_REASON_INVALID_INTEGER);
-        }
-    }
-    if (_ttoi(szText) <= 100)
-        m_settings[TEXT("IDC_TEXT_ASPECT")] = TEXT("100");
-    else
-        m_settings[TEXT("IDC_TEXT_ASPECT")] = szText;
-
     // その他。
     auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, NULL, TRUE);
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
@@ -644,6 +641,7 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_SIZE);
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
+    SET_COMBO_DATA(IDC_LETTER_ASPECT);
 #undef SET_COMBO_DATA
 
     // チェックボックスへデータを設定する。
@@ -659,8 +657,6 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     ::SetDlgItemText(hwnd, IDC_TEXT, SETTING(IDC_TEXT).c_str());
     // テキストの色。
     ::SetDlgItemText(hwnd, IDC_TEXT_COLOR, SETTING(IDC_TEXT_COLOR).c_str());
-    // 文字の縦横比。
-    ::SetDlgItemText(hwnd, IDC_TEXT_ASPECT, SETTING(IDC_TEXT_ASPECT).c_str());
     // 垂直位置調整。
     ::SetDlgItemInt(hwnd, IDC_V_ADJUST, _ttoi(SETTING(IDC_V_ADJUST).c_str()), TRUE);
 
@@ -709,9 +705,9 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
     GET_REG_DATA(IDC_PAGE_SIZE);
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
+    GET_REG_DATA(IDC_LETTER_ASPECT);
     GET_REG_DATA(IDC_TEXT);
     GET_REG_DATA(IDC_TEXT_COLOR);
-    GET_REG_DATA(IDC_TEXT_ASPECT);
     GET_REG_DATA(IDC_V_ADJUST);
     GET_REG_DATA(IDC_VERTICAL);
     GET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
@@ -748,9 +744,9 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     SET_REG_DATA(IDC_PAGE_SIZE);
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
+    SET_REG_DATA(IDC_LETTER_ASPECT);
     SET_REG_DATA(IDC_TEXT);
     SET_REG_DATA(IDC_TEXT_COLOR);
-    SET_REG_DATA(IDC_TEXT_ASPECT);
     SET_REG_DATA(IDC_V_ADJUST);
     SET_REG_DATA(IDC_VERTICAL);
     SET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
@@ -1336,7 +1332,24 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         double font_size = HPDF_MAX_FONTSIZE;
 
         // 文字のアスペクト比のしきい値。
-        double aspect_ratio_threshould = _ttoi(SETTING(IDC_TEXT_ASPECT).c_str()) / 100.0;
+        double aspect_ratio_threshould;
+        if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_100))
+            aspect_ratio_threshould = 100 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_150))
+            aspect_ratio_threshould = 150 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_200))
+            aspect_ratio_threshould = 200 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_250))
+            aspect_ratio_threshould = 250 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_300))
+            aspect_ratio_threshould = 300 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_400))
+            aspect_ratio_threshould = 400 / 100.0;
+        else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_NO_LIMIT))
+            aspect_ratio_threshould = 100000 / 100.0;
+        else
+            aspect_ratio_threshould = 100 / 100.0;
+
         // 1ページに1文字ずつ配置する。
         BOOL one_char_per_page = (BOOL)_ttoi(SETTING(IDC_ONE_LETTER_PER_PAPER).c_str());
 
@@ -2067,15 +2080,10 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
             doRefreshPreview(hwnd);
         }
         break;
-    case IDC_TEXT_ASPECT: // 文字のアスペクト比のしきい値。
-        if (codeNotify == EN_CHANGE)
-        {
-            doRefreshPreview(hwnd);
-        }
-        break;
     case IDC_PAGE_SIZE: // 「用紙サイズ」
     case IDC_PAGE_DIRECTION: // 「ページの向き」
     case IDC_FONT_NAME: // 「フォント名」
+    case IDC_LETTER_ASPECT: // 「文字のアスペクト比」
         if (codeNotify == CBN_SELCHANGE || codeNotify == CBN_SELENDOK)
         {
             doRefreshPreview(hwnd, 0);
@@ -2112,7 +2120,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         ::SetFocus(::GetDlgItem(hwnd, cmb2));
         break;
     case stc3:
-        // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         {
             HWND hEdit = ::GetDlgItem(hwnd, edt1);
             Edit_SetSel(hEdit, 0, -1); // すべて選択。
@@ -2120,7 +2128,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         }
         break;
     case stc4:
-        // テキストボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         {
             HWND hEdit = ::GetDlgItem(hwnd, edt2);
             Edit_SetSel(hEdit, 0, -1); // すべて選択。
@@ -2132,9 +2140,8 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         ::SetFocus(::GetDlgItem(hwnd, cmb3));
         break;
     case stc8:
-        // エディットコントロールの前のラベルをクリックしたら、対応するエディットコントロールにフォーカスを当てる。
-        SendDlgItemMessage(hwnd, edt4, EM_SETSEL, 0, -1);
-        ::SetFocus(::GetDlgItem(hwnd, edt4));
+        // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
+        ::SetFocus(::GetDlgItem(hwnd, cmb4));
         break;
     case stc9:
         // エディットコントロールの前のラベルをクリックしたら、対応するエディットコントロールにフォーカスを当てる。
@@ -2422,20 +2429,10 @@ DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-// デカ文字PDFのメイン関数。
-INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
+// 縦書き用の情報を初期化する。
+void doInitCharInfo(void)
 {
-    // GDI+を初期化。
-    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
-    ULONG_PTR gdiplusToken;
-    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
-
-    // アプリのインスタンスを保持する。
-    g_hInstance = hInstance;
-
     TCHAR szText[MAX_PATH];
-
-    // 縦書き用の情報を初期化する。
     LoadString(g_hInstance, IDS_OPEN_PARENS, szText, _countof(szText));
     string_t str;
     for (size_t ich = 0; szText[ich]; ++ich)
@@ -2472,6 +2469,22 @@ INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
         str += szText[ich];
         g_small_kata.push_back(str);
     }
+}
+
+
+// デカ文字PDFのメイン関数。
+INT DekaMoji_Main(HINSTANCE hInstance, INT argc, LPTSTR *argv)
+{
+    // GDI+を初期化。
+    Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+    ULONG_PTR gdiplusToken;
+    Gdiplus::GdiplusStartup(&gdiplusToken, &gdiplusStartupInput, NULL);
+
+    // アプリのインスタンスを保持する。
+    g_hInstance = hInstance;
+
+    // 縦書き用の情報を初期化する。
+    doInitCharInfo();
 
     // 共通コントロール群を初期化する。
     InitCommonControls();
