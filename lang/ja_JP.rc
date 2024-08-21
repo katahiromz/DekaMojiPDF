@@ -169,7 +169,7 @@ STRINGTABLE
     IDS_HYPHEN_DASH, "-－―ー=＝≡～"
     IDS_SMALL_KANA, "ぁぃぅぇぉっゃゅょゎゕゖァィゥェォヵㇰヶㇱㇲッㇳㇴㇵㇶㇷㇸㇹㇺャュョㇻㇼㇽㇾㇿヮ"
     IDS_REASON_INVALID_INTEGER, "有効な整数を入力して下さい。"
-    IDS_ASPECT_100, "100％未満"
+    IDS_ASPECT_100, "100％以下"
     IDS_ASPECT_150, "150％未満"
     IDS_ASPECT_200, "200％未満"
     IDS_ASPECT_250, "250％未満"

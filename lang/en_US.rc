@@ -168,7 +168,7 @@ STRINGTABLE
     IDS_COMMA_PERIOD, "、。，．"
     IDS_HYPHEN_DASH, "-－―ー=＝≡～"
     IDS_SMALL_KANA, "ぁぃぅぇぉっゃゅょゎゕゖァィゥェォヵㇰヶㇱㇲッㇳㇴㇵㇶㇷㇸㇹㇺャュョㇻㇼㇽㇾㇿヮ"
-    IDS_ASPECT_100, "Less than 100%"
+    IDS_ASPECT_100, "100% or less"
     IDS_ASPECT_150, "Less than 150%"
     IDS_ASPECT_200, "Less than 200%"
     IDS_ASPECT_250, "Less than 250%"
