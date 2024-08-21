@@ -957,13 +957,13 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
         {
             double dx2 = char_width * 0.15;
             double dy2 = char_height;
-            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx + dx2, y + dy + dy2);
         }
         else if (IsParen(wide_str, FALSE)) // 閉じたカッコか？
         {
             double dx2 = char_width * 0.15;
             double dy2 = char_height * 0.7;
-            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx2, y + dy + dy2);
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, ratio2, 0, x + dx + dx2, y + dy + dy2);
         }
         else if (IsCommaPeriod(wide_str)) // 句読点か？
         {
@@ -973,9 +973,9 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
         }
         else if (IsHyphenDash(wide_str)) // 横線か？
         {
-            double dx2 = char_width * 0.8;
+            double dx2 = char_width * 0.9;
             double dy2 = char_height * 0.9;
-            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, -ratio2, 0, x + dx2, y + dy + dy2);
+            HPDF_Page_SetTextMatrix(page, 0, -ratio1 * ratio2, -ratio2, 0, x + dx + dx2, y + dy + dy2);
         }
         else if (IsSmallKana(wide_str)) // 小さいカナ文字か？
         {
