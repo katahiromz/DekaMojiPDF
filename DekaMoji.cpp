@@ -1444,7 +1444,8 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 // ANSI文字列に変換してテキストを描画する。
                 auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
                 hpdf_draw_multiline_text(page, font, font_size, text_a,
-                    content_x, content_y, content_width, content_height, aspect_ratio_threshould, FALSE);
+                    content_x, content_y, content_width, content_height,
+                    aspect_ratio_threshould, bVertical);
             }
         }
         else
