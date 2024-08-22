@@ -1424,7 +1424,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 HPDF_Page_SetRGBFill(page, r_value, g_value, b_value);
 
                 // フォントを指定する。
-                auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
+                auto font_name_a = ansi_from_wide(CP_UTF8, font_name.c_str());
                 font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
                 // 縦書きで非英字フォントのときは全角に変換。
@@ -1474,7 +1474,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             HPDF_Page_SetRGBFill(page, r_value, g_value, b_value);
 
             // フォントを指定する。
-            auto font_name_a = ansi_from_wide(CP932, font_name.c_str());
+            auto font_name_a = ansi_from_wide(CP_UTF8, font_name.c_str());
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
             // 縦書きで非英字フォントのときは全角に変換。

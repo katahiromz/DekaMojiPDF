@@ -96,6 +96,21 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; その他の日本語フォント。
 ふい字=HUIFONT29.TTF
+ふい字Ｐ=HuiFontP29.ttf
+あくあフォント=aquafont.ttf
+あくあＰフォント=aqua_pfont.ttf
+妹フォント細字=SistersFL.ttf
+妹フォント標準=SistersFS.ttf
+妹フォント太字=SistersFB.ttf
+あずきフォント=azuki.ttf
+櫻井幸一フォント 標準=ks-kohichisakurai-regular.ttf
+櫻井幸一フォント 太字=ks-kohichisakurai-bold.ttf
+おひさまフォント=OhisamaFont11.ttf
+XANO明朝U32=XANO-mincho-U32.otf
+まきばフォント=MakibaFont13.ttf
+しねきゃぷしょん=cinecaption226.ttf
+吐き溜=hakidame.TTF
+怨霊=onryou.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Windows標準ラテンフォント。
