@@ -1241,10 +1241,11 @@ BOOL IsTextAscii(const wchar_t *text)
     return TRUE;
 }
 
-// CJK (中国、日本、韓国）フォントっぽいか？
-BOOL IsCJKFontNameLikely(const wchar_t *name)
+// 日本語フォントっぽいか？
+BOOL IsJapaneseFontNameLikely(const wchar_t *name)
 {
     return !IsTextAscii(name) ||
+           wcsstr(name, L"JP") != NULL ||
            !lstrcmpiW(name, L"Arial Unicode MS");
 }
 
@@ -1428,7 +1429,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
                 // 縦書きで非英字フォントのときは全角に変換。
-                if (bVertical && IsCJKFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
+                if (bVertical && IsJapaneseFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
                 {
                     TCHAR szText[1024];
                     LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
@@ -1478,7 +1479,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             font = HPDF_GetFont(pdf, font_name_a, "UTF-8");
 
             // 縦書きで非英字フォントのときは全角に変換。
-            if (bVertical && IsCJKFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
+            if (bVertical && IsJapaneseFontNameLikely(SETTING(IDC_FONT_NAME).c_str()))
             {
                 TCHAR szText[1024];
                 LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),

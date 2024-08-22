@@ -94,6 +94,32 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 梅UIゴシック=UME-UGO4.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; IPAフォント
+IPAゴシック=ipag.ttf
+IPA Pゴシック=ipagp.ttf
+IPA明朝=ipam.ttf
+IPA P明朝=ipamp.ttf
+IPAexゴシック=ipaexg.ttf
+IPAex明朝=ipaexm.ttf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 頭に「源」が付くフォント。
+源柔ゴシック Normal=GenJyuuGothic-Normal.ttf
+源柔ゴシック Bold=GenJyuuGothic-Bold.ttf
+源柔ゴシック等幅 Normal=GenJyuuGothic-Monospace-Normal.ttf
+源柔ゴシック等幅 Bold=GenJyuuGothic-Monospace-Bold.ttf
+源柔ゴシックP Normal=GenJyuuGothic-P-Normal.ttf
+源柔ゴシックP Bold=GenJyuuGothic-P-Bold.ttf
+源真ゴシック Normal=GenShinGothic-Normal.ttf
+源真ゴシック Bold=GenShinGothic-Bold.ttf
+源真ゴシック等幅 Normal=GenShinGothic-Monospace-Normal.ttf
+源真ゴシック等幅 Bold=GenShinGothic-Monospace-Bold.ttf
+源真ゴシックP Normal=GenShinGothic-P-Normal.ttf
+源真ゴシックP Bold=GenShinGothic-P-Bold.ttf
+源暎アンチック v5=GenEiAntiquePv5-M.ttf
+源暎アンチック 詰 v5=GenEiAntiqueNv5-M.ttf
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; その他の日本語フォント。
 ふい字=HUIFONT29.TTF
 ふい字Ｐ=HuiFontP29.ttf
@@ -104,8 +130,25 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 あずきフォント=azuki.ttf
 櫻井幸一フォント 標準=ks-kohichisakurai-regular.ttf
 櫻井幸一フォント 太字=ks-kohichisakurai-bold.ttf
+美咲ゴシック=misaki_gothic.ttf
+美咲ゴシック第2=misaki_gothic_2nd.ttf
+美咲明朝=misaki_mincho.ttf
+GN-キルゴUかなNA=GN-KillGothic-U-KanaNA.ttf
+GN-キルゴUかなNB=GN-KillGothic-U-KanaNB.ttf
+GN-キルゴUかなO=GN-KillGothic-U-KanaO.ttf
 おひさまフォント=OhisamaFont11.ttf
 まきばフォント=MakibaFont13.ttf
+たぬき油性マジック=TanukiMagic.ttf
+よもぎ (Yomogi)=Yomogi-Regular.ttf
+851手書き雑フォント=851tegaki_zatsu_normal.ttf
+Oradano明朝GSRR=OradanoGSRR.ttf
+みちます=mitimasu.ttf
+瀬戸フォント=setofont.ttf
+しっぽりアンチック=ShipporiAntique-Regular.ttf
+青柳疎石フォント１０=AoyagiSosekiFont10.ttf
+衡山毛筆フォント１０=KouzanMouhituFont10.ttf
+衡山毛筆フォント行書１０=KouzanMouhituFontGyousyo10.ttf
+衡山毛筆フォント草書=KouzanBrushFontSousyo.ttf
 吐き溜=hakidame.TTF
 怨霊=onryou.TTF
 
