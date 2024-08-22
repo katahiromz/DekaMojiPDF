@@ -1247,6 +1247,7 @@ BOOL IsJapaneseFontNameLikely(const wchar_t *name)
 {
     return !IsTextAscii(name) ||
            wcsstr(name, L"JP") != NULL ||
+           wcsstr(name, L"Japan") != NULL ||
            !lstrcmpiW(name, L"Arial Unicode MS");
 }
 
