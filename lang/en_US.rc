@@ -37,7 +37,7 @@ IDR_SETTINGS_MENU MENU
 // RT_DIALOG
 
 IDD_MAINDLG DIALOG 0, 0, 270, 190
-CAPTION "DekaMoji PDF Ver.1.1.4 by katahiromz"
+CAPTION "DekaMoji PDF Ver.1.1.5 by katahiromz"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 10, "Tahoma"
 {
@@ -101,8 +101,8 @@ FONT 10, "Tahoma"
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     1, 1, 4, 0
-PRODUCTVERSION  1, 1, 4, 0
+FILEVERSION     1, 1, 5, 0
+PRODUCTVERSION  1, 1, 5, 0
 FILEOS          0x40004
 FILETYPE        0x1
 FILESUBTYPE     0x0
@@ -113,10 +113,10 @@ FILESUBTYPE     0x0
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "Create big text PDF\0"
-            VALUE "FileVersion", "1.1.4\0"
+            VALUE "FileVersion", "1.1.5\0"
             VALUE "LegalCopyright", "(c) 2022-2024 katahiromz\0"
             VALUE "ProductName", "DekaMoji PDF\0"
-            VALUE "ProductVersion", "1.1.4\0"
+            VALUE "ProductVersion", "1.1.5\0"
         }
     }
     BLOCK "VarFileInfo"

@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "ƒfƒJ•¶ŽšPDF"
-#define MyAppVersion "1.1.4"
+#define MyAppVersion "1.1.5"
 #define MyAppPublisher "•ÐŽR”Ž•¶MZ"
 #define MyAppURL "https://katahiromz.web.fc2.com/"
 #define MyAppExeName "DekaMoji.exe"
