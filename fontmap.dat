@@ -16,13 +16,6 @@
 ＭＳ 明朝=MSMINCHO.TTC,0
 ＭＳ Ｐ明朝=MSMINCHO.TTC,1
 MS UI Gothic=MSGOTHIC.TTC,1
-;メイリオ=MEIRYO.TTC,0 ;「メイリオ」には行間の問題があるので読み込まない。
-Meiryo UI=MEIRYO.TTC,2
-游ゴシック=YUGOTHR.TTC,0
-游ゴシック Bold=YUGOTHB.TTC,0
-游明朝=YUMIN.TTF
-Yu Gothic UI=YUGOTHM.TTC,1
-Yu Gothic UI Bold=YUGOTHB.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BIZ UDPフォント(日本語)。
@@ -79,13 +72,6 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 モトヤ教科書3KP=MTK3KP.TTC,2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; UDフォント(日本語)。
-; 利用条件：印刷とプレビュー可能。
-UDデジタル教科書体N-R=UDDIGIKYOKASHON-R.TTC,0
-UDデジタル教科書体NP-R=UDDIGIKYOKASHON-R.TTC,1
-UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 梅フォント。
 梅ゴシック=UME-TGO4.TTF
 梅Pゴシック=UME-PGO4.TTF
@@ -103,19 +89,25 @@ IPAexゴシック=ipaexg.ttf
 IPAex明朝=ipaexm.ttf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 游フォントとメイリオ。
+; 利用条件：編集可能。
+游ゴシック=YUGOTHR.TTC,0
+游ゴシック Bold=YUGOTHB.TTC,0
+游明朝=YUMIN.TTF
+Yu Gothic UI=YUGOTHM.TTC,1
+Yu Gothic UI Bold=YUGOTHB.TTC,1
+Meiryo UI=MEIRYO.TTC,2
+;メイリオ=MEIRYO.TTC,0 ;「メイリオ」には行間の問題があるので読み込まない。
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; UDフォント(日本語)。
+; 利用条件：印刷とプレビュー可能。
+UDデジタル教科書体N-R=UDDIGIKYOKASHON-R.TTC,0
+UDデジタル教科書体NP-R=UDDIGIKYOKASHON-R.TTC,1
+UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 頭に「源」が付くフォント。
-源柔ゴシック Normal=GenJyuuGothic-Normal.ttf
-源柔ゴシック Bold=GenJyuuGothic-Bold.ttf
-源柔ゴシック等幅 Normal=GenJyuuGothic-Monospace-Normal.ttf
-源柔ゴシック等幅 Bold=GenJyuuGothic-Monospace-Bold.ttf
-源柔ゴシックP Normal=GenJyuuGothic-P-Normal.ttf
-源柔ゴシックP Bold=GenJyuuGothic-P-Bold.ttf
-源真ゴシック Normal=GenShinGothic-Normal.ttf
-源真ゴシック Bold=GenShinGothic-Bold.ttf
-源真ゴシック等幅 Normal=GenShinGothic-Monospace-Normal.ttf
-源真ゴシック等幅 Bold=GenShinGothic-Monospace-Bold.ttf
-源真ゴシックP Normal=GenShinGothic-P-Normal.ttf
-源真ゴシックP Bold=GenShinGothic-P-Bold.ttf
 源暎アンチック v5=GenEiAntiquePv5-M.ttf
 源暎アンチック 詰 v5=GenEiAntiqueNv5-M.ttf
 源暎ちくご明朝 v3=GenEiChikugoMin3-R.ttf
@@ -129,6 +121,18 @@ IPAex明朝=ipaexm.ttf
 源暎Nuゴシック EB=GenEiNuGothic-EB.ttf
 源暎ぽっぷる Black=GenEiPOPle-Bk.ttf
 源暎ぽっぷる Pw Black=GenEiPOPlePw-Bk.ttf
+源柔ゴシック Normal=GenJyuuGothic-Normal.ttf
+源柔ゴシック Bold=GenJyuuGothic-Bold.ttf
+源柔ゴシック等幅 Normal=GenJyuuGothic-Monospace-Normal.ttf
+源柔ゴシック等幅 Bold=GenJyuuGothic-Monospace-Bold.ttf
+源柔ゴシックP Normal=GenJyuuGothic-P-Normal.ttf
+源柔ゴシックP Bold=GenJyuuGothic-P-Bold.ttf
+源真ゴシック Normal=GenShinGothic-Normal.ttf
+源真ゴシック Bold=GenShinGothic-Bold.ttf
+源真ゴシック等幅 Normal=GenShinGothic-Monospace-Normal.ttf
+源真ゴシック等幅 Bold=GenShinGothic-Monospace-Bold.ttf
+源真ゴシックP Normal=GenShinGothic-P-Normal.ttf
+源真ゴシックP Bold=GenShinGothic-P-Bold.ttf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; その他の日本語フォント。
@@ -141,7 +145,6 @@ IPAex明朝=ipaexm.ttf
 あずきフォント=azuki.ttf
 まきばフォント=MakibaFont13.ttf
 たぬき油性マジック=TanukiMagic.ttf
-よもぎ (Yomogi)=Yomogi-Regular.ttf
 851手書き雑フォント=851tegaki_zatsu_normal.ttf
 タイムマシンわ号=timemachine-wa.ttf
 びぜんアンチック=BIZenAntique-Bold.ttf
@@ -149,20 +152,21 @@ IPAex明朝=ipaexm.ttf
 さつき源代明朝=SatsukiGendaiMincho-M.ttf
 みちます=mitimasu.ttf
 瀬戸フォント=setofont.ttf
+ニコモジ＋v2=nicomoji-plus_v2.ttf
+しっぽりアンチック=ShipporiAntique-Regular.ttf
+さわらびゴシック=SawarabiGothic-Regular.ttf
+さわらび明朝=SawarabiMincho-Regular.ttf
 M PLUS 1p (日本語)=MPLUS1p-Regular.ttf
 M PLUS 1p Bold (日本語)=MPLUS1p-Bold.ttf
 Rounded Mplus 1c (日本語)=MPLUSRounded1c-Regular.ttf
 Rounded Mplus 1c Bold (日本語)=MPLUSRounded1c-Bold.ttf
-さわらびゴシック=SawarabiGothic-Regular.ttf
-さわらび明朝=SawarabiMincho-Regular.ttf
-ニコモジ＋v2=nicomoji-plus_v2.ttf
-しっぽりアンチック=ShipporiAntique-Regular.ttf
 Noto Sans JP=NotoSansJP-Regular.ttf
 Noto Sans JP Bold=NotoSansJP-Bold.ttf
 Noto Serif JP=NotoSerifJP-Regular.ttf
 Noto Serif JP Bold=NotoSerifJP-Bold.ttf
 IBM Plex Sans JP=IBMPlexSansJP-Regular.ttf
 IBM Plex Sans JP Bold=IBMPlexSansJP-Bold.ttf
+よもぎ (Yomogi)=Yomogi-Regular.ttf
 いろは角クラシック=irohakakuC-Regular.ttf
 いろは角クラシック Bold=irohakakuC-Bold.ttf
 いろはマル=irohamaru-Regular.ttf
