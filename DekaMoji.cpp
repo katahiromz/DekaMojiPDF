@@ -87,6 +87,8 @@ enum
     IDC_PAGE_LEFT = psh7,
     IDC_PAGE_INFO = stc5,
     IDC_PAGE_RIGHT = psh8,
+    IDC_FONT_LEFT = psh9,
+    IDC_FONT_RIGHT = psh10,
 };
 
 // デカ文字PDFのメインクラス。
@@ -2195,6 +2197,28 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         {
             g_pageMgr.goNext();
             doRefreshPreview(hwnd, 0);
+        }
+        break;
+    case IDC_FONT_LEFT: // 「前のフォント」
+        {
+            INT iItem = (INT)SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_GETCURSEL, 0, 0);
+            INT cItems = (INT)SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_GETCOUNT, 0, 0);
+            if (iItem > 0)
+            {
+                SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_SETCURSEL, iItem - 1, 0);
+                doRefreshPreview(hwnd, 0);
+            }
+        }
+        break;
+    case IDC_FONT_RIGHT: // 「次のフォント」
+        {
+            INT iItem = (INT)SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_GETCURSEL, 0, 0);
+            INT cItems = (INT)SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_GETCOUNT, 0, 0);
+            if (iItem + 1 < cItems)
+            {
+                SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_SETCURSEL, iItem + 1, 0);
+                doRefreshPreview(hwnd, 0);
+            }
         }
         break;
     default:
