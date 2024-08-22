@@ -123,6 +123,8 @@ IPAex明朝=ipaexm.ttf
 ; その他の日本語フォント。
 Noto Sans JP=NotoSansJP-Regular.ttf
 Noto Sans JP Bold=NotoSansJP-Bold.ttf
+Noto Serif JP=NotoSerifJP-Regular.ttf
+Noto Serif JP Bold=NotoSerifJP-Bold.ttf
 ふい字=HUIFONT29.TTF
 ふい字Ｐ=HuiFontP29.ttf
 あくあフォント=aquafont.ttf
@@ -166,6 +168,7 @@ Georgia Bold=GEORGIAB.TTF
 Impact=IMPACT.TTF
 Lucida Console=LUCON.TTF
 Microsoft Sans Serif=MICROSS.TTF
+Matemasie=Matemasie-Regular.ttf
 Palatino Linotype=PALA.TTF
 Palatino Linotype Bold=PALAB.TTF
 Roboto=ROBOTO-REGULAR.TTF
