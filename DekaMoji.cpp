@@ -1063,11 +1063,16 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
     // テキストを描画する。
     HPDF_Page_BeginText(page);
     {
+        // 平均の文字の高さ。
+        double char_height = text_height / ucch;
+        // 平均文字幅。
+        double char_width = text_width / ucch;
+        // ベースラインからdescentだけずらす。
+        double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
+        descent *= ratio2 * ratio1;
+
         if (bVertical)
         {
-            // 平均の文字の高さ。
-            double char_height = text_height / ucch;
-
             // 縦横比を制限する。
             if (text_width  / char_height > aspect_ratio_threshould)
             {
@@ -1087,13 +1092,6 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
         }
         else
         {
-            // 平均文字幅。
-            double char_width = text_width / ucch;
-
-            // ベースラインからdescentだけずらす。
-            double descent = -HPDF_Font_GetDescent(font) * font_size / 1000.0;
-            descent *= ratio2 * ratio1;
-
             // 縦横比を制限する。
             if (text_height / char_width > aspect_ratio_threshould)
             {
@@ -1439,9 +1437,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                     LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
                                 LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
                     text_data = szText;
-                    // 半角カッコを全角カッコに。
-                    str_replace(text_data, L"(", L"\xFF08");
-                    str_replace(text_data, L")", L"\xFF09");
                 }
 
                 // ANSI文字列に変換してテキストを描画する。
@@ -1489,9 +1484,6 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 LCMapString(MAKELANGID(LANG_JAPANESE, SUBLANG_DEFAULT),
                             LCMAP_FULLWIDTH, text_data.c_str(), -1, szText, _countof(szText));
                 text_data = szText;
-                // 半角カッコを全角カッコに。
-                str_replace(text_data, L"(", L"\xFF08");
-                str_replace(text_data, L")", L"\xFF09");
             }
 
             // ANSI文字列に変換してテキストを描画する。
