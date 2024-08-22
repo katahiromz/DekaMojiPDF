@@ -48,7 +48,6 @@ HG丸ゴシックM-Pro=HGRSMP90.TTF
 HG行書体=HGRGY.TTC,0
 HGP行書体=HGRGY.TTC,1
 HGS行書体=HGRGY.TTC,2
-HG正楷書体-PRO=HGRSKP.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; リョービ日本語フォント。
@@ -315,7 +314,6 @@ Verdana Pro Bold=VERDANAPRO-BOLD.TTF
 新細明體 (PMingLiU)=MINGLIU.TTC,1
 新細明體-ExtB (PMingLiU-ExtB)=MINGLIUB.TTC,1
 細明體_HKSCS (MingLiU_HKSCS)=MINGLIU.TTC,2
-細明體_HKSCS-ExtB (MingLiU_HKSCS-ExtB)=MINGLIUB.TTC,2
 黑体 (SimHei)=SIMHEI.TTF
 宋体 (SimSun)=SIMSUN.TTC,0
 宋体-ExtB (SimSun-ExtB)=SIMSUNB.TTF
