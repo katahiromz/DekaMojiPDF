@@ -37,7 +37,7 @@ IDR_SETTINGS_MENU MENU
 // RT_DIALOG
 
 IDD_MAINDLG DIALOG 0, 0, 270, 190
-CAPTION "デカ文字PDF Ver.1.1.5 by 片山博文MZ"
+CAPTION "デカ文字PDF Ver.1.1.6 by 片山博文MZ"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 10, "ＭＳ Ｐゴシック"
 {
@@ -56,7 +56,7 @@ FONT 10, "ＭＳ Ｐゴシック"
     EDITTEXT edt2, 70, 100, 50, 10
     PUSHBUTTON "", psh1, 125, 100, 10, 10, BS_OWNERDRAW
     LTEXT "フォント名(&N):", stc6, 5, 115, 60, 10, SS_CENTERIMAGE | SS_NOTIFY | NOT WS_GROUP
-    COMBOBOX cmb3, 70, 115, 105, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX cmb3, 70, 115, 105, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
     AUTOCHECKBOX "縦書き(&V)", chx1, 5, 130, 70, 14
     AUTOCHECKBOX "各用紙に1文字ずつ出力(&L)", chx2, 80, 130, 95, 15
     LTEXT "垂直位置調整(&A):", stc9, 185, 130, 30, 20, SS_NOTIFY | NOT WS_GROUP
@@ -101,8 +101,8 @@ FONT 10, "ＭＳ Ｐゴシック"
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     1, 1, 5, 0
-PRODUCTVERSION  1, 1, 5, 0
+FILEVERSION     1, 1, 6, 0
+PRODUCTVERSION  1, 1, 6, 0
 FILEOS          0x40004
 FILETYPE        0x1
 FILESUBTYPE     0x0
@@ -113,10 +113,10 @@ FILESUBTYPE     0x0
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "大きな文字のPDF作成\0"
-            VALUE "FileVersion", "1.1.5\0"
+            VALUE "FileVersion", "1.1.6\0"
             VALUE "LegalCopyright", "(c) 2022-2024 katahiromz\0"
             VALUE "ProductName", "デカ文字PDF\0"
-            VALUE "ProductVersion", "1.1.5\0"
+            VALUE "ProductVersion", "1.1.6\0"
         }
     }
     BLOCK "VarFileInfo"

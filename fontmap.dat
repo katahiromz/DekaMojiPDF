@@ -160,7 +160,6 @@ GN-キルゴUかなO=GN-KillGothic-U-KanaO.ttf
 仕事メモ書き=ShigotoMemogaki-Regular-1-02.ttf
 びぜんアンチック=BIZenAntique-Bold.ttf
 ほにゃ字=HonyaJi-Re.ttf
-g_コミックホラー恐怖-教漢=g_comichorrorR_freeR.ttf
 いろは角クラシック=irohakakuC-Regular.ttf
 いろは角クラシック Bold=irohakakuC-Bold.ttf
 いろはマル=irohamaru-Regular.ttf
@@ -181,8 +180,9 @@ Rounded Mplus 1c Bold=MPLUSRounded1c-Bold.ttf
 さわらび明朝=SawarabiMincho-Regular.ttf
 ニコモジ＋v2=nicomoji-plus_v2.ttf
 しっぽりアンチック=ShipporiAntique-Regular.ttf
-吐き溜=hakidame.TTF
 怨霊=onryou.TTF
+g_コミックホラー恐怖-教漢=g_comichorrorR_freeR.ttf
+吐き溜=hakidame.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Windows標準ラテンフォント。

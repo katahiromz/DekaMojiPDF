@@ -505,6 +505,7 @@ void DekaMoji::OnInitDialog(HWND hwnd)
             SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_ADDSTRING, 0, (LPARAM)entry.m_font_name.c_str());
         }
     }
+    SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_SETHORIZONTALEXTENT, 400, 0);
 
     // IDC_LETTER_ASPECT: 文字のアスペクト比。
     SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_100));
