@@ -44,6 +44,7 @@ HGS創英角ゴシックUB=HGRSGU90.TTC,2
 HG創英角ポップ体=HGRPP190.TTC,0
 HGP創英角ポップ体=HGRPP190.TTC,1
 HGS創英角ポップ体=HGRPP190.TTC,2
+HG丸ゴシックM-Pro=HGRSMP90.TTF
 HG行書体=HGRGY.TTC,0
 HGP行書体=HGRGY.TTC,1
 HGS行書体=HGRGY.TTC,2
@@ -136,6 +137,9 @@ UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; その他の日本語フォント。
+東風ゴシック=kochi-gothic-subst.ttf
+東風明朝=kochi-mincho-subst.ttf
+モナーフォント=mona.ttf
 ふい字=HUIFONT29.TTF
 ふい字Ｐ=HuiFontP29.ttf
 あくあフォント=aquafont.ttf
@@ -160,6 +164,8 @@ M PLUS 1p (日本語)=MPLUS1p-Regular.ttf
 M PLUS 1p Bold (日本語)=MPLUS1p-Bold.ttf
 Rounded Mplus 1c (日本語)=MPLUSRounded1c-Regular.ttf
 Rounded Mplus 1c Bold (日本語)=MPLUSRounded1c-Bold.ttf
+VL ゴシック=VL-Gothic-Regular.ttf
+VL Pゴシック=VL-PGothic-Regular.ttf
 Noto Sans JP=NotoSansJP-Regular.ttf
 Noto Sans JP Bold=NotoSansJP-Bold.ttf
 Noto Serif JP=NotoSerifJP-Regular.ttf
@@ -193,6 +199,8 @@ g_コミックホラー恐怖-教漢=g_comichorrorR_freeR.ttf
 Arial=ARIAL.TTF
 Arial Bold=ARIALBD.TTF
 Arial Black=ARIBLK.TTF
+Century Gothic=GOTHIC.TTF
+Century Gothic Bold=GOTHICB.TTF
 Comic Sans MS=COMIC.TTF
 Comic Sans MS Bold=COMICBD.TTF
 Courier New=COUR.TTF
@@ -200,10 +208,15 @@ Courier New Bold=COURBD.TTF
 Franklin Gothic Medium=FRAMD.TTF
 Georgia=GEORGIA.TTF
 Georgia Bold=GEORGIAB.TTF
+Georgia Pro=GEORGIAPRO-REGULAR.TTF
+Georgia Pro Bold=GEORGIAPRO-BOLD.TTF
+Gill Sans Nova=GILLSANSNOVA.TTF
+Gill Sans Nova Bold=GILLSANSBONOVA.TTF
 Impact=IMPACT.TTF
 Lucida Console=LUCON.TTF
 Microsoft Sans Serif=MICROSS.TTF
 Matemasie=Matemasie-Regular.ttf
+Noto Mono=NOTOMONO-REGULAR.TTF
 Roboto=ROBOTO-REGULAR.TTF
 Roboto Bold=ROBOTO-BOLD.TTF
 Segoe Print=SEGOEPR.TTF
@@ -216,8 +229,12 @@ Tahoma=TAHOMA.TTF
 Tahoma Bold=TAHOMABD.TTF
 Times New Roman=TIMES.TTF
 Times New Roman Bold=TIMESBD.TTF
+Trebuchet MS=TREBUC.TTF
+Trebuchet MS Bold=TREBUCBD.TTF
 Verdana=VERDANA.TTF
 Verdana Bold=VERDANAB.TTF
+Verdana Pro=VERDANAPRO-REGULAR.TTF
+Verdana Pro Bold=VERDANAPRO-BOLD.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 中国語フォント。
