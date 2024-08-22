@@ -194,18 +194,51 @@ g_コミックホラー恐怖-教漢=g_comichorrorR_freeR.ttf
 吐き溜=hakidame.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Windows標準ラテンフォント。
+; Windowsラテンフォント。
 ; 利用条件：編集可能。
 Arial=ARIAL.TTF
 Arial Bold=ARIALBD.TTF
 Arial Black=ARIBLK.TTF
+Arial Nova=ARIALNOVA.TTF
+Arial Nova Bold=ARIALNOVA-BOLD.TTF
+Bahnschrift=BAHNSCHRIFT.TTF
+Bahnschrift Bold=BAHNSCHRIFT.TTF
+Caladea=CALADEA-REGULAR.TTF
+Caladea Bold=CALADEA-BOLD.TTF
+Calibri=CALIBRI.TTF
+Calibri Bold=CALIBRIB.TTF
+Candara=CANDARA.TTF
+Candara Bold=CANDARAB.TTF
+Carlito=CARLITO-REGULAR.TTF
+Carlito Bold=CARLITO-BOLD.TTF
+Cambria=CAMBRIA.TTC,0
+Cambria Bold=CAMBRIAB.TTF
 Century Gothic=GOTHIC.TTF
 Century Gothic Bold=GOTHICB.TTF
+Charis SIL=CHARISSIL-R.TTF
+Charis SIL Bold=CHARISSIL-B.TTF
 Comic Sans MS=COMIC.TTF
 Comic Sans MS Bold=COMICBD.TTF
+Consolas=CONSOLA.TTF
+Consolas Bold=CONSOLAB.TTF
+Constantia=CONSTAN.TTF
+Constantia Bold=CONSTANB.TTF
+Corbel=CORBEL.TTF
+Corbel Bold=CORBELB.TTF
 Courier New=COUR.TTF
 Courier New Bold=COURBD.TTF
-Franklin Gothic Medium=FRAMD.TTF
+DejaVu Sans=DEJAVUSANS.TTF
+DejaVu Sans Bold=DEJAVUSANS-BOLD.TTF
+DejaVu Sans Mono=DEJAVUSANSMONO.TTF
+DejaVu Sans Mono Bold=DEJAVUSANSMONO-BOLD.TTF
+DejaVu Serif=DEJAVUSERIF.TTF
+DejaVu Serif Bold=DEJAVUSERIF-BOLD.TTF
+Ebrima=EBRIMA.TTF
+Ebrima Bold=EBRIMABD.TTF
+Franklin Gothic=FRAMD.TTF
+Gabriola=GABRIOLA.TTF
+Gelasio=GELASIO-REGULAR.TTF
+Gelasio Bold=GELASIO-BOLD.TTF
 Georgia=GEORGIA.TTF
 Georgia Bold=GEORGIAB.TTF
 Georgia Pro=GEORGIAPRO-REGULAR.TTF
@@ -213,18 +246,56 @@ Georgia Pro Bold=GEORGIAPRO-BOLD.TTF
 Gill Sans Nova=GILLSANSNOVA.TTF
 Gill Sans Nova Bold=GILLSANSBONOVA.TTF
 Impact=IMPACT.TTF
+Liberation Mono=LIBERATIONMONO-REGULAR.TTF
+Liberation Mono Bold=LIBERATIONMONO-BOLD.TTF
+Liberation Sans=LIBERATIONSANS-REGULAR.TTF
+Liberation Sans Bold=LIBERATIONSANS-BOLD.TTF
+Liberation Serif=LIBERATIONSERIF-REGULAR.TTF
+Liberation Serif Bold=LIBERATIONSERIF-BOLD.TTF
+Linux Biolinum G=LINBIOLINUM_R_G.TTF
+Linux Biolinum G Bold=LINBIOLINUM_RB_G.TTF
+Linux Libertine G=LINLIBERTINE_R_G.TTF
+Linux Libertine G Bold=LINLIBERTINE_RB_G.TTF
 Lucida Console=LUCON.TTF
 Microsoft Sans Serif=MICROSS.TTF
 Matemasie=Matemasie-Regular.ttf
+Mongolian Baiti=MONBAITI.TTF
+Neue Haas Grotesk Text Pro=NHAASGROTESKTXPRO-55RG.TTF
+Neue Haas Grotesk Text Pro Bold=NHAASGROTESKTXPRO-75BD.TTF
 Noto Mono=NOTOMONO-REGULAR.TTF
+Noto Sans=NOTOSANS-REGULAR.TTF
+Noto Sans Bold=NOTOSANS-BOLD.TTF
+Noto Serif=NOTOSERIF-REGULAR.TTF
+Noto Serif Bold=NOTOSERIF-BOLD.TTF
+Noto Sans Lisu=NOTOSANSLISU-REGULAR.TTF
+Noto Sans Lisu Bold=NOTOSANSLISU-BOLD.TTF
+Reem Kufi=REEMKUFI-REGULAR.TTF
+Reem Kufi Bold=REEMKUFI-BOLD.TTF
 Roboto=ROBOTO-REGULAR.TTF
 Roboto Bold=ROBOTO-BOLD.TTF
+Rockwell Nova=ROCKWELLNOVA.TTF
+Rockwell Nova Bold=ROCKWELLNOVA-BOLD.TTF
+Rubik=RUBIK-REGULAR.TTF
+Rubik Bold=RUBIK-BOLD.TTF
 Segoe Print=SEGOEPR.TTF
 Segoe Print Bold=SEGOEPRB.TTF
 Segoe Script=SEGOESC.TTF
 Segoe Script Bold=SEGOESCB.TTF
 Segoe UI=SEGOEUI.TTF
 Segoe UI Bold=SEGOEUIB.TTF
+Sitka Small=SITKA.TTC,0
+Sitka Small Bold=SITKAB.TTC,0
+Sitka Text=SITKA.TTC,1
+Sitka Text Bold=SITKAB.TTC,1
+Sitka Subheading=SITKA.TTC,2
+Sitka Subheading Bold=SITKAB.TTC,2
+Sitka Heading=SITKA.TTC,3
+Sitka Heading Bold=SITKAB.TTC,3
+Sitka Display=SITKA.TTC,4
+Sitka Display Bold=SITKAB.TTC,4
+Sitka Banner=SITKA.TTC,5
+Sitka Banner Bold=SITKAB.TTC,5
+Sylfaen=SYLFAEN.TTF
 Tahoma=TAHOMA.TTF
 Tahoma Bold=TAHOMABD.TTF
 Times New Roman=TIMES.TTF
@@ -255,6 +326,7 @@ Verdana Pro Bold=VERDANAPRO-BOLD.TTF
 微软雅黑 Bold (Microsoft YaHei Bold)=MSYHBD.TTC,0
 微软雅黑UI (Microsoft YaHei UI)=MSYH.TTC,1
 微软雅黑UI Bold (Microsoft YaHei UI Bold)=MSYHBD.TTC,1
+Unifont=UNIFONTMEDIUM_0.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 韓国語フォント。
@@ -278,6 +350,24 @@ Microsoft Tai Le=TAILE.TTF
 Microsoft Tai Le Bold=TAILEB.TTF
 Microsoft New Tai Lue=NTAILU.TTF
 Microsoft New Tai Lue Bold=NTAILUB.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; アラビア語フォント。
+Noto Kufi Arabic=NOTOKUFIARABIC-REGULAR.TTF
+Noto Kufi Arabic Bold=NOTOKUFIARABIC-BOLD.TTF
+Noto Nasksh Arabic=NOTONASKHARABIC-REGULAR.TTF
+Noto Nasksh Arabic Bold=NOTONASKHARABIC-BOLD.TTF
+Noto Sans Arabic=NOTOSANSARABIC-REGULAR.TTF
+Noto Sans Arabic Bold=NOTOSANSARABIC-BOLD.TTF
+Noto Sans Arabic UI=NOTOSANSARABICUI-REGULAR.TTF
+Noto Sans Arabic UI Bold=NOTOSANSARABICUI-BOLD.TTF
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; ヘブライ語フォント。
+Noto Sans Hebrew=NOTOSANSHEBREW-REGULAR.TTF
+Noto Sans Hebrew Bold=NOTOSANSHEBREW-BOLD.TTF
+Noto Serif Hebrew=NOTOSERIFHEBREW-REGULAR.TTF
+Noto Serif Hebrew Bold=NOTOSERIFHEBREW-BOLD.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Unicodeフォント。
