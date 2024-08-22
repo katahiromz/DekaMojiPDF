@@ -33,13 +33,6 @@ BIZ UD明朝=BIZ-UDMINCHOM.TTC,0
 BIZ UDP明朝=BIZ-UDMINCHOM.TTC,1
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; UDフォント(日本語)。
-; 利用条件：印刷とプレビュー可能。
-UDデジタル教科書体N-R=UDDIGIKYOKASHON-R.TTC,0
-UDデジタル教科書体NP-R=UDDIGIKYOKASHON-R.TTC,1
-UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; RICOHフォント(日本語)。
 ; 利用条件：編集可能。
 HGゴシックM=HGRGM.TTC,0
@@ -84,6 +77,13 @@ RFGP2サンセリフ-U=RFG2SANU.TTC,1
 モトヤ教科書3=MTK3KP.TTC,0
 モトヤ教科書3等幅=MTK3KP.TTC,1
 モトヤ教科書3KP=MTK3KP.TTC,2
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; UDフォント(日本語)。
+; 利用条件：印刷とプレビュー可能。
+UDデジタル教科書体N-R=UDDIGIKYOKASHON-R.TTC,0
+UDデジタル教科書体NP-R=UDDIGIKYOKASHON-R.TTC,1
+UDデジタル教科書体NK-R=UDDIGIKYOKASHON-R.TTC,2
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; 梅フォント。
