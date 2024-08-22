@@ -121,6 +121,8 @@ IPAex明朝=ipaexm.ttf
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; その他の日本語フォント。
+Noto Sans JP=NotoSansJP-Regular.ttf
+Noto Sans JP Bold=NotoSansJP-Bold.ttf
 ふい字=HUIFONT29.TTF
 ふい字Ｐ=HuiFontP29.ttf
 あくあフォント=aquafont.ttf
