@@ -166,8 +166,6 @@ GN-キルゴUかなO=GN-KillGothic-U-KanaO.ttf
 MT たれ=MT_TARE.ttf
 MT たれっぴ=MT_TARE_P.ttf
 さつき源代明朝=SatsukiGendaiMincho-M.ttf
-棘丸ゴシック=TogeMaruGothic-400-Regular.ttf
-棘丸ゴシック Bold=TogeMaruGothic-700-Bold.ttf
 ゆるもじ=yurumoji.ttf
 Oradano明朝GSRR=OradanoGSRR.ttf
 みちます=mitimasu.ttf
@@ -180,8 +178,10 @@ Rounded Mplus 1c Bold=MPLUSRounded1c-Bold.ttf
 さわらび明朝=SawarabiMincho-Regular.ttf
 ニコモジ＋v2=nicomoji-plus_v2.ttf
 しっぽりアンチック=ShipporiAntique-Regular.ttf
-怨霊=onryou.TTF
+棘丸ゴシック=TogeMaruGothic-400-Regular.ttf
+棘丸ゴシック Bold=TogeMaruGothic-700-Bold.ttf
 g_コミックホラー恐怖-教漢=g_comichorrorR_freeR.ttf
+怨霊=onryou.TTF
 吐き溜=hakidame.TTF
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
