@@ -1298,12 +1298,24 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         // フォント名と垂直位置補正。
         string_t font_name;
         double v_adjust;
+        MTempFile font_temp_file(TEXT("fonttmp"), TEXT(".ttf"));
         for (auto& entry : m_font_map)
         {
             if (entry.m_font_name != SETTING(IDC_FONT_NAME))
                 continue;
 
-            auto ansi = ansi_from_wide(CP_UTF8, entry.m_pathname.c_str());
+            const char *ansi;
+            if (IsTextAscii(entry.m_pathname.c_str())) // フォント名がASCIIに適合するか？
+            {
+                ansi = ansi_from_wide(CP_ACP, entry.m_pathname.c_str());
+            }
+            else
+            {
+                // フォント名がASCIIでなければ一時ファイルを使って読み込む。
+                CopyFile(entry.m_pathname.c_str(), font_temp_file.make(), FALSE);
+                ansi = ansi_from_wide(CP_ACP, font_temp_file.get());
+            }
+
             std::string font_name_a;
             if (entry.m_index != -1)
             {
