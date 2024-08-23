@@ -23,6 +23,7 @@
 #include "MTempFile.hpp"    // 一時ファイル操作用のヘッダ。
 #include "MCenterWindow.h"  // ウィンドウの中央寄せ。
 #include "MPageMgr.h"       // ページマネージャ。
+#include "MString.hpp"      // 文字列を扱うヘッダ。
 #include "resource.h"       // リソースIDの定義ヘッダ。
 
 // 文字列クラス。
@@ -65,6 +66,7 @@ struct FONT_ENTRY
     string_t m_font_name;
     string_t m_pathname;
     int m_index = -1;
+    double m_v_adjust = 0;
 };
 
 // わかりやすい項目名を使用する。
@@ -158,7 +160,8 @@ LPTSTR doLoadString(INT nID)
 // 文字列の前後の空白を削除する。
 void str_trim(LPWSTR text)
 {
-    StrTrimW(text, L" \t\r\n\x3000");
+#define SPACES L" \t\r\n\x3000"
+    StrTrimW(text, SPACES);
 }
 
 // レジストリに設定名を保存するためにエンコードする。
@@ -383,37 +386,52 @@ BOOL DekaMoji::LoadFontMap()
             {
                 // 文字列を切り分ける。
                 *pch++ = 0;
-                auto font_name = szText;
-                auto font_file = pch;
 
-                // 前後の空白を取り除く。
-                str_trim(font_name);
-                str_trim(font_file);
+                // 「,」で分割する。
+                std::vector<string_t> fields;
+                mstr_split(fields, pch, L",");
+                if (fields.size() < 1)
+                    continue;
 
-                // 「,」があればインデックスを読み込み、切り分ける。
-                pch = wcschr(pch, L',');
+                // フォント名。
+                string_t font_name = szText;
+                mstr_trim(font_name, SPACES);
+
+                // フォントファイル名。
+                auto font_file = fields[0];
+                mstr_trim(font_file, SPACES);
+
+                // フォントインデックスを取得。
                 int index = -1;
-                if (pch)
+                if (fields.size() >= 2)
                 {
-                    *pch++ = 0;
-                    index = _wtoi(pch);
+                    auto font_index = fields[1];
+                    mstr_trim(font_index, SPACES);
+                    if (font_index.size())
+                        index = _wtoi(font_index.c_str());
                 }
 
-                // さらに前後の空白を取り除く。
-                str_trim(font_name);
-                str_trim(font_file);
+                // 垂直位置補正を取得する。
+                double v_adjust = 0;
+                if (fields.size() >= 3)
+                {
+                    auto font_v_adjust = fields[2];
+                    mstr_trim(font_v_adjust, SPACES);
+                    if (font_v_adjust.size())
+                        v_adjust = _wtof(font_v_adjust.c_str());
+                }
 
                 // フォントファイルのパスファイル名を構築する。
                 TCHAR font_pathname[MAX_PATH];
                 GetWindowsDirectory(font_pathname, _countof(font_pathname));
                 PathAppend(font_pathname, TEXT("Fonts"));
-                PathAppend(font_pathname, font_file);
+                PathAppend(font_pathname, font_file.c_str());
 
                 // 存在しなかった？ ローカルフォントを試す。
                 if (!PathFileExists(font_pathname))
                 {
                     ExpandEnvironmentStrings(TEXT("%LOCALAPPDATA%\\Microsoft\\Windows\\Fonts"), font_pathname, _countof(font_pathname));
-                    PathAppend(font_pathname, font_file);
+                    PathAppend(font_pathname, font_file.c_str());
                 }
 
                 // パスファイル名が存在するか？
@@ -424,6 +442,7 @@ BOOL DekaMoji::LoadFontMap()
                     entry.m_font_name = font_name;
                     entry.m_pathname = font_pathname;
                     entry.m_index = index;
+                    entry.m_v_adjust = v_adjust;
                     m_font_map.push_back(entry);
                 }
             }
@@ -760,32 +779,6 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     return TRUE; // 成功。
 }
 
-// 文字列中に見つかった部分文字列をすべて置き換える。
-template <typename T_STR>
-inline bool
-str_replace(T_STR& str, const T_STR& from, const T_STR& to)
-{
-    bool ret = false;
-    size_t i = 0;
-    for (;;) {
-        i = str.find(from, i);
-        if (i == T_STR::npos)
-            break;
-        ret = true;
-        str.replace(i, from.size(), to);
-        i += to.size();
-    }
-    return ret;
-}
-template <typename T_STR>
-inline bool
-str_replace(T_STR& str,
-            const typename T_STR::value_type *from,
-            const typename T_STR::value_type *to)
-{
-    return str_replace(str, T_STR(from), T_STR(to));
-}
-
 // ファイルサイズを取得する。
 DWORD get_file_size(const string_t& filename)
 {
@@ -996,7 +989,7 @@ void MyHPDF_Page_ShowVText(HPDF_Page page,
 void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
                       const char *text, double aspect_ratio_threshould,
                       double x, double y, double width, double height,
-                      int draw_box = 0, BOOL bVertical = FALSE)
+                      int draw_box, BOOL bVertical, double v_adjust)
 {
     // フォントサイズを制限。
     if (font_size > HPDF_MAX_FONTSIZE)
@@ -1082,6 +1075,9 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
             // yを中央そろえ。
             y += (height - text_height) / 2;
 
+            // text_height * v_adjustだけずらす。
+            y += char_height * v_adjust;
+
             // テキストを描画する。
             MyHPDF_Page_ShowVText(page, width, height, font, font_size, text, x, y, ratio1, ratio2);
         }
@@ -1109,6 +1105,9 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
             x += (width - text_width) / 2;
             y += (height - text_height) / 2;
 
+            // text_height * v_adjustだけずらす。
+            y += text_height * v_adjust;
+
             // 文字をページいっぱいにする。
             HPDF_Page_SetTextMatrix(page, ratio2, 0, 0, ratio1 * ratio2, x, y + descent - g_nVAdjust);
             // テキストを描画する。
@@ -1124,41 +1123,23 @@ void hpdf_draw_text(HPDF_Page page, HPDF_Font font, double font_size,
     }
 }
 
-// 文字列を分割する。
-template <typename T_STR_CONTAINER>
-inline void
-str_split(T_STR_CONTAINER& container,
-          const typename T_STR_CONTAINER::value_type& str,
-          const typename T_STR_CONTAINER::value_type& chars)
-{
-    container.clear();
-    size_t i = 0, k = str.find_first_of(chars);
-    while (k != T_STR_CONTAINER::value_type::npos)
-    {
-        container.push_back(str.substr(i, k - i));
-        i = k + 1;
-        k = str.find_first_of(chars, i);
-    }
-    container.push_back(str.substr(i));
-}
-
 // テキストを描画する。
 void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
                               const char *text,
                               double x, double y, double width, double height,
-                              double aspect_ratio_threshould, BOOL bVertical)
+                              double aspect_ratio_threshould, BOOL bVertical, double v_adjust)
 {
     char buf[1024];
     StringCchCopyA(buf, _countof(buf), text);
     //StrTrimA(buf, " \t\r\n");
 
     std::string str = buf;
-    str_replace(str, "\r\n", "\n"); // 改行コード。
-    str_replace(str, "\xE3\x80\x80", "  "); // 全角空白「　」
+    mstr_replace_all(str, "\r\n", "\n"); // 改行コード。
+    mstr_replace_all(str, "\xE3\x80\x80", "  "); // 全角空白「　」
 
     // 改行で分割。
     std::vector<std::string> lines;
-    str_split(lines, str, std::string("\n"));
+    mstr_split(lines, str, std::string("\n"));
 
     auto rows = lines.size();
     if (rows == 0)
@@ -1178,7 +1159,8 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
             double line_height = height;
 
             hpdf_draw_text(page, font, font_size, buf, aspect_ratio_threshould,
-                           line_x, line_y, line_width, line_height, 0, bVertical);
+                           line_x, line_y, line_width, line_height, 0, bVertical,
+                           v_adjust);
         }
     }
     else
@@ -1195,7 +1177,8 @@ void hpdf_draw_multiline_text(HPDF_Page page, HPDF_Font font, double font_size,
             double line_height = height / rows;
 
             hpdf_draw_text(page, font, font_size, buf, aspect_ratio_threshould,
-                           line_x, line_y, line_width, line_height, 0, bVertical);
+                           line_x, line_y, line_width, line_height, 0, bVertical,
+                           v_adjust);
         }
     }
 }
@@ -1206,12 +1189,12 @@ void split_text_data(std::vector<string_t>& chars, const string_t& text)
     string_t data = text;
 
     // 空白を消す。
-    str_replace(data, L" ", L"");
-    str_replace(data, L"\t", L"");
-    str_replace(data, L"\r", L"");
-    str_replace(data, L"\n", L"");
-    str_replace(data, L"\r", L"");
-    str_replace(data, L"\x3000", L""); // 全角空白「　」
+    mstr_replace_all(data, L" ", L"");
+    mstr_replace_all(data, L"\t", L"");
+    mstr_replace_all(data, L"\r", L"");
+    mstr_replace_all(data, L"\n", L"");
+    mstr_replace_all(data, L"\r", L"");
+    mstr_replace_all(data, L"\x3000", L""); // 全角空白「　」
 
     size_t ich, cch = lstrlen(data.c_str());
     size_t icch, ucch = ucchStrLen(data.c_str());
@@ -1312,8 +1295,9 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
         // ページ余白。
         double margin = pixels_from_mm(10);
 
-        // フォント名。
+        // フォント名と垂直位置補正。
         string_t font_name;
+        double v_adjust;
         for (auto& entry : m_font_map)
         {
             if (entry.m_font_name != SETTING(IDC_FONT_NAME))
@@ -1331,6 +1315,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 font_name_a = HPDF_LoadTTFontFromFile(pdf, ansi, HPDF_TRUE);
                 font_name = wide_from_ansi(CP_UTF8, font_name_a.c_str());
             }
+            v_adjust = entry.m_v_adjust;
         }
 
         // フォントサイズ（pt）。
@@ -1445,7 +1430,7 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
                 auto text_a = ansi_from_wide(CP_UTF8, str.c_str());
                 hpdf_draw_multiline_text(page, font, font_size, text_a,
                     content_x, content_y, content_width, content_height,
-                    aspect_ratio_threshould, bVertical);
+                    aspect_ratio_threshould, bVertical, v_adjust);
             }
         }
         else
@@ -1492,7 +1477,8 @@ string_t DekaMoji::JustDoIt(HWND hwnd, LPCTSTR pszPdfFileName)
             // ANSI文字列に変換してテキストを描画する。
             auto text_a = ansi_from_wide(CP_UTF8, text_data.c_str());
             hpdf_draw_multiline_text(page, font, font_size, text_a,
-                content_x, content_y, content_width, content_height, aspect_ratio_threshould, bVertical);
+                content_x, content_y, content_width, content_height, aspect_ratio_threshould, bVertical,
+                v_adjust);
         }
 
         // ページ番号を修正する。
