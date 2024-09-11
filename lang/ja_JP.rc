@@ -37,7 +37,7 @@ IDR_SETTINGS_MENU MENU
 // RT_DIALOG
 
 IDD_MAINDLG DIALOG 0, 0, 270, 190
-CAPTION "デカ文字PDF Ver.1.1.8 by 片山博文MZ"
+CAPTION "デカ文字PDF Ver.1.1.9 by 片山博文MZ"
 STYLE DS_CENTER | DS_MODALFRAME | WS_POPUPWINDOW | WS_CAPTION | WS_MINIMIZEBOX
 FONT 10, "ＭＳ Ｐゴシック"
 {
@@ -104,8 +104,8 @@ FONT 10, "ＭＳ Ｐゴシック"
 // RT_VERSION
 
 1 VERSIONINFO
-FILEVERSION     1, 1, 8, 0
-PRODUCTVERSION  1, 1, 8, 0
+FILEVERSION     1, 1, 9, 0
+PRODUCTVERSION  1, 1, 9, 0
 FILEOS          0x40004
 FILETYPE        0x1
 FILESUBTYPE     0x0
@@ -116,10 +116,10 @@ FILESUBTYPE     0x0
         {
             VALUE "CompanyName", "Katayama Hirofumi MZ\0"
             VALUE "FileDescription", "大きな文字のPDF作成\0"
-            VALUE "FileVersion", "1.1.8\0"
+            VALUE "FileVersion", "1.1.9\0"
             VALUE "LegalCopyright", "(c) 2022-2024 katahiromz\0"
             VALUE "ProductName", "デカ文字PDF\0"
-            VALUE "ProductVersion", "1.1.8\0"
+            VALUE "ProductVersion", "1.1.9\0"
         }
     }
     BLOCK "VarFileInfo"
@@ -174,6 +174,17 @@ STRINGTABLE
     IDS_ASPECT_300, "300％未満"
     IDS_ASPECT_400, "400％未満"
     IDS_ASPECT_NO_LIMIT, "(制限なし)"
+    IDS_SIZE_TABLOID, "Tabloid"
+    IDS_SIZE_LEDGER, "Ledger"
+    IDS_SIZE_JUNIOR_LEGAL, "Junior Legal"
+    IDS_SIZE_HALF_LETTER, "Half Letter"
+    IDS_SIZE_GOVT_LETTER, "Government Letter"
+    IDS_SIZE_GOVT_LEGAL, "Government Legal"
+    IDS_SIZE_ANSI_A, "ANSI A"
+    IDS_SIZE_ANSI_B, "ANSI B"
+    IDS_SIZE_ANSI_C, "ANSI C"
+    IDS_SIZE_ANSI_D, "ANSI D"
+    IDS_SIZE_ANSI_E, "ANSI E"
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -426,6 +426,17 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B5));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LETTER));
     SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LEGAL));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_TABLOID));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LEDGER));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_JUNIOR_LEGAL));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_HALF_LETTER));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_GOVT_LETTER));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_GOVT_LEGAL));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_A));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_B));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_C));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_D));
+    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_E));
 
     // IDC_PAGE_DIRECTION: ページの向き。
     SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_PORTRAIT));
@@ -757,6 +768,28 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
         params += TEXT(" --page-size Letter");
     else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_LEGAL))
         params += TEXT(" --page-size Legal");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_TABLOID))
+        params += TEXT(" --page-size Tabloid");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_LEDGER))
+        params += TEXT(" --page-size Ledger");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_JUNIOR_LEGAL))
+        params += TEXT(" --page-size \"Junior Legal\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_HALF_LETTER))
+        params += TEXT(" --page-size \"Half Letter\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_GOVT_LETTER))
+        params += TEXT(" --page-size \"Government Letter\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_GOVT_LEGAL))
+        params += TEXT(" --page-size \"Government Legal\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_ANSI_A))
+        params += TEXT(" --page-size \"ANSI A\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_ANSI_B))
+        params += TEXT(" --page-size \"ANSI B\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_ANSI_C))
+        params += TEXT(" --page-size \"ANSI C\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_ANSI_D))
+        params += TEXT(" --page-size \"ANSI D\"");
+    else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_ANSI_E))
+        params += TEXT(" --page-size \"ANSI E\"");
 
     // アスペクト比のしきい値。
     if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_100))

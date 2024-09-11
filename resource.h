@@ -52,6 +52,17 @@
 #define IDS_ASPECT_300                      146
 #define IDS_ASPECT_400                      147
 #define IDS_ASPECT_NO_LIMIT                 148
+#define IDS_SIZE_TABLOID                    149
+#define IDS_SIZE_LEDGER                     150
+#define IDS_SIZE_JUNIOR_LEGAL               151
+#define IDS_SIZE_HALF_LETTER                152
+#define IDS_SIZE_GOVT_LETTER                153
+#define IDS_SIZE_GOVT_LEGAL                 154
+#define IDS_SIZE_ANSI_A                     155
+#define IDS_SIZE_ANSI_B                     156
+#define IDS_SIZE_ANSI_C                     157
+#define IDS_SIZE_ANSI_D                     158
+#define IDS_SIZE_ANSI_E                     159
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001
