@@ -1388,6 +1388,12 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
             ::SetFocus(hEdit);
         }
         break;
+    case stc4:
+        ::SetFocus(::GetDlgItem(hwnd, IDC_TEXT_COLOR));
+        break;
+    case stc10:
+        ::SetFocus(::GetDlgItem(hwnd, IDC_BACK_COLOR));
+        break;
     case stc6:
         // コンボボックスの前のラベルをクリックしたら、対応するコンボボックスにフォーカスを当てる。
         ::SetFocus(::GetDlgItem(hwnd, cmb3));
