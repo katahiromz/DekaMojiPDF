@@ -646,6 +646,9 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     if (hAppKey == NULL)
         return FALSE; // 失敗。
 
+    // 負の値がうまくいかないので符号を修正。
+    SETTING(IDC_V_ADJUST) = std::to_wstring(_ttoi(SETTING(IDC_V_ADJUST).c_str()));
+
     // レジストリにデータを設定する。
 #define SET_REG_DATA(id) do { \
     auto& str = SETTING(id); \
