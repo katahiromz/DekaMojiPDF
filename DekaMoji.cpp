@@ -729,14 +729,17 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
     params += TEXT(" --back-color ");
     params += SETTING(IDC_BACK_COLOR).c_str();
 
+    // 縦書きか？
     if (SETTING(IDC_VERTICAL) != TEXT("0"))
         params += TEXT(" --vertical");
 
+    // 用紙の向き。
     if (SETTING(IDC_PAGE_DIRECTION) == doLoadString(IDS_PORTRAIT))
         params += TEXT(" --portrait");
     else if (SETTING(IDC_PAGE_DIRECTION) == doLoadString(IDS_LANDSCAPE))
         params += TEXT(" --landscape");
 
+    // ページサイズ。
     if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_A3))
         params += TEXT(" --page-size A3");
     else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_A4))
@@ -752,6 +755,7 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
     else if (SETTING(IDC_PAGE_SIZE) == doLoadString(IDS_SIZE_LEGAL))
         params += TEXT(" --page-size Legal");
 
+    // アスペクト比のしきい値。
     if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_100))
         params += TEXT(" --threshold 1");
     else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_150))
@@ -766,6 +770,10 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
         params += TEXT(" --threshold 4");
     else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_NO_LIMIT))
         params += TEXT(" --threshold 1000");
+
+    // Y方向の補正。
+    params += TEXT(" --y-adjust ");
+    params += std::to_wstring(_ttoi(SETTING(IDC_V_ADJUST).c_str()));
 
     SHELLEXECUTEINFO info = { sizeof(info) };
     info.fMask = SEE_MASK_FLAG_NO_UI | SEE_MASK_NOCLOSEPROCESS | SEE_MASK_UNICODE;
