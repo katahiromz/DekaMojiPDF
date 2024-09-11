@@ -27,7 +27,6 @@ LicenseFile=LICENSE.txt
 OutputDir=.
 OutputBaseFilename=DekaMoji-{#MyAppVersion}-setup
 SetupIconFile=res\1041_Icon_1.ico
-Compression=lzma
 SolidCompression=yes
 UninstallDisplayIcon={app}\{#MyAppExeName}
 VersionInfoCompany={#MyAppPublisher}
