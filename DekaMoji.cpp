@@ -441,11 +441,6 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     }
     SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_SETHORIZONTALEXTENT, 400, 0);
 
-    // IDC_TEXT_COLOR: 文字色。
-    g_textColorButton.set_color_text(SETTING(IDC_TEXT_COLOR).c_str());
-    // IDC_BACK_COLOR: 背景色。
-    g_backColorButton.set_color_text(SETTING(IDC_BACK_COLOR).c_str());
-
     // IDC_LETTER_ASPECT: 文字のアスペクト比。
     SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_100));
     SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_150));
@@ -653,7 +648,7 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
 
     // レジストリにデータを設定する。
 #define SET_REG_DATA(id) do { \
-    auto& str = m_settings[TEXT(#id)]; \
+    auto& str = SETTING(id); \
     DWORD cbText = (str.size() + 1) * sizeof(WCHAR); \
     RegSetValueEx(hAppKey, TEXT(#id), 0, REG_SZ, (LPBYTE)str.c_str(), cbText); \
 } while(0)
