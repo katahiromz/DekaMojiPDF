@@ -144,7 +144,6 @@ STRINGTABLE
     IDS_A5, "A5 Paper"
     IDS_B4, "B4 Paper"
     IDS_B5, "B5 Paper"
-    IDS_LOGO, "Buy 'DekaMoji PDF'"
     IDS_GENERATEFAILED, "Failed to generate file on Desktop."
     IDS_SUCCEEDED, "Created file '%s' on Desktop."
     IDS_GENERATE, "&Make PDF"

@@ -21,7 +21,6 @@
 #define IDS_A5                              107
 #define IDS_B4                              108
 #define IDS_B5                              109
-#define IDS_LOGO                            110
 #define IDS_GENERATEFAILED                  111
 #define IDS_SUCCEEDED                       112
 #define IDS_GENERATE                        113
