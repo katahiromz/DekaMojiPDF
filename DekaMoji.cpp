@@ -82,12 +82,12 @@ enum
     IDC_README = psh6,
     IDC_V_ADJUST = edt3,
     IDC_VERTICAL = chx1,
-    IDC_ONE_LETTER_PER_PAPER = chx2,
     IDC_PAGE_LEFT = psh7,
     IDC_PAGE_INFO = stc5,
     IDC_PAGE_RIGHT = psh8,
     IDC_FONT_LEFT = psh9,
     IDC_FONT_RIGHT = psh10,
+    IDC_LETTERS_PER_PAGE = cmb12,
 };
 
 // デカ文字PDFのメインクラス。
@@ -119,21 +119,23 @@ public:
     // データからダイアログへ。
     BOOL DialogFromData(HWND hwnd);
     // レジストリからデータへ。
-    BOOL DataFromReg(HWND hwnd, LPCTSTR pszSubKey = NULL);
+    BOOL DataFromReg(HWND hwnd, LPCTSTR pszSubKey = nullptr);
     // データからレジストリへ。
-    BOOL RegFromData(HWND hwnd, LPCTSTR pszSubKey = NULL);
+    BOOL RegFromData(HWND hwnd, LPCTSTR pszSubKey = nullptr);
 
     // PDFを作成する処理。
     BOOL MakePDF(HWND hwnd, LPCTSTR pszPdfFileName);
+    // ページ総数を取得。
+    INT getPageCount();
 };
 
 // グローバル変数。
-HINSTANCE g_hInstance = NULL; // インスタンス。
-HWND g_hMainWnd = NULL; // メイン ウィンドウ。
+HINSTANCE g_hInstance = nullptr; // インスタンス。
+HWND g_hMainWnd = nullptr; // メイン ウィンドウ。
 TCHAR g_szAppName[256] = TEXT(""); // アプリ名。
-HICON g_hIcon = NULL; // アイコン（大）。
-HICON g_hIconSm = NULL; // アイコン（小）。
-HFONT g_hTextFont = NULL; // テキストフォント。
+HICON g_hIcon = nullptr; // アイコン（大）。
+HICON g_hIconSm = nullptr; // アイコン（小）。
+HFONT g_hTextFont = nullptr; // テキストフォント。
 MImageViewEx g_hwndImageView; // プレビューを表示する。
 MColorBox g_textColorButton; // 文字色ボタン。
 MColorBox g_backColorButton; // 背景色ボタン。
@@ -147,7 +149,7 @@ LPTSTR doLoadString(INT nID)
 {
     static TCHAR s_szText[1024];
     s_szText[0] = 0;
-    LoadString(NULL, nID, s_szText, _countof(s_szText));
+    LoadString(nullptr, nID, s_szText, _countof(s_szText));
     return s_szText;
 }
 
@@ -190,7 +192,7 @@ void DecodeName(LPWSTR szName)
         if (!*pch0) break;
         szHEX[3] = *pch0++;
         szHEX[4] = 0;
-        *pch1++ = (WCHAR)wcstoul(szHEX, NULL, 16);
+        *pch1++ = (WCHAR)wcstoul(szHEX, nullptr, 16);
     }
     *pch1 = 0;
     StringCchCopyW(szName, MAX_PATH, szDecoded);
@@ -201,7 +203,7 @@ LPCTSTR findLocalFile(LPCTSTR filename)
 {
     // 現在のプログラムのパスファイル名を取得する。
     static TCHAR szPath[MAX_PATH];
-    GetModuleFileName(NULL, szPath, _countof(szPath));
+    GetModuleFileName(nullptr, szPath, _countof(szPath));
 
     // 現在のプログラムのあるディレクトリを取得。
     TCHAR dir[MAX_PATH];
@@ -229,7 +231,7 @@ LPCTSTR findLocalFile(LPCTSTR filename)
     if (PathFileExists(szPath))
         return szPath;
 
-    return NULL; // 見つからなかった。
+    return nullptr; // 見つからなかった。
 }
 
 // 不正な文字列が入力された。
@@ -286,37 +288,24 @@ BOOL setComboText(HWND hwnd, INT id, LPCTSTR text)
 }
 
 // ワイド文字列をANSI文字列に変換する。
-std::string ansi_from_wide(UINT codepage, LPCWSTR wide)
+std::string ansi_from_wide(LPCWSTR wide, UINT codepage = CP_ACP)
 {
-    CHAR ansi[MAX_PATH];
+    static CHAR s_ansi[1024];
 
-    // コードページで表示できない文字はゲタ文字（〓）にする。
-    static const char utf8_geta[] = "\xE3\x80\x93";
-    static const char cp932_geta[] = "\x81\xAC";
-    const char *geta = NULL;
-    if (codepage == CP_ACP || codepage == CP932)
-    {
-        geta = cp932_geta;
-    }
-    else if (codepage == CP_UTF8)
-    {
-        geta = utf8_geta;
-    }
-
-    WideCharToMultiByte(codepage, 0, wide, -1, ansi, MAX_PATH, geta, NULL);
-    ansi[MAX_PATH - 2] = 0;
-    ansi[MAX_PATH - 1] = 0;
-
-    return ansi;
+    WideCharToMultiByte(codepage, 0, wide, -1, s_ansi, _countof(s_ansi), nullptr, nullptr);
+    s_ansi[_countof(s_ansi) - 3] = 0;
+    s_ansi[_countof(s_ansi) - 2] = 0;
+    s_ansi[_countof(s_ansi) - 1] = 0;
+    return s_ansi;
 }
 
 // ANSI文字列をワイド文字列に変換する。
-std::wstring wide_from_ansi(UINT codepage, LPCSTR ansi)
+std::wstring wide_from_ansi(LPCSTR ansi, UINT codepage = CP_ACP)
 {
-    WCHAR wide[MAX_PATH];
-    MultiByteToWideChar(codepage, 0, ansi, -1, wide, MAX_PATH);
-    wide[MAX_PATH - 1] = 0;
-    return wide;
+    static WCHAR s_wide[1024];
+    MultiByteToWideChar(codepage, 0, ansi, -1, s_wide, _countof(s_wide));
+    s_wide[_countof(s_wide) - 1] = 0;
+    return s_wide;
 }
 
 // mm単位からピクセル単位への変換。
@@ -336,7 +325,7 @@ void validate_filename(string_t& filename)
 {
     for (auto& ch : filename)
     {
-        if (wcschr(L"\\/:*?\"<>|", ch) != NULL)
+        if (wcschr(L"\\/:*?\"<>|", ch) != nullptr)
             ch = L'_';
     }
 }
@@ -361,7 +350,7 @@ BOOL DekaMoji::LoadFonts()
 {
     m_fonts.clear();
 
-    HDC hDC = CreateCompatibleDC(NULL);
+    HDC hDC = CreateCompatibleDC(nullptr);
     ::EnumFontFamilies(hDC, nullptr, (FONTENUMPROC)EnumFontFamProc, (LPARAM)&m_fonts);
     DeleteDC(hDC);
 
@@ -387,10 +376,10 @@ DekaMoji::DekaMoji(HINSTANCE hInstance, INT argc, LPTSTR *argv)
 #define IDC_PAGE_DIRECTION_DEFAULT doLoadString(IDS_LANDSCAPE)
 #define IDC_FONT_NAME_DEFAULT doLoadString(IDS_FONT_01)
 #define IDC_LETTER_ASPECT_DEFAULT doLoadString(IDS_ASPECT_250)
+#define IDC_LETTERS_PER_PAGE_DEFAULT doLoadString(IDS_NO_LIMIT)
 #define IDC_TEXT_DEFAULT doLoadString(IDS_SAMPLETEXT)
 #define IDC_V_ADJUST_DEFAULT TEXT("0")
 #define IDC_VERTICAL_DEFAULT TEXT("0")
-#define IDC_ONE_LETTER_PER_PAPER_DEFAULT TEXT("0")
 #define IDC_TEXT_COLOR_DEFAULT TEXT("#000000")
 #define IDC_BACK_COLOR_DEFAULT TEXT("#FFFFFF")
 
@@ -406,8 +395,8 @@ void DekaMoji::Reset()
     SETTING(IDC_BACK_COLOR) = IDC_BACK_COLOR_DEFAULT;
     SETTING(IDC_V_ADJUST) = IDC_V_ADJUST_DEFAULT;
     SETTING(IDC_VERTICAL) = IDC_VERTICAL_DEFAULT;
-    SETTING(IDC_ONE_LETTER_PER_PAPER) = IDC_ONE_LETTER_PER_PAPER_DEFAULT;
     SETTING(IDC_LETTER_ASPECT) = IDC_LETTER_ASPECT_DEFAULT;
+    SETTING(IDC_LETTERS_PER_PAGE) = IDC_LETTERS_PER_PAGE_DEFAULT;
 }
 
 // ダイアログを初期化する。
@@ -467,8 +456,15 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     // 垂直位置補正のスピンコントロール。
     SendDlgItemMessage(hwnd, scr1, UDM_SETRANGE, 0, MAKELONG(100, -100));
 
+    // 1ページ当たりの文字数。
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_NO_LIMIT));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_1_LETTERS_PER_PAGE));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_2_LETTERS_PER_PAGE));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_3_LETTERS_PER_PAGE));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_4_LETTERS_PER_PAGE));
+
     // プレビューを更新する。
-    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, NULL);
+    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, nullptr);
 }
 
 // ダイアログからデータへ。
@@ -485,6 +481,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     GET_COMBO_DATA(IDC_PAGE_DIRECTION);
     GET_COMBO_DATA(IDC_FONT_NAME);
     GET_COMBO_DATA(IDC_LETTER_ASPECT);
+    GET_COMBO_DATA(IDC_LETTERS_PER_PAGE);
 #undef GET_COMBO_DATA
 
     // チェックボックスからデータを取得する。
@@ -510,9 +507,7 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
 
     // 縦横比。
     if (SETTING(IDC_LETTER_ASPECT).empty())
-    {
         SETTING(IDC_LETTER_ASPECT) = IDC_LETTER_ASPECT_DEFAULT;
-    }
 
     // テキスト。
     GetDlgItemText(hwnd, IDC_TEXT, szText, _countof(szText));
@@ -534,15 +529,12 @@ BOOL DekaMoji::DataFromDialog(HWND hwnd, BOOL bNoError)
     SETTING(IDC_BACK_COLOR) = g_backColorButton.get_color_text();
 
     // その他。
-    auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, NULL, TRUE);
+    auto nAdjust = GetDlgItemInt(hwnd, IDC_V_ADJUST, nullptr, TRUE);
     m_settings[TEXT("IDC_V_ADJUST")] = std::to_wstring(nAdjust);
     g_nVAdjust = nAdjust * -8;
 
     g_bVertical = (IsDlgButtonChecked(hwnd, IDC_VERTICAL) == BST_CHECKED);
     m_settings[TEXT("IDC_VERTICAL")] = std::to_wstring(g_bVertical);
-
-    g_bOneLetterPerPaper = (IsDlgButtonChecked(hwnd, IDC_ONE_LETTER_PER_PAPER) == BST_CHECKED);
-    m_settings[TEXT("IDC_ONE_LETTER_PER_PAPER")] = std::to_wstring(g_bOneLetterPerPaper);
 
     return TRUE;
 }
@@ -562,6 +554,7 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
     SET_COMBO_DATA(IDC_PAGE_DIRECTION);
     SET_COMBO_DATA(IDC_FONT_NAME);
     SET_COMBO_DATA(IDC_LETTER_ASPECT);
+    SET_COMBO_DATA(IDC_LETTERS_PER_PAGE);
 #undef SET_COMBO_DATA
 
     // チェックボックスへデータを設定する。
@@ -586,12 +579,6 @@ BOOL DekaMoji::DialogFromData(HWND hwnd)
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_CHECKED);
     else
         CheckDlgButton(hwnd, IDC_VERTICAL, BST_UNCHECKED);
-
-    // 各用紙1文字ずつ出力。
-    if (_ttoi(SETTING(IDC_ONE_LETTER_PER_PAPER).c_str()))
-        CheckDlgButton(hwnd, IDC_ONE_LETTER_PER_PAPER, BST_CHECKED);
-    else
-        CheckDlgButton(hwnd, IDC_ONE_LETTER_PER_PAPER, BST_UNCHECKED);
 
     return TRUE;
 }
@@ -618,7 +605,7 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
 #define GET_REG_DATA(id) do { \
     szText[0] = 0; \
     DWORD cbText = sizeof(szText); \
-    LONG error = RegQueryValueEx(hKey, TEXT(#id), NULL, NULL, (LPBYTE)szText, &cbText); \
+    LONG error = RegQueryValueEx(hKey, TEXT(#id), nullptr, nullptr, (LPBYTE)szText, &cbText); \
     if (error == ERROR_SUCCESS) { \
         SETTING(id) = szText; \
     } \
@@ -627,12 +614,12 @@ BOOL DekaMoji::DataFromReg(HWND hwnd, LPCTSTR pszSubKey)
     GET_REG_DATA(IDC_PAGE_DIRECTION);
     GET_REG_DATA(IDC_FONT_NAME);
     GET_REG_DATA(IDC_LETTER_ASPECT);
+    GET_REG_DATA(IDC_LETTERS_PER_PAGE);
     GET_REG_DATA(IDC_TEXT);
     GET_REG_DATA(IDC_TEXT_COLOR);
     GET_REG_DATA(IDC_BACK_COLOR);
     GET_REG_DATA(IDC_V_ADJUST);
     GET_REG_DATA(IDC_VERTICAL);
-    GET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
 #undef GET_REG_DATA
 
     // 符号なし(REG_DWORD)から符号付きの値に直す。
@@ -653,8 +640,8 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
 
     // ソフト固有のレジストリキーを作成または開く。
     HKEY hAppKey;
-    RegCreateKeyEx(HKEY_CURRENT_USER, szKey, 0, NULL, 0, KEY_READ | KEY_WRITE, NULL, &hAppKey, NULL);
-    if (hAppKey == NULL)
+    RegCreateKeyEx(HKEY_CURRENT_USER, szKey, 0, nullptr, 0, KEY_READ | KEY_WRITE, nullptr, &hAppKey, nullptr);
+    if (hAppKey == nullptr)
         return FALSE; // 失敗。
 
     // 負の値がうまくいかないので符号を修正。
@@ -670,12 +657,12 @@ BOOL DekaMoji::RegFromData(HWND hwnd, LPCTSTR pszSubKey)
     SET_REG_DATA(IDC_PAGE_DIRECTION);
     SET_REG_DATA(IDC_FONT_NAME);
     SET_REG_DATA(IDC_LETTER_ASPECT);
+    SET_REG_DATA(IDC_LETTERS_PER_PAGE);
     SET_REG_DATA(IDC_TEXT);
     SET_REG_DATA(IDC_TEXT_COLOR);
     SET_REG_DATA(IDC_BACK_COLOR);
     SET_REG_DATA(IDC_V_ADJUST);
     SET_REG_DATA(IDC_VERTICAL);
-    SET_REG_DATA(IDC_ONE_LETTER_PER_PAPER);
 #undef SET_REG_DATA
 
     // レジストリキーを閉じる。
@@ -716,12 +703,66 @@ std::wstring mstr_escape(const std::wstring& text)
     return ret;
 }
 
+// UTF-8シーケンスの最初のバイトかどうか判定する。
+constexpr bool u8_is_lead(unsigned char ch)
+{
+    return (ch & 0xC0) != 0x80;
+}
+
+// UTF-8文字列の実際の文字に分割する。
+void u8_split_chars(std::vector<std::string>& chars, const char *str)
+{
+    std::string s;
+    for (const char *pch = str; *pch; ++pch)
+    {
+        if (u8_is_lead(*pch) && s.size())
+        {
+            chars.push_back(s);
+            s.clear();
+        }
+        s += *pch;
+    }
+    if (s.size())
+        chars.push_back(s);
+}
+
+INT DekaMoji::getPageCount()
+{
+    auto utf8_text = ansi_from_wide(SETTING(IDC_TEXT).c_str(), CP_UTF8);
+
+    if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_NO_LIMIT))
+        return 1;
+
+    // Delete spaces
+    mstr_replace_all(utf8_text, " ", "");
+    mstr_replace_all(utf8_text, "\t", "");
+    mstr_replace_all(utf8_text, "\r", "");
+    mstr_replace_all(utf8_text, "\n", "");
+    mstr_replace_all(utf8_text, u8"　", "");
+
+    // Split characters
+    std::vector<std::string> chars;
+    u8_split_chars(chars, utf8_text.c_str());
+
+    int letters_per_page = 1;
+    if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_1_LETTERS_PER_PAGE))
+        letters_per_page = 1;
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_2_LETTERS_PER_PAGE))
+        letters_per_page = 2;
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_3_LETTERS_PER_PAGE))
+        letters_per_page = 3;
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_4_LETTERS_PER_PAGE))
+        letters_per_page = 4;
+
+    return (chars.size() + letters_per_page - 1) / letters_per_page;
+}
+
 // PDFを作成する処理。
 BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
 {
     // pdfplaca.exe を使う。
     TCHAR szPDFPLACA[MAX_PATH];
-    GetModuleFileName(NULL, szPDFPLACA, _countof(szPDFPLACA));
+    GetModuleFileName(nullptr, szPDFPLACA, _countof(szPDFPLACA));
     PathRemoveFileSpec(szPDFPLACA);
     PathAppend(szPDFPLACA, TEXT("pdfplaca\\pdfplaca.exe"));
     if (!PathFileExists(szPDFPLACA))
@@ -807,6 +848,18 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
     else if (SETTING(IDC_LETTER_ASPECT) == doLoadString(IDS_ASPECT_NO_LIMIT))
         params += TEXT(" --threshold 1000");
 
+    // 1ページ当たりの文字数。
+    if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_NO_LIMIT))
+        params += TEXT(" --letters-per-page -1");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_1_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 1");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_2_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 2");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_3_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 3");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_4_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 4");
+
     // Y方向の補正。
     params += TEXT(" --y-adjust ");
     params += std::to_wstring(_ttoi(SETTING(IDC_V_ADJUST).c_str()));
@@ -842,7 +895,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     SetWindowLongPtr(hwnd, GWLP_USERDATA, lParam);
 
     // アプリの名前。
-    LoadString(NULL, IDS_APPNAME, g_szAppName, _countof(g_szAppName));
+    LoadString(nullptr, IDS_APPNAME, g_szAppName, _countof(g_szAppName));
 
     // アイコンの設定。
     g_hIcon = LoadIcon(g_hInstance, MAKEINTRESOURCE(1));
@@ -868,7 +921,7 @@ BOOL OnInitDialog(HWND hwnd, HWND hwndFocus, LPARAM lParam)
     SetWindowFont(GetDlgItem(hwnd, IDC_TEXT), g_hTextFont, TRUE);
 
     // まれにテキストボックスが再描画されないことがあるのでここで再描画。
-    InvalidateRect(GetDlgItem(hwnd, IDC_TEXT), NULL, TRUE);
+    InvalidateRect(GetDlgItem(hwnd, IDC_TEXT), nullptr, TRUE);
 
     return TRUE;
 }
@@ -1117,7 +1170,7 @@ void OnTextColorButton(HWND hwnd)
 void OnReadMe(HWND hwnd)
 {
     TCHAR szPath[MAX_PATH];
-    GetModuleFileName(NULL, szPath, _countof(szPath));
+    GetModuleFileName(nullptr, szPath, _countof(szPath));
     PathRemoveFileSpec(szPath);
     PathAppend(szPath, TEXT("README.txt"));
     if (!PathFileExists(szPath))
@@ -1126,7 +1179,7 @@ void OnReadMe(HWND hwnd)
         PathRemoveFileSpec(szPath);
         PathAppend(szPath, TEXT("README.txt"));
     }
-    ShellExecute(hwnd, NULL, szPath, NULL, NULL, SW_SHOWNORMAL);
+    ShellExecute(hwnd, nullptr, szPath, nullptr, nullptr, SW_SHOWNORMAL);
 }
 
 // プレビューのリフレッシュを数えるカウンタ変数。
@@ -1149,7 +1202,7 @@ void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 
     // 頻繁に更新するのではなく、タイマーを使ってUI/UXを改善する。
     KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
-    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, NULL); // 少し後でプレビューを更新する。
+    SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, dwDelay, nullptr); // 少し後でプレビューを更新する。
 
     // リフレッシュが頻繁な場合はユーザーに待つように指示する。
     ++s_nRefreshCounter;
@@ -1221,7 +1274,7 @@ void OnSettings(HWND hwnd)
 INT_PTR CALLBACK
 NameSettingsDlgProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    static LPTSTR s_szName = NULL; // 名前へのポインタを保持する。
+    static LPTSTR s_szName = nullptr; // 名前へのポインタを保持する。
     TCHAR szText[MAX_PATH];
     switch (uMsg)
     {
@@ -1372,6 +1425,7 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
     case IDC_PAGE_DIRECTION: // 「ページの向き」
     case IDC_FONT_NAME: // 「フォント名」
     case IDC_LETTER_ASPECT: // 「文字のアスペクト比」
+    case IDC_LETTERS_PER_PAGE: // 「1ページあたりの文字数」
         if (codeNotify == CBN_SELCHANGE || codeNotify == CBN_SELENDOK)
         {
             doRefreshPreview(hwnd, 0);
@@ -1390,12 +1444,6 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
                 SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 0, 0);
             else
                 SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_SETCURSEL, 1, 0);
-            doRefreshPreview(hwnd, 0);
-        }
-        break;
-    case IDC_ONE_LETTER_PER_PAPER:
-        if (codeNotify == BN_CLICKED)
-        {
             doRefreshPreview(hwnd, 0);
         }
         break;
@@ -1447,6 +1495,9 @@ void OnCommand(HWND hwnd, int id, HWND hwndCtl, UINT codeNotify)
         // エディットコントロールの前のラベルをクリックしたら、対応するエディットコントロールにフォーカスを当てる。
         SendDlgItemMessage(hwnd, edt3, EM_SETSEL, 0, -1);
         ::SetFocus(::GetDlgItem(hwnd, edt3));
+        break;
+    case stc12:
+        ::SetFocus(::GetDlgItem(hwnd, cmb12));
         break;
     case ID_SAVESETTINGSAS: // 「設定に名前を付けて保存」
         OnSaveSubSettingsAs(hwnd);
@@ -1533,11 +1584,11 @@ void OnDestroy(HWND hwnd)
     // アイコンを破棄。
     DestroyIcon(g_hIcon);
     DestroyIcon(g_hIconSm);
-    g_hIcon = g_hIconSm = NULL;
+    g_hIcon = g_hIconSm = nullptr;
 
     // フォントを破棄。
     DeleteObject(g_hTextFont);
-    g_hTextFont = NULL;
+    g_hTextFont = nullptr;
 }
 
 // プレビューを更新する。
@@ -1568,7 +1619,7 @@ BOOL doUpdatePreview(HWND hwnd)
 
     // pdf2bmp.exe を使ってPDFをBMPに変換。
     TCHAR szPDF2BMP[MAX_PATH];
-    GetModuleFileName(NULL, szPDF2BMP, _countof(szPDF2BMP));
+    GetModuleFileName(nullptr, szPDF2BMP, _countof(szPDF2BMP));
     PathRemoveFileSpec(szPDF2BMP);
     PathAppend(szPDF2BMP, TEXT("pdf2bmp\\pdf2bmp.exe"));
     if (!PathFileExists(szPDF2BMP))
@@ -1576,6 +1627,10 @@ BOOL doUpdatePreview(HWND hwnd)
         assert(0);
         return FALSE; // pdf2bmp.exeが見つからない。
     }
+
+    // ページ情報をセットする。
+    g_pageMgr.setPageCount(pDM->getPageCount());
+    g_pageMgr.fixPage();
 
     // pdf2bmp用のコマンドライン引数を構築する。
     string_t params;
@@ -1586,7 +1641,7 @@ BOOL doUpdatePreview(HWND hwnd)
     params += TEXT("\" \"");
     params += szBmpFile;
     params += TEXT("\"");
-    //MessageBoxW(NULL, params.c_str(), NULL, 0);
+    //MessageBoxW(nullptr, params.c_str(), nullptr, 0);
 
     // シェルを用いてプログラムを実行する。
     SHELLEXECUTEINFO info = { sizeof(info) };
@@ -1609,7 +1664,7 @@ BOOL doUpdatePreview(HWND hwnd)
         return FALSE; // 失敗。
 
     // pdf2bmpの実行結果で得られたBMPを読み込む。
-    HBITMAP hbmImage = (HBITMAP)LoadImage(NULL, szBmpFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
+    HBITMAP hbmImage = (HBITMAP)LoadImage(nullptr, szBmpFile, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
     BITMAP bm;
     if (!GetObject(hbmImage, sizeof(bm), &bm))
         return FALSE; // 失敗。
@@ -1625,10 +1680,10 @@ BOOL doUpdatePreview(HWND hwnd)
     bmi.bmiHeader.biHeight = bm.bmHeight + margin * 2;
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biBitCount = 24;
-    HDC hdc1 = CreateCompatibleDC(NULL);
-    HDC hdc2 = CreateCompatibleDC(NULL);
+    HDC hdc1 = CreateCompatibleDC(nullptr);
+    HDC hdc2 = CreateCompatibleDC(nullptr);
     LPVOID pvBits;
-    HBITMAP hbmPreview = CreateDIBSection(hdc1, &bmi, DIB_RGB_COLORS, &pvBits, NULL, 0);
+    HBITMAP hbmPreview = CreateDIBSection(hdc1, &bmi, DIB_RGB_COLORS, &pvBits, nullptr, 0);
     if (hbmPreview)
     {
         // イメージを転送する。
@@ -1643,16 +1698,8 @@ BOOL doUpdatePreview(HWND hwnd)
     }
     DeleteObject(hbmImage);
 
-    // ページのナビゲーションUIを更新する。
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
-
     if (hbmPreview) // プレビューが用意できたら
     {
-        // ページ情報をセットする。
-        g_pageMgr.setPageCount(1);
-        g_pageMgr.setPage(1);
-
         // ページ情報のテキストをセットする。
         auto page_info = g_pageMgr.print();
         SetDlgItemText(hwnd, IDC_PAGE_INFO, page_info.c_str());
@@ -1661,8 +1708,12 @@ BOOL doUpdatePreview(HWND hwnd)
     {
         // ページ情報をクリアする。
         g_pageMgr.init();
-        SetDlgItemText(hwnd, IDC_PAGE_INFO, NULL);
+        SetDlgItemText(hwnd, IDC_PAGE_INFO, nullptr);
     }
+
+    // ページのナビゲーションUIを更新する。
+    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
+    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
 
     return TRUE; // 成功。
 }
@@ -1676,9 +1727,9 @@ void OnTimer(HWND hwnd, UINT id)
 
     if (!doUpdatePreview(hwnd))
     {
-        g_hwndImageView.setImage(NULL);
+        g_hwndImageView.setImage(nullptr);
         g_pageMgr.init();
-        SetDlgItemText(hwnd, IDC_PAGE_INFO, NULL);
+        SetDlgItemText(hwnd, IDC_PAGE_INFO, nullptr);
     }
 }
 
@@ -1710,7 +1761,7 @@ INT DekaMoji_DialogMain(HINSTANCE hInstance, INT argc, LPTSTR *argv)
     DekaMoji dm(hInstance, argc, argv);
 
     // ユーザーデータをパラメータとしてダイアログを開く。
-    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAINDLG), NULL, DialogProc, (LPARAM)&dm);
+    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAINDLG), nullptr, DialogProc, (LPARAM)&dm);
 
     return 0;
 }

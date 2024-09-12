@@ -61,7 +61,8 @@ FONT 10, "Tahoma"
     PUSHBUTTON "<", psh9, 65, 115, 15, 13
     PUSHBUTTON ">", psh10, 170, 115, 15, 13
     AUTOCHECKBOX "&Vertical writing", chx1, 5, 130, 70, 14
-    AUTOCHECKBOX "One &letter per paper", chx2, 85, 130, 90, 15
+    RTEXT "&Letters per page:", stc12, 80, 130, 45, 18
+    COMBOBOX cmb12, 128, 132, 47, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "V. pos. &adjust:", stc9, 185, 130, 30, 20, SS_NOTIFY | NOT WS_GROUP
     EDITTEXT edt3, 220, 135, 35, 15, ES_AUTOHSCROLL | ES_RIGHT
     CONTROL "", scr1, "msctls_updown32", UDS_NOTHOUSANDS | UDS_ARROWKEYS | UDS_AUTOBUDDY | UDS_ALIGNRIGHT | UDS_SETBUDDYINT, 245, 135, 12, 20
@@ -184,6 +185,11 @@ STRINGTABLE
     IDS_SIZE_ANSI_C, "ANSI C"
     IDS_SIZE_ANSI_D, "ANSI D"
     IDS_SIZE_ANSI_E, "ANSI E"
+    IDS_NO_LIMIT, "(No limit)"
+    IDS_1_LETTERS_PER_PAGE, "1 letter"
+    IDS_2_LETTERS_PER_PAGE, "2 letters"
+    IDS_3_LETTERS_PER_PAGE, "3 letters"
+    IDS_4_LETTERS_PER_PAGE, "4 letters"
 }
 
 //////////////////////////////////////////////////////////////////////////////

@@ -63,6 +63,11 @@
 #define IDS_SIZE_ANSI_C                     157
 #define IDS_SIZE_ANSI_D                     158
 #define IDS_SIZE_ANSI_E                     159
+#define IDS_NO_LIMIT                        160
+#define IDS_1_LETTERS_PER_PAGE              161
+#define IDS_2_LETTERS_PER_PAGE              162
+#define IDS_3_LETTERS_PER_PAGE              163
+#define IDS_4_LETTERS_PER_PAGE              164
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001
