@@ -63,6 +63,21 @@ INT ucchStrLen(LPCWSTR text)
     return ucch;
 }
 
+// フォーカスが動かない不具合を回避するための関数。
+BOOL SafeEnableWindow(HWND hwndDlg, HWND hwndCtrl, BOOL bEnable)
+{
+    if (bEnable || GetFocus() != hwndCtrl)
+       return EnableWindow(hwndCtrl, bEnable);
+    
+    HWND hwndNext = GetNextDlgTabItem(hwndDlg, hwndCtrl, FALSE);
+    if (hwndNext != hwndCtrl)
+        SetFocus(hwndNext);
+    else
+        SetFocus(NULL);
+
+    return EnableWindow(hwndCtrl, bEnable);
+}
+
 // プレビューを再描画するタイマーID。
 #define TIMER_ID_REFRESH_PREVIEW 999
 
@@ -1188,17 +1203,9 @@ static INT s_nRefreshCounter = 0;
 // プレビューのリフレッシュを始める。
 void doRefreshPreview(HWND hwnd, DWORD dwDelay = 500)
 {
-    // フォーカスを持ったコントロールを無効化するとWindowsの不具合が生じるので、
-    // フォーカスを移動して回避。
-    if (GetFocus() == GetDlgItem(hwnd, IDC_PAGE_LEFT) ||
-        GetFocus() == GetDlgItem(hwnd, IDC_PAGE_RIGHT))
-    {
-        SetFocus(GetDlgItem(hwnd, IDC_TEXT));
-    }
-
     // いったん、ページ移動を無効化する。
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), FALSE);
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), FALSE);
+    SafeEnableWindow(hwnd, GetDlgItem(hwnd, IDC_PAGE_LEFT), FALSE);
+    SafeEnableWindow(hwnd, GetDlgItem(hwnd, IDC_PAGE_RIGHT), FALSE);
 
     // 頻繁に更新するのではなく、タイマーを使ってUI/UXを改善する。
     KillTimer(hwnd, TIMER_ID_REFRESH_PREVIEW);
@@ -1712,8 +1719,8 @@ BOOL doUpdatePreview(HWND hwnd)
     }
 
     // ページのナビゲーションUIを更新する。
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
-    EnableWindow(GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
+    SafeEnableWindow(hwnd, GetDlgItem(hwnd, IDC_PAGE_LEFT), g_pageMgr.hasBack());
+    SafeEnableWindow(hwnd, GetDlgItem(hwnd, IDC_PAGE_RIGHT), g_pageMgr.hasNext());
 
     return TRUE; // 成功。
 }
