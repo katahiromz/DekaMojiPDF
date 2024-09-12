@@ -39,11 +39,6 @@
 #define IDS_SIZE_LEGAL                      128
 #define IDS_SIZE_LETTER                     129
 #define IDS_REGFILTER                       135
-#define IDS_OPEN_PARENS                     136
-#define IDS_CLOSE_PARENS                    137
-#define IDS_COMMA_PERIOD                    138
-#define IDS_HYPHEN_DASH                     139
-#define IDS_SMALL_KANA                      140
 #define IDS_REASON_INVALID_INTEGER          141
 #define IDS_ASPECT_100                      142
 #define IDS_ASPECT_150                      143

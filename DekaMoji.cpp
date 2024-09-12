@@ -414,6 +414,14 @@ void DekaMoji::Reset()
     SETTING(IDC_LETTERS_PER_PAGE) = IDC_LETTERS_PER_PAGE_DEFAULT;
 }
 
+void doAddComboString(HWND hwndDlg, INT nCtrlID, size_t cItems, const INT *pnItemStringIDs)
+{
+    for (size_t iItem = 0; iItem < cItems; ++iItem)
+    {
+        SendDlgItemMessage(hwndDlg, nCtrlID, CB_ADDSTRING, 0, (LPARAM)doLoadString(pnItemStringIDs[iItem]));
+    }
+}
+
 // ダイアログを初期化する。
 void DekaMoji::OnInitDialog(HWND hwnd)
 {
@@ -423,24 +431,28 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     g_backColorButton.m_hWnd = GetDlgItem(hwnd, IDC_BACK_COLOR);
 
     // IDC_PAGE_SIZE: 用紙サイズ。
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A3));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A4));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_A5));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B4));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_B5));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LETTER));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LEGAL));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_TABLOID));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_LEDGER));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_JUNIOR_LEGAL));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_HALF_LETTER));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_GOVT_LETTER));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_GOVT_LEGAL));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_A));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_B));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_C));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_D));
-    SendDlgItemMessage(hwnd, IDC_PAGE_SIZE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_SIZE_ANSI_E));
+    static const INT s_page_sizes[] =
+    {
+        IDS_A3,
+        IDS_A4,
+        IDS_A5,
+        IDS_B4,
+        IDS_B5,
+        IDS_SIZE_LETTER,
+        IDS_SIZE_LEGAL,
+        IDS_SIZE_TABLOID,
+        IDS_SIZE_LEDGER,
+        IDS_SIZE_JUNIOR_LEGAL,
+        IDS_SIZE_HALF_LETTER,
+        IDS_SIZE_GOVT_LETTER,
+        IDS_SIZE_GOVT_LEGAL,
+        IDS_SIZE_ANSI_A,
+        IDS_SIZE_ANSI_B,
+        IDS_SIZE_ANSI_C,
+        IDS_SIZE_ANSI_D,
+        IDS_SIZE_ANSI_E,
+    };
+    doAddComboString(hwnd, IDC_PAGE_SIZE, _countof(s_page_sizes), s_page_sizes);
 
     // IDC_PAGE_DIRECTION: ページの向き。
     SendDlgItemMessage(hwnd, IDC_PAGE_DIRECTION, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_PORTRAIT));
@@ -457,13 +469,17 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_FONT_NAME, CB_SETHORIZONTALEXTENT, 400, 0);
 
     // IDC_LETTER_ASPECT: 文字のアスペクト比。
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_100));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_150));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_200));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_250));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_300));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_400));
-    SendDlgItemMessage(hwnd, IDC_LETTER_ASPECT, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_ASPECT_NO_LIMIT));
+    static const INT s_aspects[] =
+    {
+        IDS_ASPECT_100,
+        IDS_ASPECT_150,
+        IDS_ASPECT_200,
+        IDS_ASPECT_250,
+        IDS_ASPECT_300,
+        IDS_ASPECT_400,
+        IDS_ASPECT_NO_LIMIT,
+    };
+    doAddComboString(hwnd, IDC_LETTER_ASPECT, _countof(s_aspects), s_aspects);
 
     // MImageViewExを使えるようにする。
     g_hwndImageView.doSubclass(GetDlgItem(hwnd, stc7));
@@ -472,13 +488,17 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, scr1, UDM_SETRANGE, 0, MAKELONG(100, -100));
 
     // 1ページ当たりの文字数。
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_NO_LIMIT));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_1_LETTERS_PER_PAGE));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_2_LETTERS_PER_PAGE));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_3_LETTERS_PER_PAGE));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_4_LETTERS_PER_PAGE));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_5_LETTERS_PER_PAGE));
-    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_6_LETTERS_PER_PAGE));
+    static const INT s_per_page[] =
+    {
+        IDS_NO_LIMIT,
+        IDS_1_LETTERS_PER_PAGE,
+        IDS_2_LETTERS_PER_PAGE,
+        IDS_3_LETTERS_PER_PAGE,
+        IDS_4_LETTERS_PER_PAGE,
+        IDS_5_LETTERS_PER_PAGE,
+        IDS_6_LETTERS_PER_PAGE,
+    };
+    doAddComboString(hwnd, IDC_LETTERS_PER_PAGE, _countof(s_per_page), s_per_page);
 
     // プレビューを更新する。
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, nullptr);
