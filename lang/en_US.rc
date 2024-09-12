@@ -190,6 +190,8 @@ STRINGTABLE
     IDS_2_LETTERS_PER_PAGE, "2 letters"
     IDS_3_LETTERS_PER_PAGE, "3 letters"
     IDS_4_LETTERS_PER_PAGE, "4 letters"
+    IDS_5_LETTERS_PER_PAGE, "5 letters"
+    IDS_6_LETTERS_PER_PAGE, "6 letters"
 }
 
 //////////////////////////////////////////////////////////////////////////////

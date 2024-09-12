@@ -68,6 +68,8 @@
 #define IDS_2_LETTERS_PER_PAGE              162
 #define IDS_3_LETTERS_PER_PAGE              163
 #define IDS_4_LETTERS_PER_PAGE              164
+#define IDS_5_LETTERS_PER_PAGE              165
+#define IDS_6_LETTERS_PER_PAGE              166
 
 #define ID_SAVESETTINGSAS                   1000
 #define ID_RESETSETTINGS                    1001

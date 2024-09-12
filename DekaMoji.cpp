@@ -477,6 +477,8 @@ void DekaMoji::OnInitDialog(HWND hwnd)
     SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_2_LETTERS_PER_PAGE));
     SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_3_LETTERS_PER_PAGE));
     SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_4_LETTERS_PER_PAGE));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_5_LETTERS_PER_PAGE));
+    SendDlgItemMessage(hwnd, IDC_LETTERS_PER_PAGE, CB_ADDSTRING, 0, (LPARAM)doLoadString(IDS_6_LETTERS_PER_PAGE));
 
     // プレビューを更新する。
     SetTimer(hwnd, TIMER_ID_REFRESH_PREVIEW, 0, nullptr);
@@ -768,6 +770,10 @@ INT DekaMoji::getPageCount()
         letters_per_page = 3;
     else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_4_LETTERS_PER_PAGE))
         letters_per_page = 4;
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_5_LETTERS_PER_PAGE))
+        letters_per_page = 5;
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_6_LETTERS_PER_PAGE))
+        letters_per_page = 6;
 
     return (chars.size() + letters_per_page - 1) / letters_per_page;
 }
@@ -874,6 +880,10 @@ BOOL DekaMoji::MakePDF(HWND hwnd, LPCTSTR pszPdfFileName)
         params += TEXT(" --letters-per-page 3");
     else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_4_LETTERS_PER_PAGE))
         params += TEXT(" --letters-per-page 4");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_5_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 5");
+    else if (SETTING(IDC_LETTERS_PER_PAGE) == doLoadString(IDS_6_LETTERS_PER_PAGE))
+        params += TEXT(" --letters-per-page 6");
 
     // Y方向の補正。
     params += TEXT(" --y-adjust ");
