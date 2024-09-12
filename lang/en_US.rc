@@ -61,7 +61,7 @@ FONT 10, "Tahoma"
     PUSHBUTTON "<", psh9, 65, 115, 15, 13
     PUSHBUTTON ">", psh10, 170, 115, 15, 13
     AUTOCHECKBOX "&Vertical writing", chx1, 5, 130, 70, 14
-    RTEXT "&Letters per page:", stc12, 80, 130, 45, 18
+    RTEXT "&Letters per page:", stc12, 80, 130, 45, 18, SS_NOTIFY | NOT WS_GROUP
     COMBOBOX cmb12, 128, 132, 47, 300, CBS_HASSTRINGS | CBS_AUTOHSCROLL | CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     LTEXT "V. pos. &adjust:", stc9, 185, 130, 30, 20, SS_NOTIFY | NOT WS_GROUP
     EDITTEXT edt3, 220, 135, 35, 15, ES_AUTOHSCROLL | ES_RIGHT
