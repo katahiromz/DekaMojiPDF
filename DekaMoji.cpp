@@ -63,12 +63,12 @@ INT ucchStrLen(LPCWSTR text)
     return ucch;
 }
 
-// フォーカスが動かない不具合を回避するための関数。
+// フォーカスのあるコントロールを無効化すると、フォーカスが動かなくなる不具合を回避するための関数。
 BOOL SafeEnableWindow(HWND hwndDlg, HWND hwndCtrl, BOOL bEnable)
 {
     if (bEnable || GetFocus() != hwndCtrl)
        return EnableWindow(hwndCtrl, bEnable);
-    
+
     HWND hwndNext = GetNextDlgTabItem(hwndDlg, hwndCtrl, FALSE);
     if (hwndNext != hwndCtrl)
         SetFocus(hwndNext);
